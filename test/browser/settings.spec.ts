@@ -2,6 +2,11 @@ import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
 
+const instantSettings = { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } };
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(settings => { if (!localStorage.getItem('tetrio-trainer-settings-v1')) localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)); }, instantSettings);
+});
+
 test('settings persist, validate key conflicts, and control actual inputs', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -112,7 +117,7 @@ test('fault returns the actual shape to spawn and permits a new target', async (
   const replay = JSON.parse(await readFile((await download.path())!, 'utf8'));
   expect(replay.placements.length).toBe(2);
   expect(replay.result.faults).toBe(1);
-  expect(replay.settings).toEqual(defaults);
+  expect(replay.settings).toEqual(instantSettings);
   expect(errors).toEqual([]);
 });
 

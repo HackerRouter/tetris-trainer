@@ -5,16 +5,27 @@
   <div class="app">
     <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>40 Lines <span>Trainer</span></h1></div><button id="settings-open" class="secondary">Settings</button></header>
     <main>
-      <section class="play-area"><canvas id="board" width="480" height="710" aria-label="Game board with hold and next pieces"></canvas><p id="controls-summary" class="muted"></p></section>
+      <section class="play-area">
+        <div class="tetrion">
+          <div class="left-column">
+            <section id="hold-panel" class="preview-panel hold-panel" aria-label="Hold"><h2>HOLD</h2><canvas id="hold-preview" width="150" height="90" aria-label="Held piece"></canvas></section>
+            <div class="board-stats"><div><span>PIECES</span><strong id="pieces">0</strong><small><span id="pps">0.00</span> / S</small></div><div><span>LINES</span><strong id="lines">0</strong><small>/ 40</small></div><div><span>TIME</span><strong id="time">0:00.000</strong></div></div>
+          </div>
+          <div class="board-column"><canvas id="board" width="300" height="690" aria-label="Game board"></canvas><div id="board-overlay" role="status" aria-live="polite"><span id="overlay-label">READY</span><strong id="overlay-value">Start a game</strong></div></div>
+          <div class="right-column"><section id="next-panel" class="preview-panel next-panel" aria-label="Next queue"><h2>NEXT</h2><canvas id="next-preview" width="150" height="450" aria-label="Next five pieces"></canvas></section></div>
+        </div>
+        <p id="controls-summary" class="muted"></p>
+      </section>
       <aside>
         <div class="toolbar"><button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button></div>
+        <button id="sprint" class="secondary wide" hidden>Back to 40L</button>
         <p id="message" role="status" class="muted">Set your handling, then start a game.</p>
-        <div class="time" id="time">0.000</div><span class="eyebrow">SECONDS</span>
-        <div class="progress-heading"><span>Lines cleared</span><strong><span id="lines">0</span> / 40</strong></div><progress id="progress" max="40" value="0"></progress>
-        <div class="stats"><div>Pieces<strong id="pieces">0</strong></div><div>PPS<strong id="pps">0.00</strong></div><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
-        <div id="coach" class="coach" hidden><strong>Try a shorter path</strong><p id="solution"></p><small>The outline marks your last target. You can choose a different placement.</small></div>
+        <div class="progress-heading"><span id="mode-label">40 LINE SPRINT</span><strong id="practice-progress"></strong></div><progress id="progress" max="40" value="0"></progress>
+        <div class="stats"><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
+        <div id="coach" class="coach" hidden><strong id="coach-title">Try a shorter path</strong><p id="solution"></p><small id="target-policy">The outline marks your last target. You can choose a different placement.</small></div>
+        <div class="practice-tools"><h3>Fault practice</h3><button id="practice-last" class="secondary wide" disabled>Practice last replay</button><button id="practice-import" class="secondary wide">Load replay file</button><input id="replay-file" type="file" accept=".json,.ttr,.ttrm,application/json" hidden><div id="replay-selection" hidden><label for="replay-track">Player / round</label><select id="replay-track"></select><button id="practice-track" class="secondary wide">Start selected practice</button></div><p id="practice-status" class="muted" role="status">Load a trainer JSON or TETR.IO replay to practice its finesse faults.</p></div>
         <details><summary>Session details</summary><div id="results" class="muted"></div></details>
-        <button id="download" class="secondary wide" disabled>Download replay</button>
+        <button id="undo" class="secondary wide" disabled>Undo placement · Ctrl + Z</button><button id="download" class="secondary wide" disabled>Download replay</button>
         <p class="fine-print">Finesse follows d-002: each tap, DAS hold or rotation (including 180°) counts as one input. Hints prefer hard drop. Soft drop is only suggested for obstructed targets.</p>
       </aside>
     </main>
@@ -35,11 +46,20 @@
           <h3>Display</h3><label class="check-row"><input id="grid" type="checkbox"> Grid</label><label class="check-row"><input id="ghost" type="checkbox"> Ghost piece</label>
           <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="5" max="100" step="1"><output id="opacity-unit"></output></label>
         </section>
-        <section><h3>Key bindings</h3><p class="muted">Click a binding, then press a key. Each action needs a different key.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button></section>
+        <section><h3>Training</h3>
+          <label class="number-row" for="countdownSeconds"><span>Start countdown<small>0 disables the countdown</small></span><input id="countdownSeconds" type="number" min="0" max="10" step="0.1" required><output>seconds</output></label>
+          <label class="check-row"><input id="finesseEnabled" type="checkbox"> Enable finesse detection</label>
+          <label class="check-row"><input id="allowDifferentTarget" type="checkbox"> Allow a different target after a fault</label>
+          <label class="check-row"><input id="undoEnabled" type="checkbox"> Allow undo with Ctrl + Z</label>
+          <label class="check-row"><input id="infiniteHold" type="checkbox"> Allow unlimited hold</label>
+          <label class="check-row"><input id="strictPractice" type="checkbox"> Fault practice: clear all scenes in one attempt</label>
+          <p class="muted">Fault practice always checks finesse and requires the outlined target. Hold and undo are unavailable during these drills.</p>
+          <h3>Key bindings</h3><p class="muted">Click a binding, then press a key. Each action needs a different key.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button></section>
       </div>
       <p id="settings-status" role="status" aria-live="polite"></p>
       <footer><div class="settings-tools"><button id="reset-settings" type="button" class="secondary">Restore defaults</button><button id="import-settings" type="button" class="secondary">Import</button><button id="export-settings" type="button" class="secondary">Export</button><input id="settings-file" type="file" accept=".json,application/json" hidden></div><button type="submit">Save settings</button></footer>
     </form>
   </dialog>
+  <div id="demo-popup" class="demo-popup" hidden><header><strong id="demo-title">Correct placement</strong><button id="demo-close" class="secondary small" aria-label="Close demonstration">×</button></header><button id="demo-replay" aria-label="Replay placement demonstration"><canvas id="demo-board" width="180" height="414" aria-label="Animated placement guide"></canvas><span id="demo-step"></span><small>Click to replay</small></button></div>
   <script type="module" src="/src/main.ts"></script>
 </body></html>

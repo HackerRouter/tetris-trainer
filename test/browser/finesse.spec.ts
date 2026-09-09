@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { defaults } from '../../src/settings';
 
 test('d-002 rotation counting, hard-drop coaching and retry work through real key bindings', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } });
   await page.addInitScript(() => {
     Object.defineProperty(crypto, 'getRandomValues', { value: (array: Uint32Array) => { array[0] = 942561; return array; } });
   });

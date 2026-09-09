@@ -17,7 +17,7 @@ export function createEngine(settings: Settings, seed: number): Engine {
       specialBonus: false, openerPhase: 0, rounding: 'down'
     },
     b2b: { chaining: true, charging: false }, pc: false,
-    misc: { allowed: { hardDrop: true, spin180: true, hold: true, retry: false, undo: false }, infiniteHold: false, movement: { infinite: false, lockResets: 15, lockTime: 30, may20G: true }, stride: false }
+    misc: { allowed: { hardDrop: true, spin180: true, hold: true, retry: false, undo: false }, infiniteHold: settings.training.infiniteHold, movement: { infinite: false, lockResets: 15, lockTime: 30, may20G: true }, stride: false }
   };
   return new Engine(config);
 }

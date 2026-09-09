@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { legal, type Engine, type EngineSnapshot, type Mino } from '@haelp/teto/engine';
 import { createEngine } from '../src/engine.ts';
 import { TrainerGame } from '../src/game.ts';
+
+const instantSettings = { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } };
 import { copyPiece, countFinesseInputs, findFinesse, type Cell, type FinesseResult } from '../src/finesse.ts';
 import { finesseTable } from '../src/finesse-data.ts';
 import { defaults, type GameAction } from '../src/settings.ts';
@@ -105,7 +107,7 @@ test('all 162 distinct empty-board placements have complete budgets, including u
 });
 
 test('180-degree rotation counts once, while two quarter-turns trigger retry', () => {
-  const game = new TrainerGame(defaults, seedFor('t')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('t')); game.start();
   tap(game, 'rotateCW'); tap(game, 'rotateCW'); tap(game, 'hardDrop');
   assert.equal(game.faults, 1);
   assert.equal(game.fault?.actual, 2);
@@ -120,7 +122,7 @@ test('180-degree rotation counts once, while two quarter-turns trigger retry', (
 
 test('equivalent shapes do not excuse unnecessary rotations', () => {
   for (const symbol of ['o', 'i', 's', 'z'] as const) {
-    const game = new TrainerGame(defaults, seedFor(symbol)); game.start();
+    const game = new TrainerGame(instantSettings, seedFor(symbol)); game.start();
     tap(game, 'rotate180'); tap(game, 'hardDrop');
     assert.equal(game.fault?.actual, 1, symbol);
     assert.equal(game.fault?.path.cost, 0, symbol);
@@ -128,7 +130,7 @@ test('equivalent shapes do not excuse unnecessary rotations', () => {
 });
 
 test('equal-cost alternative sequences are accepted', () => {
-  const game = new TrainerGame(defaults, seedFor('t')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('t')); game.start();
   tap(game, 'rotateCW'); tap(game, 'moveLeft'); tap(game, 'hardDrop');
   assert.equal(game.faults, 0);
   assert.equal(game.placements[0].finesseInputs, 2);
@@ -137,7 +139,7 @@ test('equal-cost alternative sequences are accepted', () => {
 
 test('DAS repeats count once and soft drop, hard drop, hold are not finesse inputs', () => {
   assert.equal(countFinesseInputs(['moveLeft', 'rotate180', 'softDrop', 'hold', 'hardDrop']), 2);
-  const game = new TrainerGame(defaults, seedFor('o')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('o')); game.start();
   game.input.press('moveLeft');
   for (let frame = 0; frame < 20; frame++) game.step();
   game.input.release('moveLeft'); game.step();
@@ -147,7 +149,7 @@ test('DAS repeats count once and soft drop, hard drop, hold are not finesse inpu
 });
 
 test('extra inputs into a wall are still counted', () => {
-  const game = new TrainerGame(defaults, seedFor('o')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('o')); game.start();
   game.input.press('moveLeft');
   for (let frame = 0; frame < 20; frame++) game.step();
   game.input.release('moveLeft'); game.step();
@@ -157,7 +159,7 @@ test('extra inputs into a wall are still counted', () => {
 });
 
 test('piece input accounting handles hold and multiple locks within a frame', () => {
-  const game = new TrainerGame(defaults, seedFor('t')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('t')); game.start();
   tap(game, 'moveLeft');
   for (const key of ['moveRight', 'hold', 'hardDrop', 'moveLeft', 'hardDrop'] as const) {
     game.input.press(key); game.input.release(key);
@@ -172,7 +174,7 @@ test('piece input accounting handles hold and multiple locks within a frame', ()
 });
 
 test('a rejected placement discards subsequent locks from the same frame', () => {
-  const game = new TrainerGame(defaults, seedFor('t')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('t')); game.start();
   const before = game.engine.snapshot();
   for (const key of ['rotateCW', 'rotateCW', 'hardDrop', 'moveLeft', 'hardDrop'] as const) {
     game.input.press(key); game.input.release(key);
@@ -192,7 +194,7 @@ test('a rejected placement discards subsequent locks from the same frame', () =>
 });
 
 test('hold resets the piece count across frames and invalid hold does not reset it', () => {
-  const game = new TrainerGame(defaults, seedFor('t')); game.start();
+  const game = new TrainerGame(instantSettings, seedFor('t')); game.start();
   tap(game, 'rotate180'); tap(game, 'hold');
   tap(game, 'moveLeft'); tap(game, 'moveRight'); tap(game, 'hold'); tap(game, 'hardDrop');
   assert.equal(game.placements[0].finesseInputs, 2);

@@ -11,6 +11,7 @@ export type Settings = {
   handling: { arr: number; das: number; dcd: number; sdf: number; cancel: boolean; safelock: boolean; irs: 'off' | 'hold' | 'tap'; ihs: 'off' | 'hold' | 'tap' };
   bindings: Record<Action, string>;
   display: { grid: boolean; ghost: boolean; ghostOpacity: number };
+  training: { countdownSeconds: number; finesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean };
 };
 
 export const storageKey = 'tetrio-trainer-settings-v1';
@@ -18,7 +19,8 @@ export const defaults: Settings = {
   version: 1,
   handling: { arr: 0, das: 6, dcd: 0, sdf: 41, cancel: false, safelock: false, irs: 'tap', ihs: 'tap' },
   bindings: { moveLeft: 'ArrowLeft', moveRight: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space', rotateCW: 'ArrowUp', rotateCCW: 'KeyZ', rotate180: 'KeyA', hold: 'KeyC', pause: 'Escape', restart: 'KeyR' },
-  display: { grid: true, ghost: true, ghostOpacity: 0.24 }
+  display: { grid: true, ghost: true, ghostOpacity: 0.24 },
+  training: { countdownSeconds: 3, finesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false }
 };
 
 const record = (v: unknown): Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
@@ -58,6 +60,16 @@ export function validateSettings(value: unknown): Settings {
   const opacity = display.ghostOpacity;
   if (typeof opacity !== 'number' || !Number.isFinite(opacity) || opacity < 0.05 || opacity > 1) throw new Error('Ghost opacity must be between 5% and 100%.');
   result.display.ghostOpacity = opacity;
+  if (root.training !== undefined) {
+    const training = record(root.training);
+    const seconds = training.countdownSeconds;
+    if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0 || seconds > 10 || Math.abs(seconds * 10 - Math.round(seconds * 10)) > 1e-7) throw new Error('Start countdown must be 0–10 seconds, in steps of 0.1.');
+    result.training.countdownSeconds = seconds;
+    for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) {
+      if (typeof training[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
+      result.training[key] = training[key];
+    }
+  }
   return result;
 }
 

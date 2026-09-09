@@ -5,6 +5,8 @@ import { createEngine } from '../src/engine.ts';
 import { FrameInput } from '../src/input.ts';
 import { TrainerGame } from '../src/game.ts';
 
+const instantSettings = { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } };
+
 test('settings migrate handling and keys together', () => {
   const data = new Map([
     ['tetrio-trainer-settings', JSON.stringify({ arr: 1.2, das: 9.4, dcd: 2, sdf: 13 })],
@@ -63,7 +65,7 @@ test('zero ARR moves to the wall after DAS, independently of browser repeats', (
 });
 
 test('SDF instant reaches the ghost landing and pause releases held keys', () => {
-  const game = new TrainerGame(defaults, 12); game.start();
+  const game = new TrainerGame(instantSettings, 12); game.start();
   game.input.press('softDrop'); game.step();
   assert.equal(Math.min(...game.engine.falling.absoluteBlocks.map(([, y]) => y)), 0);
   game.input.press('moveLeft'); game.step(); game.pause();
@@ -74,7 +76,7 @@ test('SDF instant reaches the ghost landing and pause releases held keys', () =>
 });
 
 test('hard drop records the locked piece instead of the next piece', () => {
-  const game = new TrainerGame(defaults, 12); game.start();
+  const game = new TrainerGame(instantSettings, 12); game.start();
   const symbol = game.engine.falling.symbol;
   game.input.press('hardDrop'); game.step();
   assert.equal(game.placements[0].piece, symbol);
@@ -85,7 +87,7 @@ test('hard drop records the locked piece instead of the next piece', () => {
 });
 
 test('an inefficient placement restores the queue and allows another target', () => {
-  const game = new TrainerGame(defaults, 12); game.start();
+  const game = new TrainerGame(instantSettings, 12); game.start();
   const before = game.engine.snapshot();
   for (const key of ['moveLeft', 'moveRight', 'hardDrop'] as const) {
     game.input.press(key); game.step(); game.input.release(key); game.step();

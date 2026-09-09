@@ -79,6 +79,8 @@ export class SettingsPanel {
     for (const key of ['cancel', 'safelock'] as const) this.field<HTMLInputElement>(key).checked = settings.handling[key];
     for (const key of ['grid', 'ghost'] as const) this.field<HTMLInputElement>(key).checked = settings.display[key];
     this.field('ghostOpacity').value = String(Math.round(settings.display.ghostOpacity * 100));
+    this.field('countdownSeconds').value = String(settings.training.countdownSeconds);
+    for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) this.field<HTMLInputElement>(key).checked = settings.training[key];
     this.drawBindings(); this.updateUnits();
   }
 
@@ -100,6 +102,8 @@ export class SettingsPanel {
     for (const key of ['cancel', 'safelock'] as const) result.handling[key] = this.field<HTMLInputElement>(key).checked;
     for (const key of ['grid', 'ghost'] as const) result.display[key] = this.field<HTMLInputElement>(key).checked;
     result.display.ghostOpacity = Number(this.field('ghostOpacity').value) / 100;
+    result.training.countdownSeconds = this.field('countdownSeconds').value === '' ? NaN : Number(this.field('countdownSeconds').value);
+    for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) result.training[key] = this.field<HTMLInputElement>(key).checked;
     return validateSettings(result);
   }
 }

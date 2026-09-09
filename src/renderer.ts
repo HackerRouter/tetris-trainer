@@ -1,52 +1,62 @@
-import { copyPiece } from './finesse';
+import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engine';
+import { copyPiece, type Cell } from './finesse';
 import type { TrainerGame } from './game';
 
 const colors: Record<string, string> = { i: '#49cfe5', o: '#eacf66', t: '#ae85e8', s: '#71cf98', z: '#e77888', j: '#759fea', l: '#eeac6c', gb: '#777e91' };
 
-export function drawGame(canvas: HTMLCanvasElement, game: TrainerGame) {
+export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: EngineSnapshot['board'], piece: TetrominoSnapshot | null, target: Cell[] | null, options: { grid: boolean; ghost: boolean; ghostOpacity: number }, buffer = 3) {
   const ctx = canvas.getContext('2d')!;
-  const engine = game.engine;
+  const size = canvas.width / 10, top = size * buffer, bottom = top + size * 20;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(0, 70);
-  ctx.fillStyle = '#0b101b'; ctx.fillRect(16, 20, 300, 600);
+  ctx.fillStyle = '#0b101b'; ctx.fillRect(0, top, canvas.width, size * 20);
   const drawCell = (x: number, y: number, color: string, outline = false) => {
-    if (y < 0 || y >= 23) return;
-    const px = 16 + x * 30, py = 20 + (19 - y) * 30;
-    if (outline) { ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.strokeRect(px + 3, py + 3, 24, 24); }
-    else { ctx.fillStyle = color; ctx.fillRect(px + 1, py + 1, 28, 28); ctx.fillStyle = '#ffffff24'; ctx.fillRect(px + 2, py + 2, 26, 3); }
+    if (y < 0 || y >= 20 + buffer) return;
+    const px = x * size, py = top + (19 - y) * size;
+    if (outline) { ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.strokeRect(px + 2, py + 2, size - 4, size - 4); }
+    else { ctx.fillStyle = color; ctx.fillRect(px + 1, py + 1, size - 2, size - 2); ctx.fillStyle = '#ffffff24'; ctx.fillRect(px + 2, py + 2, size - 4, Math.max(1, size / 10)); }
   };
-  if (game.settings.display.grid) {
-    ctx.strokeStyle = '#ffffff0d'; ctx.lineWidth = 1;
-    for (let x = 0; x <= 10; x++) { ctx.beginPath(); ctx.moveTo(16 + x * 30, 20); ctx.lineTo(16 + x * 30, 620); ctx.stroke(); }
-    for (let y = 0; y <= 20; y++) { ctx.beginPath(); ctx.moveTo(16, 20 + y * 30); ctx.lineTo(316, 20 + y * 30); ctx.stroke(); }
+  if (options.grid) {
+    ctx.strokeStyle = '#ffffff18'; ctx.lineWidth = 1;
+    for (let x = 1; x < 10; x++) { ctx.beginPath(); ctx.moveTo(x * size, top); ctx.lineTo(x * size, bottom); ctx.stroke(); }
+    for (let y = 1; y < 20; y++) { ctx.beginPath(); ctx.moveTo(0, top + y * size); ctx.lineTo(canvas.width, top + y * size); ctx.stroke(); }
   }
-  for (let y = 0; y < 20; y++) for (let x = 0; x < 10; x++) {
-    const tile = engine.board.state[y][x];
-    if (tile) drawCell(x, y, colors[String(tile).toLowerCase()] || '#8a92a3');
+  for (let y = 0; y < Math.min(board.length, 20 + buffer); y++) for (let x = 0; x < 10; x++) {
+    const tile = board[y][x];
+    if (tile) drawCell(x, y, colors[(typeof tile === 'string' ? tile : tile.mino).toLowerCase()] || '#8a92a3');
   }
-  if (game.status !== 'topout') {
-    if (game.settings.display.ghost) {
-      const ghost = copyPiece(engine, engine.falling.snapshot()); ghost.softDrop(engine.board.state);
-      ctx.globalAlpha = game.settings.display.ghostOpacity;
+  if (piece) {
+    if (options.ghost) {
+      const ghost = copyPiece(engine, piece); ghost.softDrop(board);
+      ctx.globalAlpha = options.ghostOpacity;
       for (const [x, y] of ghost.absoluteBlocks) drawCell(x, y, colors[ghost.symbol.toLowerCase()], true);
       ctx.globalAlpha = 1;
     }
-    for (const [x, y] of engine.falling.absoluteBlocks) drawCell(x, y, colors[engine.falling.symbol.toLowerCase()]);
+    for (const [x, y] of copyPiece(engine, piece).absoluteBlocks) drawCell(x, y, colors[piece.symbol.toLowerCase()]);
   }
-  if (game.fault) for (const [x, y] of game.fault.target) drawCell(x, y, '#ffce79', true);
-  const preview = (piece: string | null, y: number) => {
+  if (target) for (const [x, y] of target) drawCell(x, y, '#ffce79', true);
+  ctx.strokeStyle = '#b3c3da'; ctx.lineWidth = 2;
+  ctx.strokeRect(1, top + 1, canvas.width - 2, size * 20 - 2);
+}
+
+function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string | null)[], dim = false) {
+  const ctx = canvas.getContext('2d')!;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = dim ? 0.4 : 1;
+  const size = 30, slot = canvas.height / pieces.length;
+  pieces.forEach((piece, index) => {
     if (!piece) return;
     const data = engine.getPreview(piece as typeof engine.falling.symbol);
-    for (const [x, cy] of data.data) { ctx.fillStyle = colors[piece.toLowerCase()]; ctx.fillRect(355 + x * 22, y + cy * 22, 20, 20); }
-  };
-  ctx.fillStyle = '#8795ae'; ctx.font = '12px system-ui'; ctx.fillText('HOLD', 354, 39); ctx.fillText('NEXT', 354, 149);
-  preview(engine.held, 60); engine.queue.slice(0, 5).forEach((piece, i) => preview(piece, 168 + i * 78));
-  if (['paused', 'ready', 'complete', 'topout'].includes(game.status)) {
-    ctx.fillStyle = '#0b101bcc'; ctx.fillRect(16, 230, 300, 130);
-    ctx.fillStyle = '#e8edf8'; ctx.textAlign = 'center'; ctx.font = '600 25px system-ui';
-    ctx.fillText({ ready: 'Ready when you are', paused: 'Paused', complete: '40 lines complete', topout: 'Game over', playing: '' }[game.status], 166, 289);
-    ctx.textAlign = 'left';
-  }
-  ctx.restore();
+    const left = (canvas.width - data.w * size) / 2, top = index * slot + (slot - data.h * size) / 2;
+    for (const [x, y] of data.data) {
+      ctx.fillStyle = colors[piece.toLowerCase()]; ctx.fillRect(left + x * size + 1, top + y * size + 1, size - 2, size - 2);
+    }
+  });
+  ctx.globalAlpha = 1;
+}
+
+export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, game: TrainerGame) {
+  const engine = game.engine;
+  drawBoard(canvas, engine, engine.board.state, game.status === 'topout' ? null : engine.falling.snapshot(), game.target, game.settings.display);
+  drawPreviews(hold, engine, [engine.held], engine.holdLocked && !game.settings.training.infiniteHold);
+  drawPreviews(next, engine, engine.queue.slice(0, 5));
 }
