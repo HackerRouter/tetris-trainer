@@ -33,7 +33,7 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
     }
     for (const [x, y] of copyPiece(engine, piece).absoluteBlocks) drawCell(x, y, colors[piece.symbol.toLowerCase()]);
   }
-  if (target) for (const [x, y] of target) drawCell(x, y, '#ffce79', true);
+  if (target) for (const [x, y] of target) drawCell(x, y, '#9b9b9b', true);
   ctx.strokeStyle = '#b3c3da'; ctx.lineWidth = 2;
   ctx.strokeRect(1, top + 1, canvas.width - 2, size * 20 - 2);
 }
