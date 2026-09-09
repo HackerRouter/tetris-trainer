@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>40 Lines · Trainer</title></head>
+<body>
+  <div class="app">
+    <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>40 Lines <span>Trainer</span></h1></div><button id="settings-open" class="secondary">Settings</button></header>
+    <main>
+      <section class="play-area"><canvas id="board" width="480" height="710" aria-label="Game board with hold and next pieces"></canvas><p id="controls-summary" class="muted"></p></section>
+      <aside>
+        <div class="toolbar"><button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button></div>
+        <p id="message" role="status" class="muted">Set your handling, then start a game.</p>
+        <div class="time" id="time">0.000</div><span class="eyebrow">SECONDS</span>
+        <div class="progress-heading"><span>Lines cleared</span><strong><span id="lines">0</span> / 40</strong></div><progress id="progress" max="40" value="0"></progress>
+        <div class="stats"><div>Pieces<strong id="pieces">0</strong></div><div>PPS<strong id="pps">0.00</strong></div><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
+        <div id="coach" class="coach" hidden><strong>Try a shorter path</strong><p id="solution"></p><small>The outline marks your last target. You can choose a different placement.</small></div>
+        <details><summary>Session details</summary><div id="results" class="muted"></div></details>
+        <button id="download" class="secondary wide" disabled>Download replay</button>
+        <p class="fine-print">Finesse follows d-002: each tap, DAS hold or rotation (including 180°) counts as one input. Hints prefer hard drop. Soft drop is only suggested for obstructed targets.</p>
+      </aside>
+    </main>
+  </div>
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form id="settings-form" novalidate>
+      <header><div><span class="eyebrow">MAKE IT FEEL RIGHT</span><h2 id="settings-title">Settings</h2></div><button id="cancel-settings" type="button" class="secondary">Cancel</button></header>
+      <div class="settings-columns">
+        <section><h3>Handling</h3><p class="muted">Timings use 60 Hz frames. 1 frame = 16.67 ms.</p>
+          <label class="number-row" for="arr"><span>ARR<small>Auto repeat rate</small></span><input id="arr" type="number" min="0" max="20" step="0.1" required><output id="arr-unit"></output></label>
+          <label class="number-row" for="das"><span>DAS<small>Delayed auto shift</small></span><input id="das" type="number" min="0" max="20" step="0.1" required><output id="das-unit"></output></label>
+          <label class="number-row" for="dcd"><span>DCD<small>DAS cut delay</small></span><input id="dcd" type="number" min="0" max="20" step="0.1" required><output id="dcd-unit"></output></label>
+          <label class="select-row" for="sdf">Soft drop factor<select id="sdf"><option value="1">1×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option><option value="40">40×</option><option value="41">Instant</option></select></label>
+          <label class="check-row"><input id="cancel" type="checkbox"> Cancel DAS on direction change</label>
+          <label class="check-row"><input id="safelock" type="checkbox"> Prevent hard drop after auto-lock</label>
+          <label class="select-row" for="irs">Initial rotation<select id="irs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
+          <label class="select-row" for="ihs">Initial hold<select id="ihs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
+          <h3>Display</h3><label class="check-row"><input id="grid" type="checkbox"> Grid</label><label class="check-row"><input id="ghost" type="checkbox"> Ghost piece</label>
+          <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="5" max="100" step="1"><output id="opacity-unit"></output></label>
+        </section>
+        <section><h3>Key bindings</h3><p class="muted">Click a binding, then press a key. Each action needs a different key.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button></section>
+      </div>
+      <p id="settings-status" role="status" aria-live="polite"></p>
+      <footer><div class="settings-tools"><button id="reset-settings" type="button" class="secondary">Restore defaults</button><button id="import-settings" type="button" class="secondary">Import</button><button id="export-settings" type="button" class="secondary">Export</button><input id="settings-file" type="file" accept=".json,application/json" hidden></div><button type="submit">Save settings</button></footer>
+    </form>
+  </dialog>
+  <script type="module" src="/src/main.ts"></script>
+</body></html>
