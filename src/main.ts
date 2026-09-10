@@ -67,9 +67,14 @@ function saveReplay() {
 
 function start(practice?: PracticeSet) {
   if (panel.open) return;
+  const heldCodes = [...pressed.keys()];
   saveReplay();
   game = new TrainerGame(settings, undefined, practice); game.start();
   accumulator = 0; last = performance.now(); pressed.clear(); saved = false;
+  for (const code of heldCodes) {
+    const action = (['moveLeft', 'moveRight'] as const).find(action => bindingCodes(game.settings, action).includes(code));
+    if (action) { pressed.set(code, action); game.input.press(action); }
+  }
   message.textContent = practice ? 'Match every outlined target with perfect finesse.' : 'Clear 40 lines. Fault retries also restore the timer.';
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
@@ -136,7 +141,7 @@ document.addEventListener('keydown', event => {
   pressed.set(event.code, action);
   if (action === 'restart') { start(game.practice?.set); return; }
   if (action === 'pause') { pause(); return; }
-  if (game.status === 'playing') game.input.press(action, accumulator / (1000 / 60));
+  if (game.status === 'playing' || (game.status === 'countdown' && (action === 'moveLeft' || action === 'moveRight'))) game.input.press(action, accumulator / (1000 / 60));
 });
 document.addEventListener('keyup', event => {
   const action = pressed.get(event.code); pressed.delete(event.code);

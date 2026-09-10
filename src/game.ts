@@ -6,6 +6,7 @@ import { countFinesseInputs, findFinesse, type Cell, type FinesseResult } from '
 import { finesseRules } from './finesse-data';
 import { sameCells, type Demonstration, type PracticeSet } from './practice';
 import { defaults, type Settings } from './settings';
+import { applyDasPrecharge, DasPrecharge, type DasCharge } from './das-precharge';
 
 type Checkpoint = { snapshot: EngineSnapshot; timerFrames: number; perfects: number; holds: number; clears: Record<string, number>; maxCombo: number; maxB2B: number };
 type Placement = { frame: number; timeMs: number; piece: string; cells: Cell[]; rotation: number; result: LockRes; snapshot: EngineSnapshot; board: unknown; hold: unknown; next: string[]; accepted: boolean; reason: 'finesse' | 'target' | null; finesse: FinesseResult | null; finesseInputs: number; inputs: Game.Key[] };
@@ -41,6 +42,8 @@ export class TrainerGame {
   private locking: { target: Cell[]; rotation: number; inputs: Game.Key[]; keyOffset: number; checkpoint: Checkpoint } | null = null;
   private rollback: Checkpoint | null = null;
   private nextScene: number | null = null;
+  private precharge = new DasPrecharge();
+  private bufferedCharge: DasCharge | null = null;
 
   constructor(settings: Settings = defaults, seed = crypto.getRandomValues(new Uint32Array(1))[0] % 2147483646 + 1, practice?: PracticeSet) {
     this.settings = structuredClone(settings);
@@ -110,11 +113,19 @@ export class TrainerGame {
 
   step() {
     if (this.status === 'countdown') {
-      this.input.reset();
-      if (--this.countdownFrames <= 0) { this.countdownFrames = 0; this.status = 'playing'; }
+      this.precharge.tick(this.input.drain(this.engine.frame), this.settings.handling);
+      if (--this.countdownFrames <= 0) {
+        this.countdownFrames = 0; this.status = 'playing'; this.bufferedCharge = this.precharge.take();
+      }
       return;
     }
     if (this.status !== 'playing') return;
+    if (this.bufferedCharge) {
+      const charge = this.bufferedCharge; this.bufferedCharge = null;
+      const inputs = applyDasPrecharge(this.engine, charge);
+      this.pieceInputs.push(...inputs); this.inputs += inputs.length;
+      this.events.push({ frame: this.engine.frame, type: 'das-precharge', data: { charge: structuredClone(charge), inputs } });
+    }
     const holdBlocked = !!this.practice || (!!this.fault && !this.settings.training.allowDifferentTarget);
     const frames = this.input.drain(this.engine.frame).filter(frame => !holdBlocked || !('key' in frame.data && frame.data.key === 'hold'));
     this.inputs += frames.filter(frame => frame.type === 'keydown').length;
@@ -199,6 +210,7 @@ export class TrainerGame {
 
   releaseAll() {
     this.input.reset();
+    this.precharge.reset(); this.bufferedCharge = null;
     const input = this.engine.input;
     input.lShift.held = input.rShift.held = false;
     input.lShift.das = input.rShift.das = input.lShift.arr = input.rShift.arr = 0;

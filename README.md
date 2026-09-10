@@ -44,7 +44,9 @@ Target outlines are gray. Cells shared with a visible ghost use a darker version
 
 ## Training settings
 
-Start and restart use a three-second countdown. Settings → Training → Start countdown accepts 0–10 seconds in 0.1-second steps; zero starts immediately. The timer and game do not advance during the countdown. Pause, focus loss and opening Settings also pause the countdown. Inputs pressed during the countdown are not buffered into the first piece.
+Start and restart use a three-second countdown. Settings → Training → Start countdown accepts 0–10 seconds in 0.1-second steps; zero starts immediately. The timer and board do not advance during the countdown. Holding left or right precharges DAS; when the game begins, a fully charged direction immediately uses ARR, including an instant wall shift at ARR 0. A late hold retains its partial charge and waits only the remaining DAS after the initial move. A direction already held when restarting remains held, including alternate bindings. Releasing the key cancels that direction's charge. Direction switching follows the engine's DAS cancellation setting. Pause, focus loss and opening Settings pause the countdown and clear the held-input buffer. Hard drop, soft drop, rotation and Hold presses during the countdown are not buffered into the first piece.
+
+Each direction carried into play counts once toward input and finesse statistics. Precharge does not advance the displayed or engine clock. Replays include a `das-precharge` event with the initial charge and carried inputs, alongside the complete placement snapshots.
 
 - Enable finesse detection: on by default. Turning it off allows normal 40L play. Its recorded placements can still be analyzed later for fault practice.
 - Allow a different target after a fault: on by default. Turning it off requires the outlined destination before continuing. Hold is temporarily blocked while a target is required so the piece cannot be replaced with an incompatible shape.

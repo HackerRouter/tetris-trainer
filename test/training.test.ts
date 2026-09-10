@@ -28,7 +28,7 @@ test('training defaults migrate without losing existing settings and validate im
   assert.equal(validateSettings(instant({ countdownSeconds: .5 })).training.countdownSeconds, .5);
 });
 
-test('countdown lasts exactly three seconds and does not advance the game or buffer inputs', () => {
+test('countdown lasts exactly three seconds and does not advance the game or buffer hard drop', () => {
   const game = new TrainerGame(defaults, 942562); game.start();
   const snapshot = game.engine.snapshot();
   assert.equal(game.status, 'countdown'); assert.equal(game.countdownFrames, 180);
@@ -41,6 +41,68 @@ test('countdown lasts exactly three seconds and does not advance the game or buf
   assert.deepEqual(game.engine.snapshot(), snapshot);
   game.step(); assert.equal(game.engine.stats.pieces, 0);
   assert.equal(game.elapsedMs, 1000 / 60);
+});
+
+test('countdown precharges DAS and instant ARR reaches either wall on the first playing frame', () => {
+  for (const direction of ['moveLeft', 'moveRight'] as const) {
+    const game = new TrainerGame({ ...instant({ countdownSeconds: .5 }), handling: { ...defaults.handling, dcd: 4 } }, 942562); game.start();
+    const before = game.engine.snapshot();
+    game.input.press(direction); tick(game, 30);
+    assert.equal(game.status, 'playing'); assert.equal(game.elapsedMs, 0); assert.equal(game.inputs, 0);
+    assert.deepEqual(game.engine.snapshot(), before);
+    game.step();
+    const columns = game.engine.falling.absoluteBlocks.map(([x]) => x);
+    assert.equal(direction === 'moveLeft' ? Math.min(...columns) : Math.max(...columns), direction === 'moveLeft' ? 0 : 9);
+    assert.equal(game.inputs, 1);
+    assert.equal(game.elapsedMs, 1000 / 60);
+    game.input.release(direction); tap(game, 'hardDrop');
+    assert.equal(game.faults, 0); assert.equal(game.perfects, 1);
+    assert.deepEqual(game.placements[0].inputs, [direction, 'hardDrop']);
+    assert.equal(game.events.filter(event => event.type === 'das-precharge').length, 1);
+  }
+});
+
+test('precharged finite ARR repeats at ARR cadence and an immediate hard drop uses the buffered destination', () => {
+  const game = new TrainerGame({ ...instant({ countdownSeconds: .5 }), handling: { ...defaults.handling, das: 12, arr: 2 } }, 942562); game.start();
+  const x = game.engine.falling.x;
+  game.input.press('moveRight'); tick(game, 30);
+  game.step(); assert.equal(game.engine.falling.x, x + 1);
+  game.step(); assert.equal(game.engine.falling.x, x + 2);
+  game.step(); assert.equal(game.engine.falling.x, x + 2);
+  game.step(); assert.equal(game.engine.falling.x, x + 3);
+  const instantGame = new TrainerGame(instant({ countdownSeconds: .5 }), 942562); instantGame.start();
+  instantGame.input.press('moveLeft'); tick(instantGame, 30);
+  instantGame.input.press('hardDrop'); instantGame.step();
+  assert.equal(Math.min(...instantGame.placements[0].cells.map(([x]) => x)), 0);
+  assert.equal(instantGame.faults, 0);
+  assert.deepEqual(instantGame.placements[0].inputs, ['moveLeft', 'hardDrop']);
+});
+
+test('late holds retain only elapsed DAS charge and a release before start cancels the buffer', () => {
+  const game = new TrainerGame(instant({ countdownSeconds: .5 }), 942562); game.start();
+  const x = game.engine.falling.x;
+  tick(game, 28); game.input.press('moveRight'); tick(game, 2);
+  game.step(); assert.equal(game.engine.falling.x, x + 1);
+  tick(game, 2); assert.equal(game.engine.falling.x, x + 1);
+  game.step(); assert.equal(Math.max(...game.engine.falling.absoluteBlocks.map(([x]) => x)), 9);
+  const released = new TrainerGame(instant({ countdownSeconds: .5 }), 942562); released.start();
+  released.input.press('moveLeft'); tick(released, 20); released.input.release('moveLeft'); tick(released, 10);
+  released.step(); assert.equal(released.engine.falling.x, x); assert.equal(released.inputs, 0);
+});
+
+test('countdown direction switching respects DAS cancellation and pause clears all charge', () => {
+  for (const cancel of [false, true]) {
+    const game = new TrainerGame({ ...instant({ countdownSeconds: .5 }), handling: { ...defaults.handling, cancel } }, 942562); game.start();
+    game.input.press('moveLeft'); tick(game, 25); game.input.press('moveRight'); tick(game, 4);
+    game.input.release('moveRight'); game.step(); game.step();
+    const columns = game.engine.falling.absoluteBlocks.map(([x]) => x);
+    assert.equal(Math.min(...columns), cancel ? 2 : 0);
+  }
+  const game = new TrainerGame(instant({ countdownSeconds: .5 }), 942562); game.start();
+  const x = game.engine.falling.x;
+  game.input.press('moveLeft'); tick(game, 20); game.pause(); tick(game, 50); game.resume(); tick(game, 10); game.step();
+  assert.equal(game.engine.falling.x, x); assert.equal(game.inputs, 0);
+  assert.equal(game.engine.input.lShift.held, false);
 });
 
 test('faults restore the current piece timer checkpoint while replay events remain ordered', () => {
