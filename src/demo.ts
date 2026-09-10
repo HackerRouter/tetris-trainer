@@ -4,8 +4,9 @@ import { copyPiece } from './finesse';
 import type { TrainerGame } from './game';
 import type { Demonstration } from './practice';
 import { drawBoard } from './renderer';
+import { placementSteps, type GuideStep } from './guide';
 
-type Frame = { piece: TetrominoSnapshot; label: string; duration: number };
+type Frame = { piece: TetrominoSnapshot; label: string; duration: number; step: number };
 
 export class DemoPanel {
   private popup = document.getElementById('demo-popup')!;
@@ -14,6 +15,7 @@ export class DemoPanel {
   private source: Demonstration | null = null;
   private engine: Engine | null = null;
   private frames: Frame[] = [];
+  private steps: HTMLElement[] = [];
   private index = 0;
   private since = 0;
 
@@ -29,7 +31,12 @@ export class DemoPanel {
       if (this.source) {
         document.getElementById('demo-title')!.textContent = `Scene ${this.source.sceneNumber} · Correct placement`;
         this.engine = createEngine(game.settings, 1);
-        this.frames = this.build(this.source, this.engine);
+        const steps = placementSteps(this.source.path, game.settings);
+        this.steps = steps.map(step => { const item = document.createElement('li'); item.textContent = step.text; return item; });
+        document.getElementById('demo-steps')!.replaceChildren(...this.steps);
+        document.getElementById('demo-summary')!.textContent = `${this.source.path.cost} finesse input${this.source.path.cost === 1 ? '' : 's'} · ${steps.length} step${steps.length === 1 ? '' : 's'}. Hard drop is not counted.`;
+        document.getElementById('demo-note')!.textContent = this.source.path.drop === 'soft' ? 'Start from the shown position. Lower the piece only where indicated, then finish with hard drop.' : 'Start from the shown position. Follow the steps in order, then finish with hard drop.';
+        this.frames = this.build(this.source, this.engine, steps);
         this.index = 0; this.since = now;
       }
     }
@@ -39,28 +46,34 @@ export class DemoPanel {
     }
     const frame = this.frames[this.index];
     this.label.textContent = frame.label;
+    this.steps.forEach((item, index) => {
+      if (index === frame.step) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
+      item.classList.toggle('done', frame.step > index);
+    });
     drawBoard(this.canvas, this.engine, this.source.snapshot.board, frame.piece, this.source.target, { grid: true, ghost: true, ghostOpacity: .25 });
   }
 
-  private build(scene: Demonstration, engine: Engine): Frame[] {
+  private build(scene: Demonstration, engine: Engine, steps: GuideStep[]): Frame[] {
     const board = scene.snapshot.board, piece = copyPiece(engine, scene.snapshot.falling);
-    const frames: Frame[] = [{ piece: piece.snapshot(), label: 'Start here', duration: 600 }];
-    const add = (label: string, duration = 400) => frames.push({ piece: piece.snapshot(), label, duration });
-    for (const move of scene.path.moves) {
+    const frames: Frame[] = [{ piece: piece.snapshot(), label: 'Start here', duration: 600, step: -1 }];
+    let step = 0;
+    const add = (label: string, duration = 400) => frames.push({ piece: piece.snapshot(), label, duration, step });
+    for (const instruction of steps) {
+      const { move } = instruction;
+      if (move === 'hardDrop') { add('Hard drop', 350); piece.softDrop(board); step++; add('Complete · Click to replay', Infinity); continue; }
       if (move === 'dasLeft' || move === 'dasRight') {
         const direction = move === 'dasLeft' ? 'moveLeft' : 'moveRight';
         while (piece[direction](board)) add(move === 'dasLeft' ? 'Hold left, then release' : 'Hold right, then release', 90);
       } else if (move === 'softDrop') {
         const dropped = copyPiece(engine, piece.snapshot()); dropped.softDrop(board);
         while (piece.y > dropped.y) { piece.y -= 1; add('Soft drop, then release', 45); }
-      } else if (move === 'down') { piece.y -= 1; add('Soft drop one row', 120); }
+      } else if (move === 'down') { for (let row = 0; row < instruction.count; row++) { piece.y -= 1; add('Soft drop one row', 120); } }
       else if (move === 'rotateCW' || move === 'rotateCCW' || move === 'rotate180') {
         piece.rotate(board, engine.kickTableName, move === 'rotateCW' ? 1 : move === 'rotateCCW' ? 3 : 2, false);
         add(move === 'rotateCW' ? 'Rotate CW' : move === 'rotateCCW' ? 'Rotate CCW' : 'Rotate 180°');
       } else { piece[move](board); add(move === 'moveLeft' ? 'Tap left' : 'Tap right'); }
+      step++;
     }
-    add('Hard drop', 350);
-    piece.softDrop(board); add('Complete · Click to replay', Infinity);
     return frames;
   }
 }

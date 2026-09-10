@@ -2,11 +2,12 @@ import './style.css';
 import { TrainerGame } from './game';
 import { drawGame } from './renderer';
 import { SettingsPanel } from './settings-panel';
-import { actions, downloadJson, keyLabel, loadSettings, storageKey, type Action } from './settings';
+import { actions, bindingCodes, bindingLabel, downloadJson, loadSettings, storageKey, type Action } from './settings';
 import { formatTime } from './time';
 import { DemoPanel } from './demo';
 import { loadPractice, readReplay, type ReplayTrack } from './replay';
 import type { PracticeSet } from './practice';
+import { placementSteps } from './guide';
 
 const element = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const canvas = element<HTMLCanvasElement>('board');
@@ -33,9 +34,27 @@ const panel = new SettingsPanel(next => {
   resumeAfterSettings = false;
 });
 
-element('settings-open').addEventListener('click', () => {
+function openSettings() {
+  if (panel.open) return;
   resumeAfterSettings = game.active;
   game.pause(); pressed.clear(); panel.show(settings);
+}
+element('settings-open').addEventListener('click', openSettings);
+element('config-open').addEventListener('click', () => { openSettings(); panel.chooseFile(); });
+document.addEventListener('dragover', event => {
+  if (!event.dataTransfer?.types.includes('Files')) return;
+  event.preventDefault(); event.dataTransfer.dropEffect = 'copy';
+  document.body.classList.add('file-drag');
+});
+document.addEventListener('dragleave', event => { if (!event.relatedTarget) document.body.classList.remove('file-drag'); });
+document.addEventListener('dragend', () => document.body.classList.remove('file-drag'));
+document.addEventListener('drop', event => {
+  if (!event.dataTransfer?.files.length) return;
+  event.preventDefault(); document.body.classList.remove('file-drag');
+  if (importing) { message.textContent = 'Wait for replay analysis to finish before importing settings.'; return; }
+  openSettings();
+  if (event.dataTransfer.files.length !== 1) { panel.importError('Drop one settings file at a time.'); return; }
+  void panel.importFile(event.dataTransfer.files[0]);
 });
 
 function saveReplay() {
@@ -109,8 +128,8 @@ function editable(target: EventTarget | null) {
 
 document.addEventListener('keydown', event => {
   if (panel.open || editable(event.target) || event.isComposing) return;
-  if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ') { event.preventDefault(); if (!event.repeat) undo(); return; }
-  const action = (Object.keys(actions) as Action[]).find(key => game.settings.bindings[key] === event.code);
+  if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ' && game.settings.training.undoEnabled) { event.preventDefault(); if (!event.repeat) undo(); return; }
+  const action = (Object.keys(actions) as Action[]).find(key => bindingCodes(game.settings, key).includes(event.code));
   if (!action) return;
   event.preventDefault();
   if (event.repeat || pressed.has(event.code)) return;
@@ -121,7 +140,7 @@ document.addEventListener('keydown', event => {
 });
 document.addEventListener('keyup', event => {
   const action = pressed.get(event.code); pressed.delete(event.code);
-  if (action && action !== 'restart' && action !== 'pause') game.input.release(action, accumulator / (1000 / 60));
+  if (action && action !== 'restart' && action !== 'pause' && ![...pressed.values()].includes(action)) game.input.release(action, accumulator / (1000 / 60));
 });
 const autoPause = () => { game.pause(); pressed.clear(); accumulator = 0; };
 addEventListener('blur', autoPause);
@@ -154,15 +173,10 @@ function refresh() {
   overlay.classList.toggle('counting', game.status === 'countdown');
   element('overlay-label').textContent = game.status === 'countdown' ? 'GET READY' : game.status.toUpperCase();
   element('overlay-value').textContent = game.status === 'countdown' ? String(Math.ceil(game.countdownFrames / 60)) : game.status === 'ready' ? 'Start a game' : game.status === 'paused' ? 'Paused' : game.status === 'complete' ? (game.practice ? 'Practice complete' : '40 lines complete') : game.status === 'topout' ? 'Game over' : '';
-  element('controls-summary').textContent = `Move: ${keyLabel(game.settings.bindings.moveLeft)} / ${keyLabel(game.settings.bindings.moveRight)} · Drop: ${keyLabel(game.settings.bindings.hardDrop)} · Hold: ${keyLabel(game.settings.bindings.hold)} · Pause: ${keyLabel(game.settings.bindings.pause)}`;
+  element('controls-summary').textContent = `Move: ${bindingLabel(game.settings, 'moveLeft')} / ${bindingLabel(game.settings, 'moveRight')} · Drop: ${bindingLabel(game.settings, 'hardDrop')} · Hold: ${bindingLabel(game.settings, 'hold')} · Pause: ${bindingLabel(game.settings, 'pause')}`;
   element('coach').hidden = !game.fault;
   if (game.fault) {
-    const names = { moveLeft: 'Tap left', moveRight: 'Tap right', dasLeft: 'Hold left until blocked, then release', dasRight: 'Hold right until blocked, then release', rotateCW: 'Rotate CW', rotateCCW: 'Rotate CCW', rotate180: 'Rotate 180°', softDrop: 'Soft drop to the surface, then release', down: 'Soft drop one row' };
-    const path: string[] = [];
-    let down = 0;
-    const flush = () => { if (down) path.push(`Soft drop ${down} row${down === 1 ? '' : 's'}`); down = 0; };
-    for (const move of game.fault.path.moves) { if (move === 'down') down++; else { flush(); path.push(names[move]); } }
-    flush(); path.push('Hard drop');
+    const path = placementSteps(game.fault.path, game.settings).map(step => step.text);
     element('coach-title').textContent = game.fault.reason === 'target' ? 'Match the outlined target' : 'Try a shorter path';
     element('solution').textContent = `${game.fault.reason === 'target' ? 'That placement does not match the required target. ' : `${game.fault.actual} inputs used · ${game.fault.path.cost} needed. `}${path.join(' → ')}${game.fault.path.drop === 'soft' ? '. This target requires a tuck or spin after lowering the piece.' : ''}`;
   }

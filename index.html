@@ -3,7 +3,8 @@
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>40 Lines · Trainer</title></head>
 <body>
   <div class="app">
-    <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>40 Lines <span>Trainer</span></h1></div><button id="settings-open" class="secondary">Settings</button></header>
+    <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>40 Lines <span>Trainer</span></h1></div><div class="header-tools"><button id="config-open" class="secondary">Import TETR.IO config</button><button id="settings-open" class="secondary">Settings</button></div></header>
+    <p class="config-hint muted">Drop a TETR.IO .ttc config anywhere on this page to import your settings.</p>
     <main>
       <section class="play-area">
         <div class="tetrion">
@@ -41,10 +42,15 @@
           <label class="select-row" for="sdf">Soft drop factor<select id="sdf"><option value="1">1×</option><option value="5">5×</option><option value="10">10×</option><option value="20">20×</option><option value="40">40×</option><option value="41">Instant</option></select></label>
           <label class="check-row"><input id="cancel" type="checkbox"> Cancel DAS on direction change</label>
           <label class="check-row"><input id="safelock" type="checkbox"> Prevent hard drop after auto-lock</label>
+          <label class="check-row"><input id="may20g" type="checkbox"> Prefer soft drop over movement</label>
           <label class="select-row" for="irs">Initial rotation<select id="irs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
           <label class="select-row" for="ihs">Initial hold<select id="ihs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
           <h3>Display</h3><label class="check-row"><input id="grid" type="checkbox"> Grid</label><label class="check-row"><input id="ghost" type="checkbox"> Ghost piece</label>
-          <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="5" max="100" step="1"><output id="opacity-unit"></output></label>
+          <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="0" max="100" step="any"><output id="opacity-unit"></output></label>
+          <label class="range-row" for="gridOpacity">Grid opacity<input id="gridOpacity" type="range" min="0" max="100" step="any"><output id="gridOpacity-unit"></output></label>
+          <label class="range-row" for="boardOpacity">Board opacity<input id="boardOpacity" type="range" min="0" max="100" step="any"><output id="boardOpacity-unit"></output></label>
+          <label class="check-row"><input id="coloredGhost" type="checkbox"> Colored ghost piece</label>
+          <label class="check-row"><input id="dimLockedHold" type="checkbox"> Dim locked Hold piece</label>
         </section>
         <section><h3>Training</h3>
           <label class="number-row" for="countdownSeconds"><span>Start countdown<small>0 disables the countdown</small></span><input id="countdownSeconds" type="number" min="0" max="10" step="0.1" required><output>seconds</output></label>
@@ -54,12 +60,13 @@
           <label class="check-row"><input id="infiniteHold" type="checkbox"> Allow unlimited hold</label>
           <label class="check-row"><input id="strictPractice" type="checkbox"> Fault practice: clear all scenes in one attempt</label>
           <p class="muted">Fault practice always checks finesse and requires the outlined target. Hold and undo are unavailable during these drills.</p>
-          <h3>Key bindings</h3><p class="muted">Click a binding, then press a key. Each action needs a different key.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button></section>
+          <h3>Key bindings</h3><p class="muted">Imported alternate keys are supported. Click a binding, then press a key to replace its keys. Keys cannot be shared between actions.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button> <button id="clear-binding" type="button" class="secondary small">Clear selected binding</button></section>
       </div>
       <p id="settings-status" role="status" aria-live="polite"></p>
-      <footer><div class="settings-tools"><button id="reset-settings" type="button" class="secondary">Restore defaults</button><button id="import-settings" type="button" class="secondary">Import</button><button id="export-settings" type="button" class="secondary">Export</button><input id="settings-file" type="file" accept=".json,application/json" hidden></div><button type="submit">Save settings</button></footer>
+      <details id="config-report" hidden><summary>TETR.IO import details</summary><p class="muted">Mapped options appear in this form. Retained-only options have no effect yet and are preserved in settings exports. Training preferences are kept.</p><strong>Mapped from file</strong><p id="config-applied"></p><strong>Retained only</strong><p id="config-retained"></p><p id="config-warnings" role="status"></p></details>
+      <footer><div class="settings-tools"><button id="reset-settings" type="button" class="secondary">Restore defaults</button><button id="import-settings" type="button" class="secondary">Import JSON / TTC</button><button id="export-settings" type="button" class="secondary">Export</button><input id="settings-file" type="file" accept=".ttc,.json,application/json" hidden></div><button type="submit">Save settings</button></footer>
     </form>
   </dialog>
-  <div id="demo-popup" class="demo-popup" hidden><header><strong id="demo-title">Correct placement</strong><button id="demo-close" class="secondary small" aria-label="Close demonstration">×</button></header><button id="demo-replay" aria-label="Replay placement demonstration"><canvas id="demo-board" width="180" height="414" aria-label="Animated placement guide"></canvas><span id="demo-step"></span><small>Click to replay</small></button></div>
+  <div id="demo-popup" class="demo-popup" hidden><header><strong id="demo-title">Correct placement</strong><button id="demo-close" class="secondary small" aria-label="Close demonstration">×</button></header><button id="demo-replay" aria-label="Replay placement demonstration"><canvas id="demo-board" width="180" height="414" aria-label="Animated placement guide"></canvas><span id="demo-step"></span><small>Click to replay</small></button><section class="demo-instructions" aria-label="Complete placement steps"><h3>Complete steps</h3><p id="demo-summary"></p><p id="demo-note"></p><ol id="demo-steps"></ol></section></div>
   <script type="module" src="/src/main.ts"></script>
 </body></html>

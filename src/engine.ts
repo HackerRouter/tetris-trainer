@@ -6,7 +6,7 @@ export function createEngine(settings: Settings, seed: number): Engine {
     board: { width: 10, height: 20, buffer: 20 },
     queue: { minLength: 14, seed, type: '7-bag' },
     kickTable: 'SRS+',
-    handling: { ...settings.handling, may20g: true },
+    handling: { ...settings.handling },
     gravity: { value: 0.02, increase: 0, marginTime: 0 },
     options: { spinBonuses: 'T-spins', comboTable: 'multiplier', garbageTargetBonus: 'none', clutch: true, garbageBlocking: 'combo blocking', stock: 0 },
     garbage: {

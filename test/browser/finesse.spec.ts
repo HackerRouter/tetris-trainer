@@ -15,7 +15,7 @@ test('d-002 rotation counting, hard-drop coaching and retry work through real ke
   await page.keyboard.press('Space');
   await expect(page.locator('#faults')).toHaveText('1');
   await expect(page.locator('#pieces')).toHaveText('0');
-  await expect(page.locator('#solution')).toHaveText('2 inputs used · 1 needed. Rotate 180° → Hard drop');
+  await expect(page.locator('#solution')).toHaveText('2 inputs used · 1 needed. Rotate 180° (A) once, then release. → Hard drop (Space) to lock in the outlined target.');
   await expect(page.locator('#solution')).not.toContainText('Soft drop');
   await page.screenshot({ path: 'test-results/finesse.png' });
   await page.keyboard.press('a'); await page.waitForTimeout(25);

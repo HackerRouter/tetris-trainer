@@ -8,24 +8,34 @@ export type Action = keyof typeof actions;
 export type GameAction = Exclude<Action, 'pause' | 'restart'>;
 export type Settings = {
   version: 1;
-  handling: { arr: number; das: number; dcd: number; sdf: number; cancel: boolean; safelock: boolean; irs: 'off' | 'hold' | 'tap'; ihs: 'off' | 'hold' | 'tap' };
+  handling: { arr: number; das: number; dcd: number; sdf: number; cancel: boolean; safelock: boolean; may20g: boolean; irs: 'off' | 'hold' | 'tap'; ihs: 'off' | 'hold' | 'tap' };
   bindings: Record<Action, string>;
-  display: { grid: boolean; ghost: boolean; ghostOpacity: number };
+  extraBindings?: Partial<Record<Action, string[]>>;
+  display: { grid: boolean; ghost: boolean; ghostOpacity: number; gridOpacity: number; boardOpacity: number; coloredGhost: boolean; dimLockedHold: boolean };
   training: { countdownSeconds: number; finesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean };
+  tetrioConfig?: Record<string, unknown>;
 };
 
 export const storageKey = 'tetrio-trainer-settings-v1';
 export const defaults: Settings = {
   version: 1,
-  handling: { arr: 0, das: 6, dcd: 0, sdf: 41, cancel: false, safelock: false, irs: 'tap', ihs: 'tap' },
+  handling: { arr: 0, das: 6, dcd: 0, sdf: 41, cancel: false, safelock: false, may20g: true, irs: 'tap', ihs: 'tap' },
   bindings: { moveLeft: 'ArrowLeft', moveRight: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space', rotateCW: 'ArrowUp', rotateCCW: 'KeyZ', rotate180: 'KeyA', hold: 'KeyC', pause: 'Escape', restart: 'KeyR' },
-  display: { grid: true, ghost: true, ghostOpacity: 0.24 },
+  display: { grid: true, ghost: true, ghostOpacity: 0.24, gridOpacity: 0.09, boardOpacity: 1, coloredGhost: true, dimLockedHold: true },
   training: { countdownSeconds: 3, finesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false }
 };
 
 const record = (v: unknown): Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
 export function validCode(code: unknown): code is string {
-  return typeof code === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Enter|Escape|Tab|Backspace|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|CapsLock|Backquote|Minus|Equal|Bracket(Left|Right)|Backslash|Semicolon|Quote|Comma|Period|Slash|Insert|Delete|Home|End|PageUp|PageDown|Numpad([0-9]|Add|Subtract|Multiply|Divide|Decimal|Enter))$/.test(code);
+  return typeof code === 'string' && /^(Key[A-Z]|Digit[0-9]|Arrow(Left|Right|Up|Down)|Space|Enter|Escape|Tab|Backspace|Shift(Left|Right)|Control(Left|Right)|Alt(Left|Right)|Meta(Left|Right)|CapsLock|Backquote|Minus|Equal|Bracket(Left|Right)|Backslash|Semicolon|Quote|Comma|Period|Slash|Insert|Delete|Home|End|PageUp|PageDown|F([1-9]|1[0-9]|2[0-4])|NumLock|ScrollLock|Pause|ContextMenu|IntlBackslash|IntlRo|IntlYen|Numpad([0-9]|Add|Subtract|Multiply|Divide|Decimal|Enter|Equal|Comma))$/.test(code);
+}
+
+export function bindingCodes(settings: Settings, action: Action): string[] {
+  return [settings.bindings[action], ...(settings.extraBindings?.[action] ?? [])].filter(Boolean);
+}
+
+export function bindingLabel(settings: Settings, action: Action): string {
+  return bindingCodes(settings, action).map(keyLabel).join(' / ') || 'Unbound';
 }
 
 export function validateSettings(value: unknown): Settings {
@@ -41,25 +51,44 @@ export function validateSettings(value: unknown): Settings {
     if (typeof handling[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
     result.handling[key] = handling[key];
   }
+  if (handling.may20g !== undefined) {
+    if (typeof handling.may20g !== 'boolean') throw new Error('Invalid may20g setting.');
+    result.handling.may20g = handling.may20g;
+  }
   for (const key of ['irs', 'ihs'] as const) {
     if (!['off', 'hold', 'tap'].includes(String(handling[key]))) throw new Error(`Invalid ${key.toUpperCase()} setting.`);
     result.handling[key] = handling[key] as Settings['handling']['irs'];
   }
   const seen = new Map<string, Action>();
+  const extras = record(root.extraBindings);
   for (const key of Object.keys(actions) as Action[]) {
     const code = bindings[key];
-    if (!validCode(code)) throw new Error(`Choose a supported key for ${actions[key]}.`);
-    if (seen.has(code)) throw new Error(`${keyLabel(code)} is already assigned to ${actions[seen.get(code)!]}.`);
-    seen.set(code, key);
+    if (code !== '' && !validCode(code)) throw new Error(`Choose a supported key for ${actions[key]}.`);
+    const more = extras[key] ?? [];
+    if (!Array.isArray(more) || more.length > 16 || !more.every(validCode)) throw new Error(`Invalid extra bindings for ${actions[key]}.`);
+    for (const entry of [code, ...more].filter(Boolean) as string[]) {
+      if (seen.has(entry)) throw new Error(`${keyLabel(entry)} is already assigned to ${actions[seen.get(entry)!]}.`);
+      seen.set(entry, key);
+    }
     result.bindings[key] = code;
+    if (more.length) (result.extraBindings ??= {})[key] = [...more];
   }
   for (const key of ['grid', 'ghost'] as const) {
     if (typeof display[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
     result.display[key] = display[key];
   }
   const opacity = display.ghostOpacity;
-  if (typeof opacity !== 'number' || !Number.isFinite(opacity) || opacity < 0.05 || opacity > 1) throw new Error('Ghost opacity must be between 5% and 100%.');
+  if (typeof opacity !== 'number' || !Number.isFinite(opacity) || opacity < 0 || opacity > 1) throw new Error('Ghost opacity must be between 0% and 100%.');
   result.display.ghostOpacity = opacity;
+  for (const key of ['gridOpacity', 'boardOpacity'] as const) if (display[key] !== undefined) {
+    const value = display[key];
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 1) throw new Error(`Invalid ${key} setting.`);
+    result.display[key] = value;
+  }
+  for (const key of ['coloredGhost', 'dimLockedHold'] as const) if (display[key] !== undefined) {
+    if (typeof display[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
+    result.display[key] = display[key];
+  }
   if (root.training !== undefined) {
     const training = record(root.training);
     const seconds = training.countdownSeconds;
@@ -69,6 +98,10 @@ export function validateSettings(value: unknown): Settings {
       if (typeof training[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
       result.training[key] = training[key];
     }
+  }
+  if (root.tetrioConfig !== undefined) {
+    if (!root.tetrioConfig || typeof root.tetrioConfig !== 'object' || Array.isArray(root.tetrioConfig) || JSON.stringify(root.tetrioConfig).length > 1_000_000) throw new Error('Invalid retained TETR.IO config.');
+    result.tetrioConfig = structuredClone(root.tetrioConfig) as Record<string, unknown>;
   }
   return result;
 }

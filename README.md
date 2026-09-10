@@ -15,7 +15,7 @@ but yes, I'll consider to ask astra to add a blank mode with adjustable settings
 
 ------
 
-*Allllright! That's it for HackerRouter, now it's GPT-6 Astra's turn!*
+> *Allllright! That's it for HackerRouter, now it's GPT-6 Astra's turn!*
 
 
 # 40 Lines Trainer
@@ -26,7 +26,21 @@ Settings supports ARR, DAS, DCD, SDF, DAS cancellation, safe lock, initial rotat
 
 The default controls are arrow keys for movement, Up for clockwise rotation, Z for counterclockwise rotation, A for 180°, C for hold, Space for hard drop, Escape for pause, and R for restart. Click a key binding to capture a physical key. Duplicate assignments are rejected.
 
+## TETR.IO config import
+
+Click Import TETR.IO config, use Settings → Import JSON / TTC, or drop a `.ttc` file anywhere on the page. Import opens a settings draft and pauses the current game. Save settings applies it at the next start or restart; Cancel leaves the saved settings unchanged. Trainer settings JSON uses the same importer. Files are read locally, with a 1 MB limit.
+
+The importer maps all nine handling fields: ARR, DAS, DCD, SDF, safe lock, DAS cancellation, prefer soft drop over movement (`may20g`), IRS and IHS. Custom, Guideline and WASD keyboard layouts are supported. Uppercase TETR.IO key codes are converted to physical browser key codes. Alternate keys and intentionally unbound actions are preserved; keys shared between different gameplay actions are rejected. Native Exit maps to Pause / resume, and Retry maps to Restart. Clicking a binding replaces its entire key list; Clear selected binding removes it. Ctrl + Z is reserved for undo only while undo is enabled.
+
+Supported display mappings are grid opacity, board opacity, ghost opacity, colored ghost and dimming the locked Hold piece. Zero ghost or grid opacity disables that display layer. Native numeric strings are accepted for opacity and handling values. Training preferences are preserved because TETR.IO's pro-mode and restart options do not describe the trainer's retry behavior.
+
+Import details distinguish mapped fields from retained-only fields. Audio, gamepad controls, advanced rendering and animation, native game modes, desktop integration, notifications and social options are retained without being activated. Unsupported keyboard codes are reported and preserved in the original config. Unknown future fields are also retained. Settings export includes the original config under `tetrioConfig`; this is a trainer JSON export, not a rewritten native `.ttc` file.
+
+`src/tetrio-config.ts` provides the extension points. `readTetrioSection(settings, 'volume')` returns an isolated copy of the original section, or `null` when absent. `readTetrioOption(settings, 'video.particles')` reads an individual original value, or `null`. `tetrioConfigAdapters` registers the active field adapters; future features can add an adapter and validation when their runtime behavior exists. Reading a retained field does not activate it or fetch any URLs it contains. These readers return the imported source values, while the ordinary settings fields contain subsequent edits.
+
 The visual layout places Hold at the board's upper left, Pieces / Lines / Time at the lower left, and the next five pieces on the right. Time is displayed as `0:00.000`. The layout follows the supplied TETR.IO screenshot; the existing block colors and textures remain in use.
+
+Target outlines are gray. Cells shared with a visible ghost use a darker version of that ghost's outline color at the selected ghost opacity. The renderer draws the shared outline once, so overlapping layers cannot brighten it. Disabling the ghost restores the plain gray target outline.
 
 ## Training settings
 
@@ -56,11 +70,15 @@ After a game, click Practice last replay to load its mistakes. Load replay file 
 
 A practice finesse fault opens a small animated guide for that failed scene. It automatically plays the correct route once, then stops. Click the guide to replay it or close it with ×. With the one-attempt setting enabled, a fault also resets progress and practice time to scene one. Otherwise it retries the current scene. Older trainer replays can recover scenes from their retry snapshots.
 
+The guide also keeps the complete numbered route visible before, during and after playback. Each step names the current key bindings, explains taps versus holds and when to release, and finishes with hard drop. Consecutive partial soft drops are grouped by row count. The current animation step is highlighted and completed steps are marked. The normal retry coach shares the same instructions.
+
 Native import rebuilds the recorded input timeline and reevaluates placements using this trainer's d-002 rules. It supports standard 10 × 20, seven-bag, SRS / SRS+ recordings, including legacy and current multiplayer envelopes. Legacy garbage events retain their recorded hole columns. Available final placement counts, line counts and board state are checked against the simulation before import succeeds. Unsupported modes, incompatible game versions or mismatched recordings report an error rather than importing misleading scenes. Files are analyzed locally; maximum file size is 20 MB and maximum native recording duration is one hour.
 
 ## Validation
 
 `npm run build` checks TypeScript and produces the production bundle. `npm test` checks all 162 empty-board placements, finesse, input timing, timer rollback, countdown, target enforcement, undo, unlimited hold, practice resets, replay validation and real native replay fixtures. `npm run test:browser` checks settings, layout, keyboard input, countdown, animation playback and replay import in Chromium. Install its browser once with `npx playwright install chromium` if needed.
+
+Config tests also cover the supplied `.ttc`, settings migration, retained-field round trips, presets, alternate keys, invalid-file recovery, file-picker and drop imports, complete guidance, and canvas pixels for overlapping target and ghost outlines.
 
 ## References used
 
@@ -76,3 +94,6 @@ Native import rebuilds the recorded input timeline and reevaluates placements us
 - [Viewtris native formats, legacy garbage reconstruction and sample replays](https://github.com/zbrachinara/viewtris)
 - [Four-tris independent scenario practice](https://github.com/fiorescarlatto/four-tris)
 - [Alex Ong Finesse replay and undo approach](https://github.com/alex-ong/Finesse/blob/master/src/ReplayMaker.java)
+- [Public native config example with multiple keyboard bindings](https://gist.github.com/chm-dev/cee7b27b65f77fe2c30eadbe7af8115f)
+- [TETR.IO's published Guideline / WASD controls and handling labels](https://tetr.io/)
+- [MDN file drag-and-drop example](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop)
