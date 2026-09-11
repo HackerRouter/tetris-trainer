@@ -12,6 +12,9 @@ import { CustomPanel } from './custom-panel';
 import { type ModeId } from './modes';
 import { SoundPlayer } from './audio';
 import { drawNativePreview } from './ui-assets';
+import { HistoryStore } from './history';
+import { Pages } from './pages';
+import { exportNative } from './native-export';
 
 const element = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const canvas = element<HTMLCanvasElement>('board');
@@ -23,6 +26,8 @@ let selectedMode: ModeId = localStorage.getItem('tetrio-trainer-mode') === 'cust
 let modePending = false;
 let game = new TrainerGame(settings, undefined, undefined, selectedMode);
 const sound = new SoundPlayer(settings.audio);
+const history = new HistoryStore();
+let lastHistorySave = 0, historyPlacements = 0;
 let accumulator = 0, last = performance.now(), resumeAfterSettings = false, saved = false;
 const pressed = new Map<string, Action>();
 const message = element('message');
@@ -86,6 +91,18 @@ element('finesse-toggle').addEventListener('change', () => {
   message.textContent = enabled ? 'Perfect finesse enabled for this mode. Faults restore the placement and timer.' : `Finesse retries disabled for this mode.${game.practice ? ' Match each scene target to advance.' : ' Placements are accepted without a finesse check.'}`;
   element('finesse-toggle').blur();
 });
+element<HTMLInputElement>('think-toggle').checked = settings.training.justThink;
+element<HTMLSelectElement>('think-style').value = settings.training.thinkStyle;
+function changeThinking() {
+  const enabled = element<HTMLInputElement>('think-toggle').checked, style = element<HTMLSelectElement>('think-style').value as 'piece' | 'input';
+  game.setJustThink(enabled, style); pressed.clear(); accumulator = 0;
+  settings.training.justThink = enabled; settings.training.thinkStyle = style;
+  localStorage.setItem(storageKey, JSON.stringify(settings));
+  element('think-help').textContent = style === 'piece' ? 'Each piece waits for a fresh game input, then runs normally until placed.' : 'The board and timer advance on game input and while a game key is held. Release all keys to think.';
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+}
+element('think-toggle').addEventListener('change', changeThinking);
+element('think-style').addEventListener('change', changeThinking);
 document.addEventListener('pointerdown', () => sound.unlock(), { capture: true });
 document.addEventListener('keydown', () => sound.unlock(), { capture: true });
 document.addEventListener('click', event => {
@@ -111,6 +128,7 @@ document.addEventListener('dragover', event => {
 document.addEventListener('dragleave', event => { if (!event.relatedTarget) document.body.classList.remove('file-drag'); });
 document.addEventListener('dragend', () => document.body.classList.remove('file-drag'));
 document.addEventListener('drop', event => {
+  if (location.hash === '#replays' && !event.dataTransfer?.files[0]?.name.toLowerCase().endsWith('.ttc')) return;
   if (!event.dataTransfer?.files.length) return;
   event.preventDefault(); document.body.classList.remove('file-drag');
   if (importing) { message.textContent = 'Wait for replay analysis to finish before importing settings.'; return; }
@@ -121,10 +139,17 @@ document.addEventListener('drop', event => {
 
 function saveReplay() {
   if (!game.startedAt) return;
+  void saveHistory();
   if (game.practice) return;
   lastReplay = game.export();
   try { localStorage.setItem('tetrio-trainer-last-replay', JSON.stringify(lastReplay)); }
   catch { message.textContent = 'Local replay storage is full. Use Download replay to save this session.'; }
+}
+
+async function saveHistory() {
+  if (!game.startedAt || !game.placements.length) return;
+  try { await history.save(structuredClone(game.export())); }
+  catch (error) { message.textContent = (error as Error).message; }
 }
 
 function start(practice?: PracticeSet) {
@@ -134,6 +159,7 @@ function start(practice?: PracticeSet) {
   game = new TrainerGame(settings, undefined, practice, selectedMode); game.start(); sound.sync(game);
   modePending = false;
   accumulator = 0; last = performance.now(); pressed.clear(); saved = false;
+  historyPlacements = 0;
   for (const code of heldCodes) {
     const action = (['moveLeft', 'moveRight'] as const).find(action => bindingCodes(game.settings, action).includes(code));
     if (action) { pressed.set(code, action); game.input.press(action); }
@@ -155,6 +181,12 @@ element('start').addEventListener('click', () => start(modePending ? undefined :
 element('pause').addEventListener('click', pause);
 element('sprint').addEventListener('click', () => { selectMode('sprint'); start(); });
 element('download').addEventListener('click', () => { if (game.startedAt) downloadJson(game.export(), `${game.rules.id}-training-${Date.now()}.json`); });
+element('download-native').addEventListener('click', async () => {
+  const button = element<HTMLButtonElement>('download-native'); button.disabled = true;
+  try { const replay = await exportNative(structuredClone(game.export())); downloadJson(replay, `trainer-${Date.now()}.ttr`); message.textContent = 'TETR.IO replay exported and verified locally. Retried and undone attempts were removed; JSON keeps the full training history.'; }
+  catch (error) { message.textContent = (error as Error).message; }
+  finally { button.disabled = false; }
+});
 function undo() { if (game.undo()) { pressed.clear(); accumulator = 0; last = performance.now(); saved = false; message.textContent = 'Placement and timer restored.'; } }
 element('undo').addEventListener('click', () => { undo(); element('undo').blur(); });
 
@@ -197,6 +229,7 @@ function editable(target: EventTarget | null) {
 }
 
 document.addEventListener('keydown', event => {
+  if (pages.page !== 'play') return;
   if (panel.open || customPanel.open || editable(event.target) || event.isComposing) return;
   if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ' && game.rules.undo) { event.preventDefault(); if (!event.repeat) undo(); return; }
   const action = (Object.keys(actions) as Action[]).find(key => bindingCodes(game.settings, key).includes(event.code));
@@ -229,27 +262,28 @@ function refresh() {
   sound.sync(game);
   element('audio-status').textContent = sound.status;
   element('custom-open').hidden = selectedMode !== 'custom';
-  element('custom-tools').hidden = !custom;
+  element('custom-tools').hidden = !custom && !game.practice;
   element<HTMLButtonElement>('clear-field').disabled = !game.canEditField;
-  element<HTMLButtonElement>('finish-session').disabled = !game.canEditField;
+  element<HTMLButtonElement>('finish-session').disabled = !game.canEditField && !(game.practice && ['playing', 'paused'].includes(game.status));
   element<HTMLImageElement>('mode-icon').src = `/tetrio/ui/${selectedMode === 'custom' ? 'zen' : 'sprint'}.svg`;
   element('line-goal').textContent = goals.lines ? `/ ${goals.lines}` : '';
   element('time').textContent = formatTime(game.elapsedMs);
-  const waitingForInput = game.status === 'playing' && game.waitingForInput;
+  const waitingForInput = game.status === 'playing' && (game.waitingForInput || game.thinkingPaused);
   element('retry-status').hidden = !waitingForInput;
+  element('retry-status').textContent = game.waitingForInput ? 'Timer paused. Press a game key to continue.' : 'Just think · Board and timer paused. Use a game key to continue.';
   element('time').classList.toggle('waiting-for-input', waitingForInput);
   element('lines').textContent = String(engine.stats.lines);
   const progress = element<HTMLProgressElement>('progress');
   const ratios = [goals.lines ? engine.stats.lines / goals.lines : 0, goals.pieces ? engine.stats.pieces / goals.pieces : 0, goals.seconds ? game.elapsedMs / (goals.seconds * 1000) : 0];
-  progress.hidden = !game.practice && !Object.values(goals).some(Boolean);
+  progress.hidden = game.practice?.set.loop === true || (!game.practice && !Object.values(goals).some(Boolean));
   progress.max = game.practice?.set.scenes.length ?? (custom ? 1 : 40);
   progress.value = game.practice?.index ?? (custom ? Math.max(...ratios) : engine.stats.lines);
-  element('pieces').textContent = String(game.practice?.index ?? engine.stats.pieces);
-  element('mode-label').textContent = game.practice ? 'FAULT PRACTICE' : game.rules.name;
+  element('pieces').textContent = String(game.practice?.completed ?? engine.stats.pieces);
+  element('mode-label').textContent = game.practice ? game.practice.set.kind === 'pure' ? 'PURE FINESSE DRILLS' : game.practice.set.kind === 'focused' ? 'FOCUSED FAULT DRILLS' : 'FAULT PRACTICE' : game.rules.name;
   element('mode-rules').hidden = !custom;
   element('mode-rules').textContent = `${engine.board.width} × ${engine.board.height} · ${engine.kickTableName} · ${game.rules.bag} · ${Number(engine.dynamic.gravity.get().toFixed(4))} G · ${game.rules.infiniteLock ? 'Manual lock' : `${game.rules.lockDelay}f lock delay`} · ${game.rules.finesse ? 'Perfect finesse' : 'Finesse off'}. ${[goals.lines ? `${goals.lines} lines` : '', goals.pieces ? `${goals.pieces} pieces` : '', goals.seconds ? formatTime(goals.seconds * 1000) : ''].filter(Boolean).join(' / ') || 'Endless session'}. Seed: ${game.seed}. Boards cleared: ${game.boardResets}. Attack: ${engine.stats.garbage.attack}. Sent: ${engine.stats.garbage.sent}. Pending garbage: ${engine.garbageQueue.size}. Garbage cleared: ${engine.stats.garbage.cleared}.${game.rules.advanced.garbageRefill ? ` Refill: ${game.rules.advanced.garbageRefill} rows.` : ""}${game.rules.advanced.handlingOverride ? ` Room handling: ARR ${engine.handling.arr}, DAS ${engine.handling.das}, SDF ${engine.handling.sdf}.` : ''}${game.rules.advanced.sequence ? ` Authored queue${game.rules.advanced.repeatSequence ? ' (repeating)' : ''}.` : ''}`;
   element('sprint').hidden = !game.practice && !custom;
-  element('practice-progress').textContent = game.practice ? `${game.practice.index} / ${game.practice.set.scenes.length}` : '';
+  element('practice-progress').textContent = game.practice ? game.practice.set.loop ? `${game.practice.completed} completed · Endless` : `${game.practice.index} / ${game.practice.set.scenes.length}` : '';
   element('pps').textContent = game.elapsedMs ? (engine.stats.pieces * 1000 / game.elapsedMs).toFixed(2) : '0.00';
   element('inputs').textContent = String(game.inputs); element('holds').textContent = String(game.holds);
   element('faults').textContent = String(game.faults); element('perfects').textContent = String(game.perfects);
@@ -293,8 +327,13 @@ function animate(now: number) {
   if (['complete', 'topout'].includes(game.status) && !saved) {
     saved = true; message.textContent = game.status === 'complete' ? (game.practice ? 'All fault scenes complete.' : game.rules.id === 'custom' ? 'Session complete. Your replay has been saved.' : '40 lines complete. Your replay has been saved.') : 'Game over. Your replay has been saved.'; saveReplay();
   }
-  refresh(); demo.update(now, game); requestAnimationFrame(animate);
+  if (game.placements.length !== historyPlacements && now - lastHistorySave > 5000) {
+    historyPlacements = game.placements.length; lastHistorySave = now; void saveHistory();
+  }
+  refresh(); demo.update(now, game); pages.update(now); requestAnimationFrame(animate);
 }
 
+const pages = new Pages(history, { settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });
+window.addEventListener('pagehide', () => { saveReplay(); });
 if (loaded.message) message.textContent = loaded.message;
 requestAnimationFrame(animate);

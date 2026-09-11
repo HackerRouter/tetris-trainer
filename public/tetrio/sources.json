@@ -1,5 +1,5 @@
 {
-  "extractedAt": "2026-09-11T02:11:26.237Z",
+  "extractedAt": "2026-09-11T12:22:33.961Z",
   "sources": [
     {
       "path": "/res/font/hun2.ttf",
@@ -91,6 +91,27 @@
       "savedAt": "2026-07-18T09:42:08.543Z",
       "bytes": 2245,
       "sha256": "5f492823fbd9282da971e290cbff68b4b2b87ed3e83368cdcd753dfd2ebb7dde"
+    },
+    {
+      "path": "/res/skins/minos/tetrio.2x.png",
+      "url": "https://tetr.io/res/skins/minos/tetrio.2x.png",
+      "savedAt": "2026-07-18T09:42:09.398Z",
+      "bytes": 27069,
+      "sha256": "6fc9587b0ea265640cce3487b77aa69d85d26f97e5e4a738a660e14f16143a30"
+    },
+    {
+      "path": "/res/skins/ghost/tetrio.2x.png",
+      "url": "https://tetr.io/res/skins/ghost/tetrio.2x.png",
+      "savedAt": "2026-07-18T09:42:08.849Z",
+      "bytes": 605,
+      "sha256": "355178e4ff306a60cd829d03d4ed91458b079cfd6efe74e518c1364f150ae5b6"
+    },
+    {
+      "path": "/res/particles/spark.png",
+      "url": "https://tetr.io/res/particles/spark.png",
+      "savedAt": "2026-07-18T09:34:26.482Z",
+      "bytes": 10935,
+      "sha256": "8f1a238fbd8b7b80d4532882a67b31a3c3f430e34586d19b3b2260b5d74f86b8"
     },
     {
       "path": "/sfx/tetrio.opus.rsd",

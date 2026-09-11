@@ -83,7 +83,7 @@ export class SoundPlayer {
       if (game.holds > previous.holds) this.play('hold');
       const placements = game.placements.slice(previous.placements);
       for (const placement of placements) {
-        if (!placement.accepted) { this.play('failure'); continue; }
+        if (!placement.accepted) { this.play('finessefault'); continue; }
         const result = placement.result;
         if (placement.inputs.includes('hardDrop')) this.play('harddrop');
         this.play('floor');

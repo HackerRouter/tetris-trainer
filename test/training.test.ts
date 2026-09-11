@@ -23,7 +23,7 @@ test('training defaults migrate without losing existing settings and validate im
   old.handling!.das = 9.2;
   const settings = validateSettings(old);
   assert.equal(settings.handling.das, 9.2);
-  assert.deepEqual(settings.training, { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false });
+  assert.deepEqual(settings.training, { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false, justThink: false, thinkStyle: 'piece' });
   for (const countdownSeconds of [-1, 10.1, NaN, Infinity, .15]) assert.throws(() => validateSettings(instant({ countdownSeconds })));
   assert.equal(validateSettings(instant({ countdownSeconds: .5 })).training.countdownSeconds, .5);
 });

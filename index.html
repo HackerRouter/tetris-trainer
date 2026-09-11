@@ -5,7 +5,8 @@
   <div class="app">
     <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>Tetris <span>Trainer</span></h1></div><div class="header-tools"><button id="config-open" class="secondary">Import TETR.IO config</button><button id="settings-open" class="secondary">Settings</button></div></header>
     <p class="config-hint muted">Drop a TETR.IO .ttc config anywhere on this page to import your settings.</p>
-    <main>
+    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#drills">Finesse drills</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
+    <main id="play-page">
       <section class="play-area">
         <div class="tetrion">
           <div class="left-column">
@@ -28,14 +29,19 @@
         <div class="progress-heading"><span id="mode-label">40 LINE SPRINT</span><strong id="practice-progress"></strong></div><progress id="progress" max="40" value="0"></progress>
         <p id="mode-rules" class="muted" hidden></p>
         <div class="finesse-control"><label for="finesse-toggle"><span>Perfect finesse<small id="finesse-scope">40L Sprint</small></span><input id="finesse-toggle" type="checkbox" role="switch" aria-describedby="finesse-help"></label><p id="finesse-help" class="muted">Automatically retry finesse faults and restore the timer.</p></div>
+        <div class="finesse-control"><label for="think-toggle"><span>Just think<small>Freeze the board and timer while thinking</small></span><input id="think-toggle" type="checkbox" role="switch" aria-describedby="think-help"></label><label class="select-row" for="think-style">Pause style<select id="think-style"><option value="piece">Think before each piece</option><option value="input">Run only while operating</option></select></label><p id="think-help" class="muted">Each piece waits for a fresh game input, then runs normally until placed.</p></div>
         <div class="stats"><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
         <div id="coach" class="coach" hidden><strong id="coach-title">Try a shorter path</strong><p id="solution"></p><small id="target-policy">The outline marks your last target. You can choose a different placement.</small></div>
         <div class="practice-tools"><h3>Fault practice</h3><button id="practice-last" class="secondary wide" disabled>Practice last replay</button><button id="practice-import" class="secondary wide">Load replay file</button><input id="replay-file" type="file" accept=".json,.ttr,.ttrm,application/json" hidden><div id="replay-selection" hidden><label for="replay-track">Player / round</label><select id="replay-track"></select><button id="practice-track" class="secondary wide">Start selected practice</button></div><p id="practice-status" class="muted" role="status">Load a trainer JSON or TETR.IO replay to practice its finesse faults.</p></div>
         <details><summary>Session details</summary><div id="results" class="muted"></div></details>
         <button id="undo" class="secondary wide" disabled>Undo placement · Ctrl + Z</button><button id="download" class="secondary wide" disabled>Download replay</button>
+        <button id="download-native" class="secondary wide">Export TETR.IO replay (.ttr)</button>
         <p class="fine-print">Finesse follows d-002: each tap, DAS hold or rotation (including 180°) counts as one input. Hints prefer hard drop when allowed. Other board sizes and rotation systems use a search with the same input costs.</p>
       </aside>
     </main>
+    <section id="drills-page" class="page-content" hidden aria-labelledby="drills-title"></section>
+    <section id="statistics-page" class="page-content" hidden aria-labelledby="statistics-title"></section>
+    <section id="replays-page" class="page-content" hidden aria-labelledby="replays-title"></section>
   </div>
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form id="settings-form" novalidate>

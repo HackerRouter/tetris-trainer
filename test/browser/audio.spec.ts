@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 test('soft drop locks with floor audio, and keyboard or button pauses use one click without voices', async ({ page }) => {
   const { sprites } = JSON.parse(await readFile('public/tetrio/sound-pack.json', 'utf8'));
   const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
-  settings.custom.gravity = .02; settings.custom.infiniteLock = false; settings.custom.lockDelay = 8; settings.handling.sdf = 41;
+  settings.custom.gravity = .02; settings.custom.infiniteLock = false; settings.custom.lockDelay = 30; settings.handling.sdf = 41;
   await page.addInitScript(settings => {
     localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings));
     const monitor = window as typeof window & { soundCalls: number[] }; monitor.soundCalls = [];
@@ -18,9 +18,9 @@ test('soft drop locks with floor audio, and keyboard or button pauses use one cl
   const reset = () => page.evaluate(() => { (window as typeof window & { soundCalls: number[] }).soundCalls = []; });
   await page.goto('/'); await expect(page.locator('#audio-status')).toContainText('ready');
   await page.locator('#mode-select').selectOption('custom'); await page.locator('#start').click();
-  await reset(); await page.keyboard.down('ArrowDown');
+  await page.waitForTimeout(100);
+  await reset(); await page.keyboard.press('ArrowDown', { delay: 60 });
   await expect(page.locator('#pieces')).toHaveText('1');
-  await page.keyboard.up('ArrowDown');
   expect(await calls()).toContain(sprites.softdrop.offset); expect(await calls()).toContain(sprites.floor.offset);
   expect(await calls()).not.toContain(sprites.boardlock.offset); expect(await calls()).not.toContain(sprites.harddrop.offset);
   for (const control of ['keyboard', 'button']) {

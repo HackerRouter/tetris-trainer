@@ -44,8 +44,8 @@ export class DemoPanel {
       }
     }
     if (this.popup.hidden || !this.source || !this.engine) return;
-    while (this.index < this.frames.length - 1 && now - this.since >= this.frames[this.index].duration) {
-      this.since += this.frames[this.index].duration; this.index++;
+    while (now - this.since >= this.frames[this.index].duration) {
+      this.since += this.frames[this.index].duration; this.index = (this.index + 1) % this.frames.length;
     }
     const frame = this.frames[this.index];
     this.label.textContent = frame.label;
@@ -58,20 +58,20 @@ export class DemoPanel {
 
   private build(scene: Demonstration, engine: Engine, steps: GuideStep[]): Frame[] {
     const board = scene.snapshot.board, piece = copyPiece(engine, scene.snapshot.falling);
-    const frames: Frame[] = [{ piece: piece.snapshot(), label: 'Start here', duration: 600, step: -1 }];
+    const frames: Frame[] = [{ piece: piece.snapshot(), label: 'Start here', duration: 1100, step: -1 }];
     let step = 0;
-    const add = (label: string, duration = 400) => frames.push({ piece: piece.snapshot(), label, duration, step });
+    const add = (label: string, duration = 700) => frames.push({ piece: piece.snapshot(), label, duration, step });
     for (const instruction of steps) {
       const { move } = instruction;
-      if (move === 'hardDrop') { add('Hard drop', 350); piece.softDrop(board); step++; add('Complete · Click to replay', Infinity); continue; }
-      if (move === 'waitLock') { add('Wait for automatic lock', Math.max(400, engine.misc.movement.lockTime * 1000 / 60)); step++; add('Complete · Click to replay', Infinity); continue; }
+      if (move === 'hardDrop') { add('Hard drop', 600); piece.softDrop(board); step++; add('Complete · Replaying shortly', 1800); continue; }
+      if (move === 'waitLock') { add('Wait for automatic lock', Math.max(700, Math.min(2000, engine.misc.movement.lockTime * 1000 / 60))); step++; add('Complete · Replaying shortly', 1800); continue; }
       if (move === 'dasLeft' || move === 'dasRight') {
         const direction = move === 'dasLeft' ? 'moveLeft' : 'moveRight';
-        while (piece[direction](board)) add(move === 'dasLeft' ? 'Hold left, then release' : 'Hold right, then release', 90);
+        while (piece[direction](board)) add(move === 'dasLeft' ? 'Hold left, then release' : 'Hold right, then release', 150);
       } else if (move === 'softDrop') {
         const dropped = copyPiece(engine, piece.snapshot()); dropped.softDrop(board);
-        while (piece.y > dropped.y) { piece.y -= 1; add('Soft drop, then release', 45); }
-      } else if (move === 'down') { for (let row = 0; row < instruction.count; row++) { piece.y -= 1; add('Soft drop one row', 120); } }
+        while (piece.y > dropped.y) { piece.y -= 1; add('Soft drop, then release', 80); }
+      } else if (move === 'down') { for (let row = 0; row < instruction.count; row++) { piece.y -= 1; add('Soft drop one row', 220); } }
       else if (move === 'rotateCW' || move === 'rotateCCW' || move === 'rotate180') {
         piece.rotate(board, engine.kickTableName, move === 'rotateCW' ? 1 : move === 'rotateCCW' ? 3 : 2, false);
         add(move === 'rotateCW' ? 'Rotate CW' : move === 'rotateCCW' ? 'Rotate CCW' : 'Rotate 180°');

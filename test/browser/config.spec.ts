@@ -91,9 +91,12 @@ test('the demonstration shows the full key-aware route before, during and after 
   await expect(page.locator('#demo-popup')).toBeVisible();
   await expect(page.locator('#demo-steps li')).toHaveText(['Tap left (Left) once, then release.', 'Hard drop (Up) to lock in the outlined target.']);
   await expect(page.locator('#demo-summary')).toContainText('1 finesse input · 2 steps');
+  await page.clock.install(); await page.locator('#demo-replay').click(); await page.clock.runFor(1200);
   await expect(page.locator('#demo-steps [aria-current="step"]')).toHaveText('Tap left (Left) once, then release.');
+  await page.clock.runFor(1400);
   await expect(page.locator('#demo-step')).toContainText('Complete');
   await expect(page.locator('#demo-steps li')).toHaveCount(2);
+  await page.clock.runFor(1900); await expect(page.locator('#demo-step')).toHaveText('Start here');
   await page.locator('#demo-replay').click(); await expect(page.locator('#demo-step')).toHaveText('Start here');
   await page.screenshot({ path: 'test-results/complete-guide.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });

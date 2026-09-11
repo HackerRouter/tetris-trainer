@@ -5,6 +5,8 @@ export class FrameInput {
   private held = new Set<GameAction>();
   private pending: { type: 'keydown' | 'keyup'; key: GameAction; subframe: number }[] = [];
 
+  get activeKeys() { return [...this.held]; }
+
   press(key: GameAction, subframe = 0): boolean {
     if (this.held.has(key)) return false;
     this.held.add(key);

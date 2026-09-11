@@ -70,11 +70,11 @@ npm run presets:import -- "D:\CODE_PROJECT\TETRIO_OFFLINE\offline-data\archive"
 
 ## Local TETR.IO audio and UI resources
 
-Sound effects, Config / HUN / ProFont fonts, board and Hold / Next atlas frames, menu textures and mode icons were extracted from the supplied `TETRIO_OFFLINE` archive. Block rendering is unchanged. Background images and music are not loaded.
+Sound effects, Config / HUN / ProFont fonts, board and Hold / Next atlas frames, menu textures and mode icons were extracted from the supplied `TETRIO_OFFLINE` archive. The native mino and ghost atlases now drive block and shadow rendering. Background images and music are not loaded.
 
 Movement, rotation, soft / hard drop, hold, locking, clears, spins, combos, B2B, all clear, countdown, retry failures, completion, pause, undo and menu clicks trigger local audio. Settings → Audio controls enablement, volume and menu sounds; Preview sound auditions the draft volume. Audio unlocks after a click or key press. Missing audio does not block play. Voices and repeated movement sounds are limited. Replay analysis is silent.
 
-`public/tetrio/sound-pack.json` contains 48 selected effects in a roughly 1.4 MB resource pack: sprite timings plus a base64-encoded, 57-second Opus atlas. The browser fetches ordinary JSON and decodes the audio bytes in memory using Web Audio. It never requests a standalone audio URL, creates an audio Blob URL or uses a media element, avoiding IDM's interception of the former `.ogg` request. IDM and browser settings do not need to change. The extractor removes the obsolete standalone audio assets. `sources.json` records source URLs, archive timestamps and hashes. Extraction follows tRSD 1.0 as documented by [TETR.IO PLUS's public sound filter](https://gitlab.com/UniQMG/tetrio-plus/-/blob/master/source/filters/sfx/sfx-request-filter.js). Resources were also checked against [TETR.IO's personalization FAQ](https://tetrio.github.io/faq/personalization.html).
+`public/tetrio/sound-pack.json` contains 49 selected effects in a roughly 1.4 MB resource pack: sprite timings plus a base64-encoded, 57-second Opus atlas. The browser fetches ordinary JSON and decodes the audio bytes in memory using Web Audio. It never requests a standalone audio URL, creates an audio Blob URL or uses a media element, avoiding IDM's interception of the former `.ogg` request. IDM and browser settings do not need to change. The extractor removes the obsolete standalone audio assets. `sources.json` records source URLs, archive timestamps and hashes. Extraction follows tRSD 1.0 as documented by [TETR.IO PLUS's public sound filter](https://gitlab.com/UniQMG/tetrio-plus/-/blob/master/source/filters/sfx/sfx-request-filter.js). Resources were also checked against [TETR.IO's personalization FAQ](https://tetrio.github.io/faq/personalization.html).
 
 Extracted assets are already present. To refresh them, with FFmpeg on PATH, run:
 
@@ -136,13 +136,13 @@ After a finesse retry, a target-mismatch retry or Undo, the restored timer and g
 
 The page shows `Timer paused. Press a game key to continue.` while waiting. Recordings include `waitingForInput` in runtime and retry / undo data and an `input-resume` event naming the key and restored time. Neither the displayed timer nor the engine's session frame clock advances during this review period.
 
-Download replay exports settings, mode rules, seed, input events, retry snapshots, placements and statistics as training JSON. It is not a native TETR.IO `.ttr` export. The app uses the bundled local UI and sound resources described above.
+Download replay exports settings, mode rules, seed, input events, retry snapshots, placements and statistics as training JSON. This JSON preserves the complete training history. The separate TETR.IO export button produces a native event envelope for compatible sessions, as described below. The app uses the bundled local UI and sound resources described above.
 
 ## Fault practice
 
 After a game, click Practice last replay to load its mistakes. Load replay file accepts trainer JSON, TETR.IO solo `.ttr`, and multiplayer `.ttrm`. Multiplayer files expose a Player / round selector. Each scene restores the board immediately before a faulty placement and outlines its destination. Practice requires its target and checks finesse by default. Its page switch can allow inefficient routes without changing Sprint or Custom preferences. Hold and undo are unavailable during these drills. Back to 40L returns to sprint mode.
 
-A finesse fault opens an animated guide in every mode with Perfect finesse enabled: Sprint, Custom / room presets and fault practice. It automatically plays the correct route once, then stops. Click the guide to replay it or close it with ×; a new fault opens a fresh guide. The compact guide sits in the side panel so it cannot cover controls or downloads. Turning finesse off dismisses it. In fault practice, the one-attempt setting also resets progress and practice time to scene one. Otherwise it retries the current scene. Older trainer replays can recover scenes from their retry snapshots.
+A finesse fault opens an animated guide in every mode with Perfect finesse enabled: Sprint, Custom / room presets and fault practice. It automatically loops the correct route at a slower pace, with a pause at the completed placement. Click the guide to replay it or close it with ×; a new fault opens a fresh guide. The compact guide sits in the side panel so it cannot cover controls or downloads. Turning finesse off dismisses it. In fault practice, the one-attempt setting also resets progress and practice time to scene one. Otherwise it retries the current scene. Older trainer replays can recover scenes from their retry snapshots.
 
 The guide also keeps the complete numbered route visible before, during and after playback. Each step names the current key bindings, explains taps versus holds and when to release, and finishes with hard drop when enabled or automatic locking otherwise. Consecutive partial soft drops are grouped by row count. The current animation step is highlighted and completed steps are marked. The normal retry coach shares the same instructions. Demo and practice boards use the recorded custom dimensions and rotation system; practice disables the original session's goals and timed garbage source.
 
@@ -181,3 +181,30 @@ Room tests compare all ten catalog entries with initialized engine rules and exe
 - [MDN file drag-and-drop example](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop)
 
 Audio mappings were checked against the supplied client: soft-drop movement uses `softdrop`; piece locking uses `floor`, with `harddrop` added for a hard drop. `boardlock` belongs to the Zenith revival board effect and is not a piece-lock sound. Pausing and resuming use the menu click and respect the UI sound toggle.
+
+
+## Just think
+
+The main-page switch defaults to off. Its default style, **Think before each piece**, freezes the board and timer until a fresh game key, runs that piece normally, then freezes again after placement. **Run only while operating** advances on input events and while a game key is held; releasing all keys lets the player think. Both styles freeze gravity, lock delay and solo pressure together with the clock. Finesse retry waiting remains active independently of this switch. Settings and guide clicks do not resume a retry.
+
+## Drill, statistics and replay pages
+
+Navigation now includes **Play**, **Finesse drills**, **Statistics** and **Replays**. Moving away from Play pauses gameplay.
+
+Pure finesse drills generate all 162 unique empty-board placements, with piece, leftmost-column and rotation filters, plus endless or finite sessions. The field resets after each successful target. Statistics can select specific frequent faults for an endless focused drill. Empty-board practice isolates the placement habit; **Use original boards** preserves stack-dependent tucks and spins. Mixed board dimensions or kick systems are rejected with an explanation.
+
+Statistics persist sessions and recordings in IndexedDB, separately from the last-replay localStorage slot. They include average faults and excess inputs per session, perfect-attempt percentage, fault rankings, mode / completion filters and session playback. Repeated retries count separately; unchecked placements are evaluated when saved. Pure and fault practice are included. History is periodically saved during play and when changing sessions or pages. Backups export full recordings; backup imports validate the complete batch before one database transaction. Session IDs prevent duplicate entries. Deletion asks for confirmation and does not immediately recreate the active recording through autosave.
+
+The replay page accepts trainer JSON and native `.ttr` / `.ttrm`, via file picker or drag and drop. It supports player / round selection, play / pause, 0.25x to 4x speed, seeking, frame stepping, and Hold / Next display. It reconstructs recorded engine frames, including trainer rollback markers. Thinking time and manual pauses are omitted from the playback timeline. Native playback shares the validated importer and its mode compatibility limits.
+
+## Native replay export
+
+**Export TETR.IO replay (.ttr)** creates a local, unverified TETR.IO event envelope with game options, initial state, inputs and an end event. Retried and undone branches are removed. Export runs the generated file through native replay simulation and checks piece count, line count and final tiles before downloading. This is local verification, not TETR.IO server verification or a leaderboard submission.
+
+Native export currently covers ordinary Sprint and Custom sessions. Scene practice, authored queues, timed solo packets, refill / board clearing and countdown DAS precharge report an explicit compatibility message. Use trainer JSON for the exact complete recording of those features. The native exporter is based on public Viewtris samples and the supplied client format; acceptance by every current TETR.IO client version has not been established.
+
+## Materials and effects
+
+The original TETR.IO mino atlas and ghost atlas are now used for active pieces, the stack, Hold, Next and ghost outlines. Atlas coordinates and piece colors follow the archived client's simple-skin loader. Ghosts are tinted using its original white outline texture. Targets remain gray, with darker ghost-colored overlaps. Lock flashes, hard-drop beams and line-clear flashes approximate the native presentation in Canvas; they are not a complete port of the original particle renderer. Motion effects respect the browser's reduced-motion preference. Retry uses a 0.22-second excerpt of the native finesse-fault sound with a short fade; loading still uses the IDM-resistant JSON sound pack.
+
+AI helper candidates, implementation order and stricter input metrics are documented in [AI-TRAINING-RESEARCH.md](AI-TRAINING-RESEARCH.md). No strategic AI is activated yet.

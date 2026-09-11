@@ -13,7 +13,8 @@ const selected = [
   ['/res/skins/board/generic/board.png', 'ui/board.png'], ['/res/skins/board/generic/queue.png', 'ui/queue.png'],
   ['/res/header-overlay.png', 'ui/header-overlay.png'], ['/res/footer.png', 'ui/footer.png'],
   ['/res/40l.svg', 'ui/sprint.svg'], ['/res/zen.svg', 'ui/zen.svg'], ['/res/customsolo.svg', 'ui/custom.svg'],
-  ['/res/icon/revert.svg', 'ui/revert.svg'], ['/res/icon/close.svg', 'ui/close.svg']
+  ['/res/icon/revert.svg', 'ui/revert.svg'], ['/res/icon/close.svg', 'ui/close.svg'],
+  ['/res/skins/minos/tetrio.2x.png', 'ui/minos.png'], ['/res/skins/ghost/tetrio.2x.png', 'ui/ghost.png'], ['/res/particles/spark.png', 'ui/spark.png']
 ];
 const sources = [];
 async function asset(path) {
@@ -47,7 +48,7 @@ while (true) {
 }
 const length = rsd.readUInt32LE(cursor); cursor += 4;
 if (cursor + length !== rsd.length || rsd.subarray(cursor, cursor + 4).toString() !== 'OggS') throw new Error('Invalid RSD audio payload.');
-const names = ['boardappear', 'boardlock', 'move', 'rotate', 'floor', 'harddrop', 'softdrop', 'hold', 'clearline', 'clearquad', 'clearspin', 'clearbtb', 'allclear', 'combobreak', ...Array.from({ length: 16 }, (_, i) => `combo_${i + 1}`), 'countdown1', 'countdown2', 'countdown3', 'countdown4', 'countdown5', 'go', 'failure', 'finish', 'menuback', 'menuclick', 'menuconfirm', 'menuhover', 'menutap', 'pause_continue', 'pause_exit', 'pause_retry', 'pause_start', 'undo'];
+const names = ['boardappear', 'boardlock', 'move', 'rotate', 'floor', 'harddrop', 'softdrop', 'hold', 'clearline', 'clearquad', 'clearspin', 'clearbtb', 'allclear', 'combobreak', ...Array.from({ length: 16 }, (_, i) => `combo_${i + 1}`), 'countdown1', 'countdown2', 'countdown3', 'countdown4', 'countdown5', 'go', 'failure', 'finish', 'menuback', 'menuclick', 'menuconfirm', 'menuhover', 'menutap', 'pause_continue', 'pause_exit', 'pause_retry', 'pause_start', 'undo', 'finessefault'];
 const working = await mkdtemp(join(tmpdir(), 'trainer-audio-'));
 const input = join(working, 'source.ogg');
 const output = join(working, 'sounds.ogg');
@@ -58,8 +59,8 @@ const filters = [`[0:a]aresample=48000,asplit=${names.length}${names.map((_, i) 
 names.forEach((name, i) => {
   const sound = atlas[name];
   if (!sound) throw new Error(`Required sound missing: ${name}`);
-  const start = Math.round(sound.offset * 48000), end = Math.round((sound.offset + sound.duration) * 48000);
-  filters.push(`[s${i}]atrim=start_sample=${start}:end_sample=${end},asetpts=PTS-STARTPTS[a${i}]`);
+  const start = Math.round(sound.offset * 48000), end = Math.round((sound.offset + Math.min(sound.duration, name === 'finessefault' ? .22 : Infinity)) * 48000);
+  filters.push(`[s${i}]atrim=start_sample=${start}:end_sample=${end},asetpts=PTS-STARTPTS${name === 'finessefault' ? ',afade=t=out:st=0.18:d=0.04' : ''}[a${i}]`);
   compact[name] = { offset: samples / 48000, duration: (end - start) / 48000 };
   samples += end - start;
 });

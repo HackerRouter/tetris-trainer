@@ -2,5 +2,4 @@ node_modules/
 dist/
 test-results/
 playwright-report/
-prompt.md
-TODO.md
+TEMP/

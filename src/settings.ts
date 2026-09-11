@@ -14,7 +14,7 @@ export type Settings = {
   bindings: Record<Action, string>;
   extraBindings?: Partial<Record<Action, string[]>>;
   display: { grid: boolean; ghost: boolean; ghostOpacity: number; gridOpacity: number; boardOpacity: number; coloredGhost: boolean; dimLockedHold: boolean };
-  training: { countdownSeconds: number; finesseEnabled: boolean; practiceFinesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean };
+  training: { countdownSeconds: number; finesseEnabled: boolean; practiceFinesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean; justThink: boolean; thinkStyle: 'piece' | 'input' };
   tetrioConfig?: Record<string, unknown>;
   audio: { enabled: boolean; volume: number; ui: boolean };
   custom: CustomRules;
@@ -26,7 +26,7 @@ export const defaults: Settings = {
   handling: { arr: 0, das: 6, dcd: 0, sdf: 41, cancel: false, safelock: false, may20g: true, irs: 'tap', ihs: 'tap' },
   bindings: { moveLeft: 'ArrowLeft', moveRight: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space', rotateCW: 'ArrowUp', rotateCCW: 'KeyZ', rotate180: 'KeyA', hold: 'KeyC', pause: 'Escape', restart: 'KeyR' },
   display: { grid: true, ghost: true, ghostOpacity: 0.24, gridOpacity: 0.09, boardOpacity: 1, coloredGhost: true, dimLockedHold: true },
-  training: { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false },
+  training: { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false, justThink: false, thinkStyle: 'piece' },
   audio: { enabled: true, volume: .3, ui: true },
   custom: structuredClone(customDefaults)
 };
@@ -100,6 +100,14 @@ export function validateSettings(value: unknown): Settings {
     const seconds = training.countdownSeconds;
     if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0 || seconds > 10 || Math.abs(seconds * 10 - Math.round(seconds * 10)) > 1e-7) throw new Error('Start countdown must be 0–10 seconds, in steps of 0.1.');
     result.training.countdownSeconds = seconds;
+    if (training.justThink !== undefined) {
+      if (typeof training.justThink !== 'boolean') throw new Error('Invalid Just think option.');
+      result.training.justThink = training.justThink;
+    }
+    if (training.thinkStyle !== undefined) {
+      if (training.thinkStyle !== 'piece' && training.thinkStyle !== 'input') throw new Error('Unknown Just think style.');
+      result.training.thinkStyle = training.thinkStyle;
+    }
     if (training.practiceFinesseEnabled !== undefined) {
       if (typeof training.practiceFinesseEnabled !== 'boolean') throw new Error('Invalid practice finesse setting.');
       result.training.practiceFinesseEnabled = training.practiceFinesseEnabled;

@@ -31,13 +31,14 @@ export class TrainerGame {
   unverified = 0;
   countdownFrames = 0;
   waitingForInput = false;
+  thinking = false;
   fault: { target: Cell[]; path: FinesseResult; actual: number; reason: 'finesse' | 'target' } | null = null;
   events: { frame: number; type: string; data: unknown }[] = [];
   placements: Placement[] = [];
   clears: Record<string, number> = {};
   maxCombo = 0;
   maxB2B = 0;
-  practice: { set: PracticeSet; index: number; restarts: number } | null = null;
+  practice: { set: PracticeSet; index: number; restarts: number; completed: number } | null = null;
   demonstration: Demonstration | null = null;
   private timerFrames = 0;
   private checkpoint: Checkpoint;
@@ -74,7 +75,7 @@ export class TrainerGame {
     this.engine.events.on('falling.lock', res => this.locked(res));
     if (practice) {
       if (!practice.scenes.length) throw new Error('This replay has no finesse faults to practice.');
-      this.practice = { set: structuredClone(practice), index: 0, restarts: 0 };
+      this.practice = { set: structuredClone(practice), index: 0, restarts: 0, completed: 0 };
       this.loadScene(0);
     }
   }
@@ -84,11 +85,13 @@ export class TrainerGame {
     this.startedAt = new Date().toISOString();
     this.countdownFrames = Math.round(this.settings.training.countdownSeconds * 60);
     this.status = this.countdownFrames > 0 ? 'countdown' : 'playing';
+    this.thinking = this.settings.training.justThink && this.settings.training.thinkStyle === 'piece';
     this.events.push({ frame: this.engine.frame, type: 'start', data: { countdownSeconds: this.settings.training.countdownSeconds } });
   }
 
   get elapsedMs() { return this.timerFrames * 1000 / 60; }
   get active() { return this.status === 'playing' || this.status === 'countdown'; }
+  get thinkingPaused() { return this.settings.training.justThink && (this.settings.training.thinkStyle === 'piece' ? this.thinking : !this.input.activeKeys.length); }
   get target() { return this.practice?.set.scenes[this.practice.index]?.target ?? this.fault?.target ?? null; }
   get canUndo() { return this.rules.undo && !this.practice && this.undoStack.length > 0 && !['ready', 'countdown'].includes(this.status); }
   get canEditField() { return this.rules.id === 'custom' && !this.practice && ['playing', 'paused'].includes(this.status); }
@@ -137,12 +140,14 @@ export class TrainerGame {
     if (this.status !== 'playing') return;
     const holdBlocked = !this.rules.hold || !!this.practice || (!!this.fault && !this.settings.training.allowDifferentTarget);
     const frames = this.input.drain(this.engine.frame).filter(frame => !holdBlocked || !('key' in frame.data && frame.data.key === 'hold'));
-    if (this.waitingForInput) {
+    if (this.waitingForInput || this.thinking) {
       const trigger = frames.find(frame => frame.type === 'keydown' && (frame.data.key !== 'hardDrop' || this.rules.advanced.hardDrop) && (frame.data.key !== 'rotate180' || this.rules.allow180));
       if (!trigger || trigger.type !== 'keydown') return;
       this.waitingForInput = false;
+      this.thinking = false;
       this.events.push({ frame: this.engine.frame, type: 'input-resume', data: { key: trigger.data.key, timeMs: this.elapsedMs } });
     }
+    if (this.settings.training.justThink && this.settings.training.thinkStyle === 'input' && !frames.length && !this.input.activeKeys.some(key => (key !== 'hold' || !holdBlocked) && (key !== 'rotate180' || this.rules.allow180) && (key !== 'hardDrop' || this.rules.advanced.hardDrop))) return;
     const received = this.room.beforeTick(this.timerFrames);
     if (received) this.events.push({ frame: this.engine.frame, type: 'solo-garbage', data: { amount: received, timeMs: this.elapsedMs } });
     if (this.bufferedCharge) {
@@ -157,6 +162,7 @@ export class TrainerGame {
     const result = this.engine.tick(frames);
     this.pieceInputs.push(...result.keys.slice(this.frameKeyOffset));
     this.frameKeyOffset = 0;
+    if (this.thinking) this.releaseAll();
     if (this.rollback) {
       const checkpoint = this.rollback;
       this.rollback = null;
@@ -199,7 +205,7 @@ export class TrainerGame {
       if (reason === 'finesse' && finesse) {
         this.demonstration = { id: `fault-${this.faults}`, serial: this.faults, sceneNumber: this.practice ? this.practice.index + 1 : this.engine.stats.pieces, snapshot: structuredClone(snapshot), target: locking.target, path: finesse };
         if (this.practice && this.settings.training.strictPractice) {
-          this.practice.restarts++;
+          this.practice.restarts++; this.practice.completed = 0;
           this.rollback = { ...locking.checkpoint, timerFrames: 0, perfects: 0, holds: 0, clears: {}, maxCombo: 0, maxB2B: 0 };
           this.nextScene = 0;
         }
@@ -217,7 +223,11 @@ export class TrainerGame {
       const refilled = this.room.refill();
       if (refilled) this.events.push({ frame: this.engine.frame, type: 'garbage-refill', data: { amount: refilled, timeMs: this.elapsedMs, room: structuredClone(this.room.state) } });
       this.checkpoint = this.capture();
-      if (this.practice) this.nextScene = this.practice.index + 1;
+      if (this.practice) {
+        this.practice.completed++;
+        this.nextScene = this.practice.set.loop ? (this.practice.index + 1) % this.practice.set.scenes.length : this.practice.index + 1;
+      }
+      this.thinking = this.settings.training.justThink && this.settings.training.thinkStyle === 'piece';
     }
   }
 
@@ -239,6 +249,13 @@ export class TrainerGame {
     if (!enabled) { this.fault = null; this.demonstration = null; }
     this.releaseAll();
     this.events.push({ frame: this.engine.frame, type: 'finesse-setting', data: { enabled, timeMs: this.elapsedMs } });
+  }
+
+  setJustThink(enabled: boolean, style: 'piece' | 'input') {
+    this.settings.training.justThink = enabled; this.settings.training.thinkStyle = style;
+    this.thinking = enabled && style === 'piece';
+    this.releaseAll();
+    this.events.push({ frame: this.engine.frame, type: 'just-think', data: { enabled, style, timeMs: this.elapsedMs } });
   }
 
   clearField(manual = true) {
@@ -263,7 +280,7 @@ export class TrainerGame {
   }
 
   finish() {
-    if (!this.canEditField) return false;
+    if (!this.canEditField && !(this.practice && ['playing', 'paused'].includes(this.status))) return false;
     this.status = 'complete'; this.releaseAll();
     this.events.push({ frame: this.engine.frame, type: 'finish', data: { timeMs: this.elapsedMs } });
     return true;
@@ -290,6 +307,6 @@ export class TrainerGame {
   }
 
   export() {
-    return { version: 1, mode: this.practice ? 'fault-practice' : this.rules.id === 'custom' ? 'custom' : '40l-finesse', modeRules: this.rules, presetSource: this.rules.sourcePreset ? exportPreset(this.settings.custom).source : null, runtime: { room: structuredClone(this.room.state), timerFrames: this.timerFrames, waitingForInput: this.waitingForInput }, seed: this.seed, startedAt: this.startedAt, savedAt: new Date().toISOString(), settings: this.settings, engineVersion: '4.2.7', finesseRules, status: this.status, events: this.events, placements: this.placements, practice: this.practice ? { name: this.practice.set.name, completed: this.practice.index, total: this.practice.set.scenes.length, restarts: this.practice.restarts } : null, result: { timeMs: this.elapsedMs, sessionTimeMs: this.engine.frame * 1000 / 60, inputs: this.inputs, holds: this.holds, faults: this.faults, targetMisses: this.targetMisses, perfects: this.perfects, unverified: this.unverified, clears: this.clears, maxCombo: this.maxCombo, maxB2B: this.maxB2B, boardResets: this.boardResets, ...this.engine.stats } };
+    return { version: 1, mode: this.practice ? 'fault-practice' : this.rules.id === 'custom' ? 'custom' : '40l-finesse', modeRules: this.rules, presetSource: this.rules.sourcePreset ? exportPreset(this.settings.custom).source : null, runtime: { room: structuredClone(this.room.state), timerFrames: this.timerFrames, waitingForInput: this.waitingForInput, thinking: this.thinking, justThink: this.settings.training.justThink, thinkStyle: this.settings.training.thinkStyle }, finalSnapshot: this.engine.snapshot({ isUndoRedo: true }), seed: this.seed, startedAt: this.startedAt, savedAt: new Date().toISOString(), settings: this.settings, engineVersion: '4.2.7', finesseRules, status: this.status, events: this.events, placements: this.placements, practice: this.practice ? { name: this.practice.set.name, completed: this.practice.completed, kind: this.practice.set.kind, loop: this.practice.set.loop, total: this.practice.set.scenes.length, restarts: this.practice.restarts } : null, result: { timeMs: this.elapsedMs, sessionTimeMs: this.engine.frame * 1000 / 60, inputs: this.inputs, holds: this.holds, faults: this.faults, targetMisses: this.targetMisses, perfects: this.perfects, unverified: this.unverified, clears: this.clears, maxCombo: this.maxCombo, maxB2B: this.maxB2B, boardResets: this.boardResets, ...this.engine.stats } };
   }
 }
