@@ -1,3 +1,5 @@
+import { customDefaults, validateCustomRules, type CustomRules } from './modes';
+
 export const actions = {
   moveLeft: 'Move left', moveRight: 'Move right', softDrop: 'Soft drop',
   hardDrop: 'Hard drop', rotateCW: 'Rotate clockwise', rotateCCW: 'Rotate counterclockwise',
@@ -12,8 +14,10 @@ export type Settings = {
   bindings: Record<Action, string>;
   extraBindings?: Partial<Record<Action, string[]>>;
   display: { grid: boolean; ghost: boolean; ghostOpacity: number; gridOpacity: number; boardOpacity: number; coloredGhost: boolean; dimLockedHold: boolean };
-  training: { countdownSeconds: number; finesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean };
+  training: { countdownSeconds: number; finesseEnabled: boolean; practiceFinesseEnabled: boolean; allowDifferentTarget: boolean; undoEnabled: boolean; infiniteHold: boolean; strictPractice: boolean };
   tetrioConfig?: Record<string, unknown>;
+  audio: { enabled: boolean; volume: number; ui: boolean };
+  custom: CustomRules;
 };
 
 export const storageKey = 'tetrio-trainer-settings-v1';
@@ -22,7 +26,9 @@ export const defaults: Settings = {
   handling: { arr: 0, das: 6, dcd: 0, sdf: 41, cancel: false, safelock: false, may20g: true, irs: 'tap', ihs: 'tap' },
   bindings: { moveLeft: 'ArrowLeft', moveRight: 'ArrowRight', softDrop: 'ArrowDown', hardDrop: 'Space', rotateCW: 'ArrowUp', rotateCCW: 'KeyZ', rotate180: 'KeyA', hold: 'KeyC', pause: 'Escape', restart: 'KeyR' },
   display: { grid: true, ghost: true, ghostOpacity: 0.24, gridOpacity: 0.09, boardOpacity: 1, coloredGhost: true, dimLockedHold: true },
-  training: { countdownSeconds: 3, finesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false }
+  training: { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false },
+  audio: { enabled: true, volume: .3, ui: true },
+  custom: structuredClone(customDefaults)
 };
 
 const record = (v: unknown): Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
@@ -94,6 +100,10 @@ export function validateSettings(value: unknown): Settings {
     const seconds = training.countdownSeconds;
     if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0 || seconds > 10 || Math.abs(seconds * 10 - Math.round(seconds * 10)) > 1e-7) throw new Error('Start countdown must be 0–10 seconds, in steps of 0.1.');
     result.training.countdownSeconds = seconds;
+    if (training.practiceFinesseEnabled !== undefined) {
+      if (typeof training.practiceFinesseEnabled !== 'boolean') throw new Error('Invalid practice finesse setting.');
+      result.training.practiceFinesseEnabled = training.practiceFinesseEnabled;
+    }
     for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) {
       if (typeof training[key] !== 'boolean') throw new Error(`Invalid ${key} setting.`);
       result.training[key] = training[key];
@@ -102,6 +112,12 @@ export function validateSettings(value: unknown): Settings {
   if (root.tetrioConfig !== undefined) {
     if (!root.tetrioConfig || typeof root.tetrioConfig !== 'object' || Array.isArray(root.tetrioConfig) || JSON.stringify(root.tetrioConfig).length > 1_000_000) throw new Error('Invalid retained TETR.IO config.');
     result.tetrioConfig = structuredClone(root.tetrioConfig) as Record<string, unknown>;
+  }
+  if (root.custom !== undefined) result.custom = validateCustomRules(root.custom);
+  if (root.audio !== undefined) {
+    const audio = record(root.audio);
+    if (typeof audio.enabled !== 'boolean' || typeof audio.ui !== 'boolean' || typeof audio.volume !== 'number' || !Number.isFinite(audio.volume) || audio.volume < 0 || audio.volume > 1) throw new Error('Invalid audio settings.');
+    result.audio = { enabled: audio.enabled, ui: audio.ui, volume: audio.volume };
   }
   return result;
 }

@@ -2,31 +2,42 @@ import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engi
 import { copyPiece, type Cell } from './finesse';
 import type { TrainerGame } from './game';
 import type { Settings } from './settings';
+import { drawNativeBorder } from './ui-assets';
 
 const colors: Record<string, string> = { i: '#49cfe5', o: '#eacf66', t: '#ae85e8', s: '#71cf98', z: '#e77888', j: '#759fea', l: '#eeac6c', gb: '#777e91' };
 
 export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: EngineSnapshot['board'], piece: TetrominoSnapshot | null, target: Cell[] | null, options: Pick<Settings['display'], 'grid' | 'ghost' | 'ghostOpacity'> & Partial<Settings['display']>, buffer = 3) {
   const ctx = canvas.getContext('2d')!;
-  const size = canvas.width / 10, top = size * buffer, bottom = top + size * 20;
+  const width = engine.board.width, height = engine.board.height;
+  const size = canvas.width / width, top = size * buffer, bottom = top + size * height;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.globalAlpha = options.boardOpacity ?? 1;
-  ctx.fillStyle = '#0b101b'; ctx.fillRect(0, top, canvas.width, size * 20);
+  ctx.fillStyle = '#0b101b'; ctx.fillRect(0, top, canvas.width, size * height);
   ctx.globalAlpha = 1;
   const drawCell = (x: number, y: number, color: string, outline = false) => {
-    if (y < 0 || y >= 20 + buffer) return;
-    const px = x * size, py = top + (19 - y) * size;
+    if (y < 0 || y >= height + buffer) return;
+    const px = x * size, py = top + (height - 1 - y) * size;
     if (outline) { ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.strokeRect(px + 2, py + 2, size - 4, size - 4); }
     else { ctx.fillStyle = color; ctx.fillRect(px + 1, py + 1, size - 2, size - 2); ctx.fillStyle = '#ffffff24'; ctx.fillRect(px + 2, py + 2, size - 4, Math.max(1, size / 10)); }
   };
   if (options.grid) {
     ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = options.gridOpacity ?? .09; ctx.lineWidth = 1;
-    for (let x = 1; x < 10; x++) { ctx.beginPath(); ctx.moveTo(x * size, top); ctx.lineTo(x * size, bottom); ctx.stroke(); }
-    for (let y = 1; y < 20; y++) { ctx.beginPath(); ctx.moveTo(0, top + y * size); ctx.lineTo(canvas.width, top + y * size); ctx.stroke(); }
+    for (let x = 1; x < width; x++) { ctx.beginPath(); ctx.moveTo(x * size, top); ctx.lineTo(x * size, bottom); ctx.stroke(); }
+    for (let y = 1; y < height; y++) { ctx.beginPath(); ctx.moveTo(0, top + y * size); ctx.lineTo(canvas.width, top + y * size); ctx.stroke(); }
     ctx.globalAlpha = 1;
   }
-  for (let y = 0; y < Math.min(board.length, 20 + buffer); y++) for (let x = 0; x < 10; x++) {
+  for (let y = 0; y < Math.min(board.length, height + buffer); y++) for (let x = 0; x < width; x++) {
     const tile = board[y][x];
-    if (tile) drawCell(x, y, colors[(typeof tile === 'string' ? tile : tile.mino).toLowerCase()] || '#8a92a3');
+    if (tile) {
+      const symbol = (typeof tile === 'string' ? tile : tile.mino).toLowerCase();
+      drawCell(x, y, colors[symbol] || '#8a92a3');
+      if (symbol === 'bomb') {
+        const px = (x + .5) * size, py = top + (height - y - .5) * size;
+        ctx.fillStyle = '#202533'; ctx.beginPath(); ctx.arc(px, py, size * .28, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = Math.max(1, size * .05); ctx.stroke();
+        ctx.fillStyle = '#ff9988'; ctx.fillRect(px + size * .1, py - size * .37, size * .12, size * .12);
+      }
+    }
   }
   const targetCells = new Set(target?.map(([x, y]) => `${x},${y}`));
   const ghostCells = new Set<string>();
@@ -51,8 +62,10 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
     drawCell(x, y, overlap ? overlapColor : '#9b9b9b', true);
   }
   ctx.globalAlpha = 1;
-  ctx.strokeStyle = '#b3c3da'; ctx.lineWidth = 2;
-  ctx.strokeRect(1, top + 1, canvas.width - 2, size * 20 - 2);
+  if (!drawNativeBorder(ctx, top, canvas.width, size * height)) {
+    ctx.strokeStyle = '#b3c3da'; ctx.lineWidth = 2;
+    ctx.strokeRect(1, top + 1, canvas.width - 2, size * height - 2);
+  }
 }
 
 function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string | null)[], dim = false) {
@@ -73,7 +86,10 @@ function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string
 
 export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, game: TrainerGame) {
   const engine = game.engine;
-  drawBoard(canvas, engine, engine.board.state, game.status === 'topout' ? null : engine.falling.snapshot(), game.target, game.settings.display);
-  drawPreviews(hold, engine, [engine.held], game.settings.display.dimLockedHold && engine.holdLocked && !game.settings.training.infiniteHold);
-  drawPreviews(next, engine, engine.queue.slice(0, 5));
+  if (canvas.width !== engine.board.width * 30 || canvas.height !== (engine.board.height + 3) * 30) {
+    canvas.width = engine.board.width * 30; canvas.height = (engine.board.height + 3) * 30;
+  }
+  drawBoard(canvas, engine, engine.board.state, game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), game.target, { ...game.settings.display, ghost: game.settings.display.ghost && game.rules.advanced.shadow });
+  drawPreviews(hold, engine, [engine.held], game.settings.display.dimLockedHold && engine.holdLocked && !game.rules.infiniteHold);
+  drawPreviews(next, engine, engine.queue.slice(0, game.rules.nextCount));
 }

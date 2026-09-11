@@ -98,7 +98,10 @@ export class SettingsPanel {
     for (const key of ['grid', 'ghost', 'coloredGhost', 'dimLockedHold'] as const) this.field<HTMLInputElement>(key).checked = settings.display[key];
     for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) this.field(key).value = String(settings.display[key] * 100);
     this.field('countdownSeconds').value = String(settings.training.countdownSeconds);
-    for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) this.field<HTMLInputElement>(key).checked = settings.training[key];
+    this.field('audio-volume').value = String(settings.audio.volume * 100);
+    this.field<HTMLInputElement>('audio-enabled').checked = settings.audio.enabled;
+    this.field<HTMLInputElement>('audio-ui').checked = settings.audio.ui;
+    for (const key of ['allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) this.field<HTMLInputElement>(key).checked = settings.training[key];
     this.drawBindings(); this.updateUnits();
     document.querySelector<HTMLElement>('#config-report')!.hidden = true;
     if (settings.tetrioConfig) {
@@ -119,11 +122,13 @@ export class SettingsPanel {
       this.field<HTMLOutputElement>(`${key}-unit`).textContent = key === 'arr' && value === 0 ? 'Instant' : `${(value * 1000 / 60).toFixed(1)} ms`;
     }
     document.querySelector('#opacity-unit')!.textContent = `${this.field('ghostOpacity').value}%`;
+    document.querySelector('#audio-volume-unit')!.textContent = `${this.field('audio-volume').value}%`;
     for (const key of ['gridOpacity', 'boardOpacity']) document.querySelector(`#${key}-unit`)!.textContent = `${this.field(key).value}%`;
   }
 
   private read(): Settings {
     const result = structuredClone(this.draft);
+    result.audio = { enabled: this.field<HTMLInputElement>('audio-enabled').checked, volume: Number(this.field('audio-volume').value) / 100, ui: this.field<HTMLInputElement>('audio-ui').checked };
     for (const key of ['arr', 'das', 'dcd', 'sdf'] as const) {
       const value = this.field(key).value;
       result.handling[key] = value === '' ? NaN : Number(value);
@@ -133,7 +138,7 @@ export class SettingsPanel {
     for (const key of ['grid', 'ghost', 'coloredGhost', 'dimLockedHold'] as const) result.display[key] = this.field<HTMLInputElement>(key).checked;
     for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) result.display[key] = Number(this.field(key).value) / 100;
     result.training.countdownSeconds = this.field('countdownSeconds').value === '' ? NaN : Number(this.field('countdownSeconds').value);
-    for (const key of ['finesseEnabled', 'allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) result.training[key] = this.field<HTMLInputElement>(key).checked;
+    for (const key of ['allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) result.training[key] = this.field<HTMLInputElement>(key).checked;
     return validateSettings(result);
   }
 }

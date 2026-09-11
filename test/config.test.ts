@@ -16,7 +16,8 @@ test('the supplied TTC maps handling, physical keys and supported video settings
   assert.equal(settings.display.gridOpacity, .5); assert.equal(settings.display.ghostOpacity, .8);
   assert.equal(settings.display.boardOpacity, .85); assert.equal(settings.display.coloredGhost, true);
   assert.deepEqual(settings.training, base.training);
-  assert.equal(result.applied.length, 25);
+  assert.deepEqual(settings.audio, { enabled: true, volume: .3, ui: true });
+  assert.equal(result.applied.length, 27);
   assert.ok(result.retained.includes('gameoptions.pro_40l'));
   assert.ok(result.retained.includes('video.graphics'));
   assert.deepEqual(base.tetrioConfig, undefined);

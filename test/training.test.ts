@@ -23,7 +23,7 @@ test('training defaults migrate without losing existing settings and validate im
   old.handling!.das = 9.2;
   const settings = validateSettings(old);
   assert.equal(settings.handling.das, 9.2);
-  assert.deepEqual(settings.training, { countdownSeconds: 3, finesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false });
+  assert.deepEqual(settings.training, { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false });
   for (const countdownSeconds of [-1, 10.1, NaN, Infinity, .15]) assert.throws(() => validateSettings(instant({ countdownSeconds })));
   assert.equal(validateSettings(instant({ countdownSeconds: .5 })).training.countdownSeconds, .5);
 });
@@ -120,6 +120,43 @@ test('faults restore the current piece timer checkpoint while replay events rema
   assert.ok(game.events.every((event, i) => !i || event.frame >= game.events[i - 1].frame));
 });
 
+test('retry waits without advancing the board or clock and executes the first fresh game input once', () => {
+  const game = new TrainerGame(instant(), 942562); game.start();
+  tick(game, 60); mistake(game);
+  assert.equal(game.waitingForInput, true);
+  const before = game.engine.snapshot(), inputs = game.inputs, events = game.events.length;
+  tick(game, 600); game.input.release('hardDrop'); tick(game, 60);
+  assert.equal(game.elapsedMs, 0); assert.deepEqual(game.engine.snapshot(), before);
+  assert.equal(game.inputs, inputs); assert.equal(game.events.length, events);
+  assert.equal(game.export().runtime.waitingForInput, true);
+  tap(game, 'moveLeft');
+  assert.equal(game.waitingForInput, false); assert.equal(game.engine.falling.x, before.falling.location[0] - 1);
+  assert.equal(game.inputs, inputs + 1); assert.equal(game.elapsedMs, 1000 / 60);
+  tap(game, 'hardDrop'); assert.equal(game.engine.stats.pieces, 1);
+  assert.deepEqual(game.placements.at(-1)!.inputs, ['moveLeft', 'hardDrop']);
+  const resumes = game.events.filter(event => event.type === 'input-resume');
+  assert.equal(resumes.length, 1); assert.deepEqual(resumes[0].data, { key: 'moveLeft', timeMs: 0 });
+});
+
+test('every allowed game action resumes retry timing, including zero-movement drops and hold', () => {
+  for (const action of ['moveLeft', 'moveRight', 'softDrop', 'hardDrop', 'rotateCW', 'rotateCCW', 'rotate180', 'hold'] as const) {
+    const game = new TrainerGame(instant(), 942562); game.start(); mistake(game);
+    tap(game, action);
+    assert.equal(game.waitingForInput, false, action); assert.equal(game.elapsedMs, 1000 / 60, action);
+    assert.equal(game.events.filter(event => event.type === 'input-resume').length, 1);
+  }
+});
+
+test('manual pause and finesse settings preserve the input wait, and blocked hold cannot resume it', () => {
+  const game = new TrainerGame(instant({ allowDifferentTarget: false }), 942562); game.start(); mistake(game);
+  tap(game, 'hold'); tick(game, 60); assert.equal(game.waitingForInput, true); assert.equal(game.elapsedMs, 0);
+  game.pause(); game.input.press('moveLeft'); tick(game, 60); game.releaseAll(); game.resume(); tick(game, 60);
+  assert.equal(game.waitingForInput, true); assert.equal(game.elapsedMs, 0);
+  game.setFinesseEnabled(false); tick(game, 60);
+  assert.equal(game.waitingForInput, true); assert.equal(game.elapsedMs, 0);
+  tap(game, 'hardDrop'); assert.equal(game.engine.stats.pieces, 1); assert.equal(game.elapsedMs, 1000 / 60);
+});
+
 test('disabling alternative targets rejects another destination until the outline is matched', () => {
   const game = new TrainerGame(instant({ allowDifferentTarget: false }), 942562); game.start();
   mistake(game);
@@ -128,6 +165,7 @@ test('disabling alternative targets rejects another destination until the outlin
   assert.equal(game.engine.stats.pieces, 0);
   assert.equal(game.fault?.reason, 'target'); assert.equal(game.targetMisses, 1);
   assert.ok(sameCells(game.fault!.target, target)); assert.equal(game.elapsedMs, 0);
+  tick(game, 120); assert.equal(game.elapsedMs, 0); assert.equal(game.waitingForInput, true);
   const piece = game.engine.falling.symbol;
   tap(game, 'hold'); assert.equal(game.engine.falling.symbol, piece);
   tap(game, 'hardDrop'); assert.equal(game.engine.stats.pieces, 1);
@@ -157,6 +195,8 @@ test('undo restores board, bag, hold, statistics and timer and is disabled by de
   assert.deepEqual(game.engine.board.state, first.board);
   assert.deepEqual(game.engine.queue.snapshot(), first.queue);
   assert.equal(game.engine.held, first.hold);
+  const waiting = game.engine.snapshot(); tick(game, 180);
+  assert.equal(game.waitingForInput, true); assert.equal(game.elapsedMs, time); assert.deepEqual(game.engine.snapshot(), waiting);
   assert.equal(game.undo(), true); assert.equal(game.elapsedMs, 0);
   assert.equal(game.undo(), false);
 });
@@ -185,6 +225,8 @@ test('practice imports fault scenes, enforces targets, resets the whole set and 
   assert.equal(game.perfects, 0); assert.equal(game.elapsedMs, 0);
   assert.ok(game.demonstration); assert.ok(sameCells(game.demonstration!.target, failedTarget));
   assert.equal(game.demonstration!.path.cost, 0);
+  const waiting = game.engine.snapshot(); tick(game, 180);
+  assert.equal(game.elapsedMs, 0); assert.equal(game.waitingForInput, true); assert.deepEqual(game.engine.snapshot(), waiting);
   tap(game, 'hardDrop'); tap(game, 'hardDrop');
   assert.equal(game.status, 'complete'); assert.equal(game.practice?.index, 2);
 });

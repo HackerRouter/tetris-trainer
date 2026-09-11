@@ -10,6 +10,8 @@ const boolean = (value: unknown): boolean => { if (typeof value !== 'boolean') t
 const opacity = (value: unknown): number => { const n = numeric(value); if (!Number.isFinite(n) || n < 0 || n > 1) throw new Error('Opacity must be between 0 and 1.'); return n; };
 
 export const tetrioConfigAdapters: ConfigAdapter[] = [
+  { path: 'volume.sfx', apply: (settings, value) => { const n = numeric(value); if (!Number.isFinite(n) || n < 0 || n > 1) throw new Error('Volume must be between 0 and 1.'); settings.audio.volume = n; } },
+  { path: 'volume.disable', apply: (settings, value) => { settings.audio.enabled = !boolean(value); } },
   ...(['arr', 'das', 'dcd', 'sdf'] as const).map(key => ({ path: `handling.${key}`, apply: (settings: Settings, value: unknown) => { settings.handling[key] = numeric(value); } })),
   ...(['cancel', 'safelock', 'may20g'] as const).map(key => ({ path: `handling.${key}`, apply: (settings: Settings, value: unknown) => { settings.handling[key] = boolean(value); } })),
   ...(['irs', 'ihs'] as const).map(key => ({ path: `handling.${key}`, apply: (settings: Settings, value: unknown) => {

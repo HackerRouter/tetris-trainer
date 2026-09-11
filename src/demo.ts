@@ -20,6 +20,7 @@ export class DemoPanel {
   private since = 0;
 
   constructor() {
+    document.querySelector('.finesse-control')!.after(this.popup);
     document.getElementById('demo-close')!.addEventListener('click', event => { this.popup.hidden = true; (event.currentTarget as HTMLElement).blur(); });
     document.getElementById('demo-replay')!.addEventListener('click', event => { this.index = 0; this.since = performance.now(); (event.currentTarget as HTMLElement).blur(); });
   }
@@ -29,13 +30,15 @@ export class DemoPanel {
       this.source = game.demonstration;
       this.popup.hidden = !this.source;
       if (this.source) {
-        document.getElementById('demo-title')!.textContent = `Scene ${this.source.sceneNumber} · Correct placement`;
-        this.engine = createEngine(game.settings, 1);
+        document.getElementById('demo-title')!.textContent = `${game.practice ? 'Scene' : 'Piece'} ${this.source.sceneNumber} · Correct placement`;
+        this.engine = createEngine(game.settings, 1, game.rules);
+        this.canvas.width = this.engine.board.width * 18;
+        this.canvas.height = (this.engine.board.height + 3) * 18;
         const steps = placementSteps(this.source.path, game.settings);
         this.steps = steps.map(step => { const item = document.createElement('li'); item.textContent = step.text; return item; });
         document.getElementById('demo-steps')!.replaceChildren(...this.steps);
-        document.getElementById('demo-summary')!.textContent = `${this.source.path.cost} finesse input${this.source.path.cost === 1 ? '' : 's'} · ${steps.length} step${steps.length === 1 ? '' : 's'}. Hard drop is not counted.`;
-        document.getElementById('demo-note')!.textContent = this.source.path.drop === 'soft' ? 'Start from the shown position. Lower the piece only where indicated, then finish with hard drop.' : 'Start from the shown position. Follow the steps in order, then finish with hard drop.';
+        document.getElementById('demo-summary')!.textContent = `${this.source.path.cost} finesse input${this.source.path.cost === 1 ? '' : 's'} · ${steps.length} step${steps.length === 1 ? '' : 's'}. Drop inputs are not counted.`;
+        document.getElementById('demo-note')!.textContent = this.source.path.drop === 'lock' ? 'Start from the shown position. Follow the steps, soft drop and wait for automatic locking.' : this.source.path.drop === 'soft' ? 'Start from the shown position. Lower the piece only where indicated, then finish with hard drop.' : 'Start from the shown position. Follow the steps in order, then finish with hard drop.';
         this.frames = this.build(this.source, this.engine, steps);
         this.index = 0; this.since = now;
       }
@@ -61,6 +64,7 @@ export class DemoPanel {
     for (const instruction of steps) {
       const { move } = instruction;
       if (move === 'hardDrop') { add('Hard drop', 350); piece.softDrop(board); step++; add('Complete · Click to replay', Infinity); continue; }
+      if (move === 'waitLock') { add('Wait for automatic lock', Math.max(400, engine.misc.movement.lockTime * 1000 / 60)); step++; add('Complete · Click to replay', Infinity); continue; }
       if (move === 'dasLeft' || move === 'dasRight') {
         const direction = move === 'dasLeft' ? 'moveLeft' : 'moveRight';
         while (piece[direction](board)) add(move === 'dasLeft' ? 'Hold left, then release' : 'Hold right, then release', 90);

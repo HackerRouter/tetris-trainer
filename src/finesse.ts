@@ -3,7 +3,7 @@ import { finesseTable } from './finesse-data';
 
 export type Cell = [number, number];
 export type Move = 'moveLeft' | 'moveRight' | 'dasLeft' | 'dasRight' | 'rotateCW' | 'rotateCCW' | 'rotate180' | 'softDrop' | 'down';
-export type FinesseResult = { cost: number; moves: Move[]; source: 'd-002' | 'extended'; drop: 'hard' | 'soft' };
+export type FinesseResult = { cost: number; moves: Move[]; source: 'd-002' | 'extended'; drop: 'hard' | 'soft' | 'lock' };
 
 const horizontalMoves: Move[] = ['moveLeft', 'moveRight', 'dasLeft', 'dasRight', 'rotateCW', 'rotateCCW', 'rotate180'];
 const codes: Record<string, Move> = { l: 'moveLeft', r: 'moveRight', L: 'dasLeft', R: 'dasRight', C: 'rotateCW', c: 'rotateCCW', 1: 'rotate180' };
@@ -39,7 +39,7 @@ function referencePath(engine: Engine, snapshot: EngineSnapshot, target: Cell[])
   const table = finesseTable[symbol];
   const initial = copyPiece(engine, snapshot.falling);
   const spawn = new Tetromino({ symbol: initial.symbol, boardWidth: engine.board.width, boardHeight: engine.board.height, initialRotation: 0 });
-  if (!table || initial.x !== spawn.x || initial.rotation !== 0) return null;
+  if (!table || !['SRS', 'SRS+'].includes(engine.kickTableName) || engine.board.width !== 10 || initial.x !== spawn.x || initial.rotation !== 0) return null;
   const shape = placementKey(target);
   const candidates: string[] = [];
   for (const [position, row] of Object.entries(table)) {
@@ -53,6 +53,7 @@ function referencePath(engine: Engine, snapshot: EngineSnapshot, target: Cell[])
   for (const sequence of candidates.sort((a, b) => a.length - b.length)) {
     const piece = copyPiece(engine, snapshot.falling);
     const moves = [...sequence].map(code => codes[code]);
+    if (!engine.misc.allowed.spin180 && moves.includes('rotate180')) continue;
     if (!legal(piece.absoluteBlocks, snapshot.board) || !moves.every(move => applyMove(engine, snapshot.board, piece, move))) continue;
     piece.softDrop(snapshot.board);
     if (key(piece.absoluteBlocks) === key(target)) return { cost: moves.length, moves, source: 'd-002', drop: 'hard' };
@@ -63,7 +64,7 @@ function referencePath(engine: Engine, snapshot: EngineSnapshot, target: Cell[])
 function search(engine: Engine, snapshot: EngineSnapshot, target: Cell[], allowSoftDrop: boolean): FinesseResult | null {
   const board = snapshot.board;
   const targetKey = key(target);
-  const moves: Move[] = [...horizontalMoves];
+  const moves: Move[] = horizontalMoves.filter(move => move !== 'rotate180' || engine.misc.allowed.spin180);
   if (allowSoftDrop) {
     moves.push('softDrop');
     if (engine.handling.sdf !== 41) moves.push('down');
@@ -94,5 +95,6 @@ function search(engine: Engine, snapshot: EngineSnapshot, target: Cell[], allowS
 }
 
 export function findFinesse(engine: Engine, snapshot: EngineSnapshot, target: Cell[]): FinesseResult | null {
-  return referencePath(engine, snapshot, target) ?? search(engine, snapshot, target, false) ?? search(engine, snapshot, target, true);
+  const result = referencePath(engine, snapshot, target) ?? search(engine, snapshot, target, false) ?? search(engine, snapshot, target, true);
+  return result && !engine.misc.allowed.hardDrop ? { ...result, drop: 'lock' } : result;
 }

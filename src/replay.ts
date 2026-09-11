@@ -4,6 +4,8 @@ import { createEngine } from './engine';
 import { countFinesseInputs, findFinesse, type Cell } from './finesse';
 import { sameCells, type PracticeScene, type PracticeSet } from './practice';
 import { defaults, type Settings } from './settings';
+import { customDefaults, modeDefinitions, randomizers, rotationSystems, validateCustomRules, type ModeRules } from './modes';
+import { RoomRuntime } from './room-runtime';
 
 type Raw = Record<string, any>;
 export type ReplayTrack = { name: string; kind: 'trainer' | 'native'; data: Raw; date?: string; endStats?: Raw };
@@ -13,7 +15,7 @@ const keys = new Set(['moveLeft', 'moveRight', 'rotateCW', 'rotateCCW', 'rotate1
 
 export function readReplay(value: unknown, name: string): ReplayTrack[] {
   const root = object(value);
-  if (root.version === 1 && ['40l-finesse', 'fault-practice'].includes(root.mode) && Array.isArray(root.placements)) return [{ name, kind: 'trainer', data: root }];
+  if (root.version === 1 && ['40l-finesse', 'fault-practice', 'custom'].includes(root.mode) && Array.isArray(root.placements)) return [{ name, kind: 'trainer', data: root }];
   const tracks: ReplayTrack[] = [];
   function visit(value: unknown, label: string, depth = 0) {
     if (depth > 8 || tracks.length > 500) throw new Error('Replay contains too many nested rounds.');
@@ -37,48 +39,49 @@ export function readReplay(value: unknown, name: string): ReplayTrack[] {
   return tracks;
 }
 
-function boardState(value: unknown): EngineSnapshot['board'] {
-  if (!Array.isArray(value) || value.length < 20 || value.length > 40) throw new Error('Only 10 × 20 boards with up to 20 buffer rows are supported.');
+function boardState(value: unknown, width = 10, height = 20): EngineSnapshot['board'] {
+  if (!Array.isArray(value) || value.length < height || value.length > height + 20) throw new Error('Replay board height does not match its mode.');
   const board = value.map(row => {
-    if (!Array.isArray(row) || row.length !== 10) throw new Error('Replay contains an unsupported board size.');
+    if (!Array.isArray(row) || row.length !== width) throw new Error('Replay contains an unsupported board size.');
     return row.map(tile => {
       if (tile === null) return null;
       const mino = typeof tile === 'string' ? tile : object(tile).mino;
-      if (!symbols.has(mino) && mino !== 'gb') throw new Error('Replay contains an unsupported board tile.');
+      if (!symbols.has(mino) && mino !== 'gb' && mino !== 'bomb') throw new Error('Replay contains an unsupported board tile.');
       return { mino: mino as Mino, connections: Number.isInteger(object(tile).connections) ? object(tile).connections & 31 : 0 };
     });
   });
-  while (board.length < 40) board.push(Array(10).fill(null));
+  while (board.length < height + 20) board.push(Array(width).fill(null));
   return board;
 }
 
-function targetCells(value: unknown): Cell[] {
-  if (!Array.isArray(value) || value.length !== 4 || value.some(cell => !Array.isArray(cell) || cell.length !== 2 || !cell.every(Number.isInteger) || cell[0] < 0 || cell[0] > 9 || cell[1] < 0 || cell[1] > 39)) throw new Error('Replay contains an invalid target.');
+function targetCells(value: unknown, width = 10, height = 20): Cell[] {
+  if (!Array.isArray(value) || value.length !== 4 || value.some(cell => !Array.isArray(cell) || cell.length !== 2 || !cell.every(Number.isInteger) || cell[0] < 0 || cell[0] >= width || cell[1] < 0 || cell[1] >= height + 20)) throw new Error('Replay contains an invalid target.');
   if (new Set(value.map(cell => cell.join(','))).size !== 4) throw new Error('Replay target has duplicate cells.');
   return value.map(cell => [...cell] as Cell);
 }
 
-function sanitizeSnapshot(value: unknown, settings: Settings): EngineSnapshot {
+function sanitizeSnapshot(value: unknown, settings: Settings, rules: ModeRules): EngineSnapshot {
   const raw = object(value), falling = object(raw.falling);
-  if (!symbols.has(falling.symbol) || !Number.isInteger(falling.rotation) || falling.rotation < 0 || falling.rotation > 3 || !Array.isArray(falling.location) || falling.location.length !== 2 || !falling.location.every(Number.isFinite) || !Number.isInteger(falling.location[0]) || falling.location[0] < -3 || falling.location[0] > 9 || falling.location[1] < 0 || falling.location[1] >= 40) throw new Error('Replay contains an invalid falling piece.');
-  const engine = createEngine(settings, 1);
+  const { width, height } = rules.board;
+  if (!symbols.has(falling.symbol) || !Number.isInteger(falling.rotation) || falling.rotation < 0 || falling.rotation > 3 || !Array.isArray(falling.location) || falling.location.length !== 2 || !falling.location.every(Number.isFinite) || !Number.isInteger(falling.location[0]) || falling.location[0] < -3 || falling.location[0] >= width || falling.location[1] < 0 || falling.location[1] >= height + 20) throw new Error('Replay contains an invalid falling piece.');
+  const engine = createEngine(settings, 1, rules);
   const snapshot = engine.snapshot({ isUndoRedo: true });
-  snapshot.board = boardState(raw.board);
-  const piece = new Tetromino({ symbol: falling.symbol, initialRotation: falling.rotation, boardWidth: 10, boardHeight: 20 });
+  snapshot.board = boardState(raw.board, width, height);
+  const piece = new Tetromino({ symbol: falling.symbol, initialRotation: falling.rotation, boardWidth: width, boardHeight: height });
   piece.location = [...falling.location] as Cell;
   snapshot.falling = piece.snapshot();
   if (!legal(piece.absoluteBlocks, snapshot.board)) throw new Error('The replay scene starts with an overlapping piece.');
   snapshot.hold = symbols.has(raw.hold) ? raw.hold : null;
   snapshot.holdLocked = !!raw.holdLocked;
   const next = raw.queue?.value;
-  if (!Array.isArray(next) || !next.length || next.length > 100 || next.some(piece => !symbols.has(piece))) throw new Error('Replay scene has an invalid next queue.');
+  if (!Array.isArray(next) || !next.length || next.length > 4100 || next.some(piece => !symbols.has(piece))) throw new Error('Replay scene has an invalid next queue.');
   snapshot.queue.value = [...next]; snapshot._queue.value = [...next];
   return snapshot;
 }
 
-function sceneFrom(snapshotValue: unknown, targetValue: unknown, settings: Settings, id: string): PracticeScene {
-  const snapshot = sanitizeSnapshot(snapshotValue, settings), target = targetCells(targetValue);
-  const engine = createEngine(settings, 1);
+function sceneFrom(snapshotValue: unknown, targetValue: unknown, settings: Settings, id: string, rules = modeDefinitions.sprint.rules(settings)): PracticeScene {
+  const snapshot = sanitizeSnapshot(snapshotValue, settings, rules), target = targetCells(targetValue, rules.board.width, rules.board.height);
+  const engine = createEngine(settings, 1, rules);
   if (!legal(target, snapshot.board)) throw new Error('The replay target overlaps the saved board.');
   const path = findFinesse(engine, snapshot, target);
   if (!path) throw new Error('A fault scene cannot be reached with the current handling. Try a finite soft drop factor.');
@@ -87,6 +90,10 @@ function sceneFrom(snapshotValue: unknown, targetValue: unknown, settings: Setti
 
 function trainerScenes(track: ReplayTrack, settings: Settings): PracticeSet {
   const replay = track.data;
+  const allow180 = replay.modeRules?.allow180 !== false;
+  const customRules = replay.mode === 'custom' || replay.modeRules?.id === 'custom' ? validateCustomRules(replay.settings?.custom) : undefined;
+  const rules = modeDefinitions[customRules ? 'custom' : 'sprint'].rules({ ...settings, custom: customRules ?? settings.custom });
+  rules.allow180 = allow180;
   if (replay.placements.length > 20000) throw new Error('Replay contains too many placements.');
   const retries = (Array.isArray(replay.events) ? replay.events : []).filter((event: Raw) => event.type === 'retry');
   let retryIndex = 0;
@@ -98,21 +105,23 @@ function trainerScenes(track: ReplayTrack, settings: Settings): PracticeSet {
     if (!snapshot) {
       while (retryIndex < retries.length) {
         const retry = retries[retryIndex++].data;
-        if (Array.isArray(retry?.target) && sameCells(targetCells(retry.target), targetCells(placement.cells))) { snapshot = retry.snapshot; break; }
+        if (Array.isArray(retry?.target) && sameCells(targetCells(retry.target, rules.board.width, rules.board.height), targetCells(placement.cells, rules.board.width, rules.board.height))) { snapshot = retry.snapshot; break; }
       }
     }
     if (!snapshot) throw new Error('This older replay is missing a fault snapshot. Record a new game and try again.');
-    const scene = sceneFrom(snapshot, placement.cells, settings, `trainer-${scenes.length + 1}`);
+    const scene = sceneFrom(snapshot, placement.cells, settings, `trainer-${scenes.length + 1}`, rules);
     if (placement.accepted === false || countFinesseInputs(placement.inputs) > scene.path.cost) scenes.push(scene);
   }
-  return { name: track.name, scenes };
+  return { name: track.name, scenes, allow180, customRules };
 }
 
 function nativeConfig(options: Raw, track: ReplayTrack): EngineInitializeParams {
-  if ((options.boardwidth ?? 10) !== 10 || (options.boardheight ?? 20) !== 20) throw new Error('Native replay practice currently supports 10 × 20 boards.');
-  if (!['SRS', 'SRS+'].includes(options.kickset ?? 'SRS+') || (options.bagtype ?? '7-bag') !== '7-bag') throw new Error('This replay uses an unsupported rotation or randomizer mode.');
+  if (options.garbageentry === 'delayed' || Number(options.garbageare ?? 0) > 0 || Number(options.garbagearebump ?? 0) > 0 || Number(options.garbageattackcap ?? 0) > 0) throw new Error('This native replay uses delayed Battle Royale garbage rules that are not supported yet.');
+  if (!Number.isInteger(options.boardwidth ?? 10) || (options.boardwidth ?? 10) < 4 || (options.boardwidth ?? 10) > 16 || !Number.isInteger(options.boardheight ?? 20) || (options.boardheight ?? 20) < 10 || (options.boardheight ?? 20) > 40) throw new Error('Native replay board must be 4–16 columns and 10–40 rows.');
+  if (!rotationSystems.includes(options.kickset ?? 'SRS+') || !randomizers.includes(options.bagtype ?? '7-bag')) throw new Error('This replay uses an unsupported rotation or randomizer mode.');
   if (!Number.isInteger(options.seed) || options.seed < 1 || options.seed > 2147483646) throw new Error('Native replay is missing a valid random seed.');
   const config = structuredClone(createEngine(defaults, options.seed).initializer);
+  config.board = { width: options.boardwidth ?? 10, height: options.boardheight ?? 20, buffer: 20 };
   const number = (key: string, fallback: number) => {
     const value = options[key] ?? fallback;
     if (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 10_000_000) throw new Error(`Invalid replay option: ${key}.`);
@@ -128,17 +137,20 @@ function nativeConfig(options: Raw, track: ReplayTrack): EngineInitializeParams 
   }
   for (const key of ['cancel', 'safelock', 'may20g'] as const) if (typeof handling[key] === 'boolean') config.handling[key] = handling[key];
   for (const key of ['irs', 'ihs'] as const) if (['tap', 'hold', 'off'].includes(handling[key])) config.handling[key] = handling[key];
+  if (options.room_handling) {
+    for (const key of ['arr', 'das', 'sdf'] as const) config.handling[key] = number(`room_handling_${key}`, config.handling[key]);
+  }
   config.options = { ...config.options, comboTable: options.combotable ?? 'multiplier', garbageBlocking: options.garbageblocking ?? 'combo blocking', garbageTargetBonus: options.garbagetargetbonus ?? 'none', spinBonuses: options.spinbonuses ?? 'T-spins', clutch: options.clutch ?? true };
   config.garbage = {
-    ...config.garbage, seed: options.seed,
+    ...config.garbage, seed: options.seed, boardWidth: config.board.width, bombs: !!options.usebombs,
     cap: { absolute: number('garbageabsolutecap', 0), value: number('garbagecap', 8), increase: number('garbagecapincrease', 0), max: number('garbagecapmax', 40), marginTime: number('garbagecapmargin', 0) },
     garbage: { speed: number('garbagespeed', 20), holeSize: number('garbageholesize', 1) },
     multiplier: { value: number('garbagemultiplier', 1), increase: number('garbageincrease', 0), marginTime: number('garbagemargin', 10800) },
     messiness: { change: number('messiness_change', 1), within: number('messiness_inner', 0), nosame: !!options.messiness_nosame, timeout: number('messiness_timeout', 0), center: !!options.messiness_center },
     specialBonus: !!options.garbagespecialbonus, openerPhase: number('openerphase', 0), rounding: options.roundmode === 'rng' ? 'rng' : 'down'
   };
-  config.b2b = { chaining: !options.b2bcharging, charging: options.b2bcharging ? { at: number('b2bcharge_at', 4), base: number('b2bcharge_base', 3) } : false };
-  config.pc = { b2b: number('allclear_b2b', 0), garbage: number('allclear_garbage', 0) };
+  config.b2b = { chaining: options.b2bchaining ?? !options.b2bcharging, charging: options.b2bcharging ? { at: number('b2bcharge_at', 4), base: number('b2bcharge_base', 3) } : false };
+  config.pc = options.allclears === false ? false : { b2b: number('allclear_b2b', 0), garbage: number('allclear_garbage', 0) };
   config.misc.infiniteHold = !!options.infinite_hold;
   config.misc.allowed.spin180 = options.allow180 !== false;
   config.misc.allowed.hardDrop = options.allow_harddrop !== false && options.allowharddrop !== false;
@@ -167,7 +179,7 @@ async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (
       const garbage = object(data.data);
       if (!Number.isFinite(garbage.amt) || garbage.amt < 0 || garbage.amt > 10000) throw new Error('Replay contains invalid garbage data.');
       if (Number.isInteger(garbage.column) && garbage.iid === undefined) {
-        if (garbage.column < 0 || garbage.column > 9) throw new Error('Replay garbage column is outside the board.');
+        if (garbage.column < 0 || garbage.column > 15) throw new Error('Replay garbage column is outside the board.');
         const key = `${data.sender}:${data.cid}`;
         if (!interactionIds.has(key)) interactionIds.set(key, interactionIds.size + 1);
         const id = interactionIds.get(key)!;
@@ -182,11 +194,15 @@ async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (
   const options = { ...object(initial?.data?.options), ...object(track.data.options) };
   const config = nativeConfig(options, { ...track, data: { ...track.data, events } });
   const engine = new Engine(config);
+  if ([...columns.values()].some(column => column >= engine.board.width)) throw new Error('Replay garbage column is outside the board.');
+  const customRules = validateCustomRules({ ...structuredClone(customDefaults), gravity: config.gravity.value, lockDelay: config.misc.movement.lockTime, lockResets: config.misc.movement.lockResets, infiniteLock: false, bag: config.queue.type, hold: config.misc.allowed.hold, infiniteHold: config.misc.infiniteHold, allow180: config.misc.allowed.spin180, topout: 'stop', advanced: { ...customDefaults.advanced, width: config.board.width, height: config.board.height, kickSet: config.kickTable, hardDrop: config.misc.allowed.hardDrop, bombs: config.garbage.bombs, entryDelay: options.are ?? 0, lineClearDelay: options.lineclear_are ?? 0 } });
+  const rules = modeDefinitions.custom.rules({ ...settings, custom: customRules });
+  const room = new RoomRuntime(engine, rules, false, config.queue.seed);
   if (columns.size) {
     const tank = engine.garbageQueue.tank.bind(engine.garbageQueue);
     engine.garbageQueue.tank = (...args) => tank(...args).map(garbage => ({ ...garbage, column: columns.get(garbage.id) ?? garbage.column }));
   }
-  if (initial?.data?.game?.board) engine.board.state = boardState([...initial.data.game.board].reverse());
+  if (initial?.data?.game?.board) engine.board.state = boardState([...initial.data.game.board].reverse(), engine.board.width, engine.board.height);
   let previous = -1;
   for (const event of events) {
     if (!Number.isInteger(event.frame) || event.frame < previous || event.frame > 216000) throw new Error('Replay has unordered frames or exceeds one hour.');
@@ -201,13 +217,14 @@ async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (
   let locking: { snapshot: EngineSnapshot; target: Cell[]; inputs: Game.Key[]; offset: number } | null = null;
   const scenes: PracticeScene[] = [];
   engine.events.on('falling.lock.pre', () => { locking = { snapshot, target: engine.falling.absoluteBlocks, inputs: priorInputs, offset: keyOffset }; });
-  engine.events.on('falling.new', ({ isHold }) => { priorInputs = []; keyOffset = engine.resCache.keys.length; if (isHold) snapshot = engine.snapshot({ isUndoRedo: true }); });
+  engine.events.on('falling.new', ({ isHold }) => { if (!room.waking || isHold) priorInputs = []; keyOffset = engine.resCache.keys.length; if (isHold) snapshot = engine.snapshot({ isUndoRedo: true }); });
   engine.events.on('falling.lock', result => {
     if (locking) {
       const inputs = [...locking.inputs, ...result.keysPresses.slice(locking.offset)];
       const path = findFinesse(engine, locking.snapshot, locking.target);
-      if (path && countFinesseInputs(inputs) > path.cost) scenes.push(sceneFrom(locking.snapshot, locking.target, settings, `native-${engine.frame}-${scenes.length}`));
+      if (path && countFinesseInputs(inputs) > path.cost) scenes.push(sceneFrom(locking.snapshot, locking.target, settings, `native-${engine.frame}-${scenes.length}`, rules));
     }
+    room.locked(result);
     snapshot = engine.snapshot({ isUndoRedo: true });
     locking = null;
   });
@@ -216,6 +233,7 @@ async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (
     const batch: Game.Replay.Frame[] = [];
     while (index < events.length && events[index].frame === engine.frame) batch.push(events[index++]);
     const end = batch.find(event => event.type === 'end');
+    room.beforeTick(engine.frame);
     const result = engine.tick(batch.filter(event => event.type !== 'end'));
     priorInputs.push(...result.keys.slice(keyOffset)); keyOffset = 0;
     if (end) break;
@@ -228,9 +246,9 @@ async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (
   const finalBoard = ending?.data?.export?.game?.board;
   if (finalBoard) {
     const tiles = (board: EngineSnapshot['board']) => JSON.stringify(board.map(row => row.map(tile => tile?.mino ?? null)));
-    if (tiles(boardState([...finalBoard].reverse())) !== tiles(engine.board.state)) throw new Error('Replay simulation does not match its final board. No practice scenes were imported.');
+    if (tiles(boardState([...finalBoard].reverse(), engine.board.width, engine.board.height)) !== tiles(engine.board.state)) throw new Error('Replay simulation does not match its final board. No practice scenes were imported.');
   }
-  return { name: track.name, scenes };
+  return { name: track.name, scenes, allow180: engine.misc.allowed.spin180, customRules };
 }
 
 export async function loadPractice(track: ReplayTrack, settings: Settings, progress?: (text: string) => void): Promise<PracticeSet> {

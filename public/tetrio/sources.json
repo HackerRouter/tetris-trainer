@@ -1,0 +1,103 @@
+{
+  "extractedAt": "2026-09-11T02:11:26.237Z",
+  "sources": [
+    {
+      "path": "/res/font/hun2.ttf",
+      "url": "https://tetr.io/res/font/hun2.ttf?v=11",
+      "savedAt": "2026-07-18T09:34:25.487Z",
+      "bytes": 51016,
+      "sha256": "80339df18ebe2c710fb8d7348e3b64ccab853bac7775f9743be84215686ab7de"
+    },
+    {
+      "path": "/res/font/cr.ttf",
+      "url": "https://tetr.io/res/font/cr.ttf",
+      "savedAt": "2026-07-18T09:34:49.634Z",
+      "bytes": 52052,
+      "sha256": "13b447e4657f7a4c6c12b2ceb24856bce7070db75697e665c633cd7063a1d505"
+    },
+    {
+      "path": "/res/font/cb.ttf",
+      "url": "https://tetr.io/res/font/cb.ttf",
+      "savedAt": "2026-07-18T09:34:49.634Z",
+      "bytes": 57424,
+      "sha256": "cd5e0bb5670fb8aee57c2399b3c2bf44ae95b9d55f9858aedcadbd7a691f887e"
+    },
+    {
+      "path": "/res/font/pfwex.woff",
+      "url": "https://tetr.io/res/font/pfwex.woff",
+      "savedAt": "2026-07-18T09:34:25.487Z",
+      "bytes": 26308,
+      "sha256": "15662b09c9aaa2ffd2dde98ad8479e3af36e897803933e70c78ede49eb6db981"
+    },
+    {
+      "path": "/res/skins/board/generic/board.png",
+      "url": "https://tetr.io/res/skins/board/generic/board.png?v=3",
+      "savedAt": "2026-07-18T09:34:59.149Z",
+      "bytes": 15017,
+      "sha256": "5721abb52bad64f4e448cd958b9558a6b14274fa47c02d9a6d5a96e1e46fa0bf"
+    },
+    {
+      "path": "/res/skins/board/generic/queue.png",
+      "url": "https://tetr.io/res/skins/board/generic/queue.png",
+      "savedAt": "2026-07-18T09:34:59.149Z",
+      "bytes": 6166,
+      "sha256": "7753c6562c5f53a09164dfff8ad58313453a8af8863958040d43c5473f74f115"
+    },
+    {
+      "path": "/res/header-overlay.png",
+      "url": "https://tetr.io/res/header-overlay.png",
+      "savedAt": "2026-07-18T09:34:25.487Z",
+      "bytes": 154,
+      "sha256": "f13452398f0571699c2ec4e353937ef8bc2dd33519b35052d2d4a4e29c25f868"
+    },
+    {
+      "path": "/res/footer.png",
+      "url": "https://tetr.io/res/footer.png",
+      "savedAt": "2026-07-18T09:34:25.487Z",
+      "bytes": 172,
+      "sha256": "b1d9f3b0fa5b31b42d2398afda0bbbfa2b257b323187bc822d017465cf4072bb"
+    },
+    {
+      "path": "/res/40l.svg",
+      "url": "https://tetr.io/res/40l.svg",
+      "savedAt": "2026-07-18T09:34:24.575Z",
+      "bytes": 5285,
+      "sha256": "32be596247de425da4da54c1ad2a889d32c527c952221c6a4f8d49fd8d5f761c"
+    },
+    {
+      "path": "/res/zen.svg",
+      "url": "https://tetr.io/res/zen.svg",
+      "savedAt": "2026-07-18T09:34:24.575Z",
+      "bytes": 5450,
+      "sha256": "118261c4485abee241a19d1cdb482a887fb59db5c319ea6ed057e00a6ee26a02"
+    },
+    {
+      "path": "/res/customsolo.svg",
+      "url": "https://tetr.io/res/customsolo.svg",
+      "savedAt": "2026-07-18T09:34:24.599Z",
+      "bytes": 5421,
+      "sha256": "c5326a8972736ebc08b59507c456c27f307f6fe3c0f55d5e7dd4ba14d6cc3a9c"
+    },
+    {
+      "path": "/res/icon/revert.svg",
+      "url": "https://tetr.io/res/icon/revert.svg",
+      "savedAt": "2026-07-18T09:42:08.220Z",
+      "bytes": 2124,
+      "sha256": "1163a3c39cdef815176d6704b36563ad5c6f4daa045a900b216c32dc7c4fd206"
+    },
+    {
+      "path": "/res/icon/close.svg",
+      "url": "https://tetr.io/res/icon/close.svg",
+      "savedAt": "2026-07-18T09:42:08.543Z",
+      "bytes": 2245,
+      "sha256": "5f492823fbd9282da971e290cbff68b4b2b87ed3e83368cdcd753dfd2ebb7dde"
+    },
+    {
+      "path": "/sfx/tetrio.opus.rsd",
+      "url": "https://tetr.io/sfx/tetrio.opus.rsd?hv=771338492.507fe115b47d.20260714T182728",
+      "savedAt": "2026-07-18T09:34:26.958Z",
+      "bytes": 6046497,
+      "sha256": "85d0e54d2b942c7d55cea4b91b8aaf60fe422f64f110e48b5a80a1001fb1b983"
+    }
+  ]
+}

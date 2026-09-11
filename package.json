@@ -6,7 +6,9 @@
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
-    "test": "node --import tsx --test test/core.test.ts test/finesse.test.ts test/training.test.ts test/config.test.ts",
+    "test": "node --import tsx --test test/core.test.ts test/finesse.test.ts test/training.test.ts test/config.test.ts test/custom.test.ts test/rooms.test.ts",
+    "assets:import": "node scripts/import-tetrio-assets.mjs",
+    "presets:import": "node scripts/import-room-presets.mjs",
     "test:browser": "playwright test"
   },
   "dependencies": {

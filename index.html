@@ -1,33 +1,39 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>40 Lines · Trainer</title></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tetris Trainer · Sprint & Custom</title></head>
 <body>
   <div class="app">
-    <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>40 Lines <span>Trainer</span></h1></div><div class="header-tools"><button id="config-open" class="secondary">Import TETR.IO config</button><button id="settings-open" class="secondary">Settings</button></div></header>
+    <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>Tetris <span>Trainer</span></h1></div><div class="header-tools"><button id="config-open" class="secondary">Import TETR.IO config</button><button id="settings-open" class="secondary">Settings</button></div></header>
     <p class="config-hint muted">Drop a TETR.IO .ttc config anywhere on this page to import your settings.</p>
     <main>
       <section class="play-area">
         <div class="tetrion">
           <div class="left-column">
-            <section id="hold-panel" class="preview-panel hold-panel" aria-label="Hold"><h2>HOLD</h2><canvas id="hold-preview" width="150" height="90" aria-label="Held piece"></canvas></section>
-            <div class="board-stats"><div><span>PIECES</span><strong id="pieces">0</strong><small><span id="pps">0.00</span> / S</small></div><div><span>LINES</span><strong id="lines">0</strong><small>/ 40</small></div><div><span>TIME</span><strong id="time">0:00.000</strong></div></div>
+            <section id="hold-panel" class="preview-panel hold-panel" aria-label="Hold"><canvas id="hold-frame" class="preview-frame" aria-hidden="true"></canvas><h2>HOLD</h2><canvas id="hold-preview" width="150" height="90" aria-label="Held piece"></canvas></section>
+            <div class="board-stats"><div><span>PIECES</span><strong id="pieces">0</strong><small><span id="pps">0.00</span> / S</small></div><div><span>LINES</span><strong id="lines">0</strong><small id="line-goal">/ 40</small></div><div><span>TIME</span><strong id="time">0:00.000</strong></div></div>
           </div>
           <div class="board-column"><canvas id="board" width="300" height="690" aria-label="Game board"></canvas><div id="board-overlay" role="status" aria-live="polite"><span id="overlay-label">READY</span><strong id="overlay-value">Start a game</strong></div></div>
-          <div class="right-column"><section id="next-panel" class="preview-panel next-panel" aria-label="Next queue"><h2>NEXT</h2><canvas id="next-preview" width="150" height="450" aria-label="Next five pieces"></canvas></section></div>
+          <div class="right-column"><section id="next-panel" class="preview-panel next-panel" aria-label="Next queue"><canvas id="next-frame" class="preview-frame" aria-hidden="true"></canvas><h2>NEXT</h2><canvas id="next-preview" width="150" height="450" aria-label="Next pieces"></canvas></section></div>
         </div>
         <p id="controls-summary" class="muted"></p>
+        <p id="retry-status" class="muted" role="status" hidden>Timer paused. Press a game key to continue.</p>
       </section>
       <aside>
+        <div class="mode-picker"><img id="mode-icon" src="/tetrio/ui/sprint.svg" width="32" height="32" alt=""><label for="mode-select">Game mode<select id="mode-select"><option value="sprint">40L Sprint</option><option value="custom">Custom / Zen</option></select></label></div>
+        <button id="custom-open" class="secondary wide" hidden>Custom rules</button>
         <div class="toolbar"><button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button></div>
+        <div id="custom-tools" class="toolbar" hidden><button id="clear-field" class="secondary" disabled>Clear board</button><button id="finish-session" class="secondary" disabled>Finish session</button></div>
         <button id="sprint" class="secondary wide" hidden>Back to 40L</button>
         <p id="message" role="status" class="muted">Set your handling, then start a game.</p>
         <div class="progress-heading"><span id="mode-label">40 LINE SPRINT</span><strong id="practice-progress"></strong></div><progress id="progress" max="40" value="0"></progress>
+        <p id="mode-rules" class="muted" hidden></p>
+        <div class="finesse-control"><label for="finesse-toggle"><span>Perfect finesse<small id="finesse-scope">40L Sprint</small></span><input id="finesse-toggle" type="checkbox" role="switch" aria-describedby="finesse-help"></label><p id="finesse-help" class="muted">Automatically retry finesse faults and restore the timer.</p></div>
         <div class="stats"><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
         <div id="coach" class="coach" hidden><strong id="coach-title">Try a shorter path</strong><p id="solution"></p><small id="target-policy">The outline marks your last target. You can choose a different placement.</small></div>
         <div class="practice-tools"><h3>Fault practice</h3><button id="practice-last" class="secondary wide" disabled>Practice last replay</button><button id="practice-import" class="secondary wide">Load replay file</button><input id="replay-file" type="file" accept=".json,.ttr,.ttrm,application/json" hidden><div id="replay-selection" hidden><label for="replay-track">Player / round</label><select id="replay-track"></select><button id="practice-track" class="secondary wide">Start selected practice</button></div><p id="practice-status" class="muted" role="status">Load a trainer JSON or TETR.IO replay to practice its finesse faults.</p></div>
         <details><summary>Session details</summary><div id="results" class="muted"></div></details>
         <button id="undo" class="secondary wide" disabled>Undo placement · Ctrl + Z</button><button id="download" class="secondary wide" disabled>Download replay</button>
-        <p class="fine-print">Finesse follows d-002: each tap, DAS hold or rotation (including 180°) counts as one input. Hints prefer hard drop. Soft drop is only suggested for obstructed targets.</p>
+        <p class="fine-print">Finesse follows d-002: each tap, DAS hold or rotation (including 180°) counts as one input. Hints prefer hard drop when allowed. Other board sizes and rotation systems use a search with the same input costs.</p>
       </aside>
     </main>
   </div>
@@ -51,15 +57,20 @@
           <label class="range-row" for="boardOpacity">Board opacity<input id="boardOpacity" type="range" min="0" max="100" step="any"><output id="boardOpacity-unit"></output></label>
           <label class="check-row"><input id="coloredGhost" type="checkbox"> Colored ghost piece</label>
           <label class="check-row"><input id="dimLockedHold" type="checkbox"> Dim locked Hold piece</label>
+          <h3>Audio</h3>
+          <label class="check-row"><input id="audio-enabled" type="checkbox"> Enable sound effects</label>
+          <label class="range-row" for="audio-volume">SFX volume<input id="audio-volume" type="range" min="0" max="100" step="1"><output id="audio-volume-unit"></output></label>
+          <label class="check-row"><input id="audio-ui" type="checkbox"> Menu sounds</label>
+          <p id="audio-status" class="muted" role="status"></p>
+          <button id="audio-preview" class="secondary small" type="button">Preview sound</button>
         </section>
         <section><h3>Training</h3>
           <label class="number-row" for="countdownSeconds"><span>Start countdown<small>0 disables the countdown</small></span><input id="countdownSeconds" type="number" min="0" max="10" step="0.1" required><output>seconds</output></label>
-          <label class="check-row"><input id="finesseEnabled" type="checkbox"> Enable finesse detection</label>
           <label class="check-row"><input id="allowDifferentTarget" type="checkbox"> Allow a different target after a fault</label>
           <label class="check-row"><input id="undoEnabled" type="checkbox"> Allow undo with Ctrl + Z</label>
           <label class="check-row"><input id="infiniteHold" type="checkbox"> Allow unlimited hold</label>
           <label class="check-row"><input id="strictPractice" type="checkbox"> Fault practice: clear all scenes in one attempt</label>
-          <p class="muted">Fault practice always checks finesse and requires the outlined target. Hold and undo are unavailable during these drills.</p>
+          <p class="muted">The main page's Perfect finesse switch applies immediately and is saved separately for each mode. Custom rules override undo and hold options. Fault practice requires the outlined target; Hold and undo are unavailable during these drills.</p>
           <h3>Key bindings</h3><p class="muted">Imported alternate keys are supported. Click a binding, then press a key to replace its keys. Keys cannot be shared between actions.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button> <button id="clear-binding" type="button" class="secondary small">Clear selected binding</button></section>
       </div>
       <p id="settings-status" role="status" aria-live="polite"></p>

@@ -38,15 +38,13 @@ test('TETR.IO module positions, default countdown, pause and timer formatting', 
 });
 
 test('training switches and fractional countdown persist through settings import and export', async ({ page }) => {
-  await page.goto('/'); await page.locator('#settings-open').click();
+  await page.goto('/'); await page.locator('#finesse-toggle').uncheck(); await page.locator('#settings-open').click();
   await page.locator('#countdownSeconds').fill('.5');
-  await page.locator('#finesseEnabled').uncheck();
   await page.locator('#allowDifferentTarget').uncheck();
   await page.locator('#undoEnabled').check(); await page.locator('#infiniteHold').check(); await page.locator('#strictPractice').check();
   await page.getByRole('button', { name: 'Save settings', exact: true }).click();
-  await page.reload(); await page.locator('#settings-open').click();
+  await page.reload(); await expect(page.locator('#finesse-toggle')).not.toBeChecked(); await page.locator('#settings-open').click();
   await expect(page.locator('#countdownSeconds')).toHaveValue('0.5');
-  await expect(page.locator('#finesseEnabled')).not.toBeChecked();
   await expect(page.locator('#strictPractice')).toBeChecked();
   await expect(page.locator('#infiniteHold')).toBeChecked();
   await page.locator('#cancel-settings').click(); await page.locator('#start').click();
@@ -73,6 +71,27 @@ test('fault timer rewinds and a locked target rejects a different placement', as
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
 });
 
+test('retry and undo wait for a fresh game key while guide playback, releases and settings leave timing paused', async ({ page }) => {
+  await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), instant({ undoEnabled: true }));
+  await page.goto('/'); await page.locator('#start').click();
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight'); await page.keyboard.down('Space');
+  await expect(page.locator('#faults')).toHaveText('1'); await expect(page.locator('#retry-status')).toBeVisible();
+  await expect(page.locator('#time')).toHaveText('0:00.000');
+  await page.waitForTimeout(300); await page.keyboard.up('Space'); await page.keyboard.press('q');
+  await expect(page.locator('#demo-step')).toContainText('Complete'); await expect(page.locator('#time')).toHaveText('0:00.000');
+  await page.locator('#demo-replay').click(); await expect(page.locator('#demo-step')).toHaveText('Start here');
+  await expect(page.locator('#demo-step')).toContainText('Complete'); await expect(page.locator('#time')).toHaveText('0:00.000');
+  await page.locator('#settings-open').click(); await page.locator('#cancel-settings').click();
+  await expect(page.locator('#retry-status')).toBeVisible(); await expect(page.locator('#time')).toHaveText('0:00.000');
+  await page.keyboard.press('ArrowLeft'); await expect(page.locator('#retry-status')).not.toBeVisible();
+  await expect(page.locator('#inputs')).toHaveText('4'); await expect(page.locator('#time')).not.toHaveText('0:00.000');
+  await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
+  await page.keyboard.press('Control+z'); await expect(page.locator('#retry-status')).toBeVisible();
+  await page.waitForTimeout(300); await expect(page.locator('#time')).toHaveText('0:00.000');
+  await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
+  await expect(page.locator('#retry-status')).not.toBeVisible();
+});
+
 test('strict fault practice restarts the set, animates once, replays on click and returns to 40L', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), instant({ strictPractice: true }));
@@ -86,6 +105,7 @@ test('strict fault practice restarts the set, animates once, replays on click an
   await expect(page.locator('#demo-popup')).toBeVisible();
   await expect(page.locator('#demo-step')).toContainText('Complete', { timeout: 3000 });
   await page.waitForTimeout(700); await expect(page.locator('#demo-step')).toContainText('Complete');
+  await expect(page.locator('#time')).toHaveText('0:00.000'); await expect(page.locator('#retry-status')).toBeVisible();
   await page.locator('#demo-replay').click(); await expect(page.locator('#demo-step')).toHaveText('Start here');
   await page.screenshot({ path: 'test-results/fault-practice.png', fullPage: true });
   await page.keyboard.press('Space'); await expect(page.locator('#practice-progress')).toHaveText('1 / 2');
