@@ -51,10 +51,28 @@ test('statistics count repeated and unchecked faults, rank patterns, and create 
   assert.equal(set.scenes[0].snapshot.board.flat().filter(Boolean).length, 0);
 });
 
-test('trainer playback reconstructs faults, rollback and final accepted board', async () => {
+test('focused practice enables checking despite an old disabled preference and retries the same scene', async () => {
+  const source = play();
+  for (let i = 0; i < 2; i++) { tap(source, 'moveLeft'); tap(source, 'moveRight'); tap(source, 'hardDrop'); tap(source, 'hardDrop'); }
+  const groups = faultGroups([await analyzeSession(source.export())]); assert.equal(groups.length, 2);
+  const settings = structuredClone(source.settings); settings.training.practiceFinesseEnabled = false;
+  const game = new TrainerGame(settings, 1, focusedDrills(groups, settings, false)); game.start();
+  assert.equal(game.rules.finesse, true);
+  for (let i = 0; i < 2; i++) {
+    const target = structuredClone(game.target), time = game.elapsedMs;
+    tap(game, 'moveLeft'); tap(game, 'moveRight'); tap(game, 'hardDrop');
+    assert.equal(game.practice!.index, i); assert.equal(game.practice!.completed, i); assert.deepEqual(game.target, target);
+    assert.equal(game.placements.at(-1)!.accepted, false); assert.equal(game.waitingForInput, true); assert.equal(game.elapsedMs, time);
+    tap(game, 'hardDrop'); assert.equal(game.practice!.completed, i + 1);
+  }
+  game.setFinesseEnabled(false); assert.equal(game.practice!.set.finesseEnabled, false);
+  tap(game, 'moveLeft'); tap(game, 'moveRight'); tap(game, 'hardDrop'); assert.equal(game.practice!.completed, 3);
+});
+
+test('trainer playback removes failed branches and retains the final accepted board', async () => {
   const game = play(); tick(game, 10); tap(game, 'moveLeft'); tap(game, 'moveRight'); tap(game, 'hardDrop'); tap(game, 'hardDrop');
   const replay = await buildPlayback(readReplay(game.export(), 'Test')[0], game.settings);
-  assert.ok(replay.frames.some(frame => frame.label === 'retry')); assert.equal(replay.engine.stats.pieces, game.engine.stats.pieces);
+  assert.equal(replay.frames.some(frame => frame.label === 'retry'), false); assert.equal(replay.duration, game.elapsedMs / 1000); assert.equal(replay.engine.stats.pieces, game.engine.stats.pieces);
   assert.deepEqual(replay.engine.board.state, game.engine.board.state);
 });
 
@@ -67,8 +85,21 @@ test('native playback accepts a real TETR.IO recording independently of its faul
 test('TETR.IO export removes failed branches and round-trips the successful board', async () => {
   const game = play(); tap(game, 'moveLeft'); tap(game, 'moveRight'); tap(game, 'hardDrop'); tap(game, 'hardDrop');
   const native = await exportNative(game.export()); assert.equal(native.verified, false);
+  assert.equal(native.version, 1); assert.equal(native.id, null); assert.equal(native.replay.options.version, 19);
+  assert.equal(native.replay.results.stats.piecesplaced, 1); assert.equal(native.replay.results.stats.finaltime, game.elapsedMs);
   const playback = await buildPlayback(readReplay(native, 'Export')[0], game.settings);
   assert.equal(playback.engine.stats.pieces, 1);
   const tiles = (board: typeof game.engine.board.state) => board.map(row => row.map(tile => tile?.mino ?? null));
   assert.deepEqual(tiles(playback.engine.board.state), tiles(game.engine.board.state));
+});
+
+test('native export preserves custom maps and rejects malformed native maps', async () => {
+  const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
+  settings.custom.advanced.map = '###....###'; settings.custom.gravity = 0;
+  const game = new TrainerGame(settings, 17, undefined, 'custom'); game.start(); tap(game, 'hardDrop');
+  const file = await exportNative(game.export());
+  const playback = await buildPlayback(readReplay(file, 'Map')[0], game.settings);
+  assert.deepEqual(playback.engine.board.state.map(row => row.map(tile => tile?.mino)), game.engine.board.state.map(row => row.map(tile => tile?.mino)));
+  file.replay.options.map = '____?i,j?o';
+  await assert.rejects(buildPlayback(readReplay(file, 'Bad map')[0], game.settings), /board map/);
 });

@@ -6,13 +6,15 @@
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 5173 --strictPort",
-    "test": "node --import tsx --test test/core.test.ts test/finesse.test.ts test/training.test.ts test/config.test.ts test/custom.test.ts test/rooms.test.ts test/features.test.ts",
+    "test": "node --import tsx --test test/core.test.ts test/finesse.test.ts test/training.test.ts test/config.test.ts test/custom.test.ts test/rooms.test.ts test/features.test.ts test/openers.test.ts test/timeline.test.ts",
     "assets:import": "node scripts/import-tetrio-assets.mjs",
     "presets:import": "node scripts/import-room-presets.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:native": "node --import tsx scripts/verify-native-export.ts"
   },
   "dependencies": {
     "@haelp/teto": "4.2.7",
+    "tetris-fumen": "1.1.3",
     "typescript": "latest",
     "vite": "latest"
   },

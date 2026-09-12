@@ -4,6 +4,7 @@ import type { TrainerGame } from './game';
 import type { Settings } from './settings';
 import { drawNativeBorder } from './ui-assets';
 import { drawMino, drawGhost, nativeColors } from './mino-assets';
+import type { ModeRules } from './modes';
 
 const colors = nativeColors;
 
@@ -87,27 +88,41 @@ function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string
 
 const effects = new WeakMap<TrainerGame, { placements: number; since: number }>();
 
-export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, game: TrainerGame) {
-  const engine = game.engine;
+export type PlacementEffect = { cells: Cell[]; piece: string; hardDrop: boolean; lines: number };
+type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null };
+
+export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, engine: Engine, rules: ModeRules, display: Settings['display'], scene: Scene, age: number) {
   if (canvas.width !== engine.board.width * 30 || canvas.height !== (engine.board.height + 3) * 30) {
     canvas.width = engine.board.width * 30; canvas.height = (engine.board.height + 3) * 30;
   }
-  drawBoard(canvas, engine, engine.board.state, game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), game.target, { ...game.settings.display, ghost: game.settings.display.ghost && game.rules.advanced.shadow });
-  drawPreviews(hold, engine, [engine.held], game.settings.display.dimLockedHold && engine.holdLocked && !game.rules.infiniteHold);
-  drawPreviews(next, engine, engine.queue.slice(0, game.rules.nextCount));
-  const now = performance.now(), previous = effects.get(game);
-  if (!previous || previous.placements !== game.placements.length) effects.set(game, { placements: game.placements.length, since: now });
-  const effect = effects.get(game)!, placement = game.placements.at(-1), age = now - effect.since;
+  drawBoard(canvas, engine, scene.board, scene.piece, scene.target, { ...display, ghost: display.ghost && rules.advanced.shadow });
+  drawPreviews(hold, engine, [scene.hold], display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
+  drawPreviews(next, engine, scene.next);
+  drawPlacementEffect(canvas, engine, scene.effect, age);
+}
+
+function drawPlacementEffect(canvas: HTMLCanvasElement, engine: Engine, placement: PlacementEffect | null, age: number) {
   const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (placement?.accepted && age < 240 && !reduced) {
-    const ctx = canvas.getContext('2d')!, strength = Math.max(0, 1 - age / 240), size = canvas.width / engine.board.width;
+  if (placement && age >= 0 && age < 240 && !reduced) {
+    const ctx = canvas.getContext('2d')!, strength = Math.max(0, 1 - age / 240) * .5, size = canvas.width / engine.board.width;
     ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = strength * .5;
     for (const [x, y] of placement.cells) {
       const px = x * size, py = (engine.board.height + 2 - y) * size;
       ctx.fillStyle = '#ffffff'; ctx.fillRect(px, py, size, size);
-      if (placement.inputs.includes('hardDrop')) { const beam = ctx.createLinearGradient(0, py - size * 5, 0, py); beam.addColorStop(0, 'transparent'); beam.addColorStop(1, colors[placement.piece] ?? '#ffffff'); ctx.fillStyle = beam; ctx.fillRect(px + size * .3, py - size * 5, size * .4, size * 5); }
+      if (placement.hardDrop) { const beam = ctx.createLinearGradient(0, py - size * 5, 0, py); beam.addColorStop(0, 'transparent'); beam.addColorStop(1, colors[placement.piece] ?? '#ffffff'); ctx.fillStyle = beam; ctx.fillRect(px + size * .3, py - size * 5, size * .4, size * 5); }
     }
-    if (placement.result.lines) { ctx.globalAlpha = strength * .12; ctx.fillStyle = '#ffffff'; ctx.fillRect(0, size * 3, canvas.width, size * engine.board.height); }
+    if (placement.lines) { ctx.globalAlpha = strength * .12; ctx.fillStyle = '#ffffff'; ctx.fillRect(0, size * 3, canvas.width, size * engine.board.height); }
     ctx.restore();
   }
+}
+
+export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, game: TrainerGame) {
+  const engine = game.engine, now = performance.now(), previous = effects.get(game);
+  if (!previous || previous.placements !== game.placements.length) effects.set(game, { placements: game.placements.length, since: now });
+  const placement = game.placements.at(-1);
+  drawScene(canvas, hold, next, engine, game.rules, game.settings.display, {
+    board: engine.board.state, piece: game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), target: game.target,
+    hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, game.rules.nextCount),
+    effect: placement?.accepted ? { cells: placement.cells, piece: placement.piece, hardDrop: placement.inputs.includes('hardDrop'), lines: placement.result.lines } : null
+  }, now - effects.get(game)!.since);
 }

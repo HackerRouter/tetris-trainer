@@ -1,3 +1,4 @@
+import { placementSounds } from './sound-events';
 import type { TrainerGame } from './game';
 import type { Settings } from './settings';
 
@@ -84,15 +85,7 @@ export class SoundPlayer {
       const placements = game.placements.slice(previous.placements);
       for (const placement of placements) {
         if (!placement.accepted) { this.play('finessefault'); continue; }
-        const result = placement.result;
-        if (placement.inputs.includes('hardDrop')) this.play('harddrop');
-        this.play('floor');
-        if (result.lines) {
-          this.play(result.spin !== 'none' ? 'clearspin' : result.lines >= 4 ? 'clearquad' : 'clearline');
-          if (game.engine.stats.combo > 0) this.play(`combo_${Math.min(16, game.engine.stats.combo)}`);
-          if (game.engine.stats.b2b > 0 && (result.spin !== 'none' || result.lines >= 4)) this.play('clearbtb');
-          if (game.engine.board.perfectClear) this.play('allclear');
-        }
+        for (const name of placementSounds(game.engine, placement.result, placement.inputs.includes('hardDrop'))) this.play(name);
       }
       if (!placements.length && game.holds === previous.holds && game.status === 'playing') {
         if (piece.x !== previous.x) this.play('move');

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "tki",
+    "name": "TKI-3",
+    "note": "Held-J construction. Learn the first T-spin double; other TKI variants are not included.",
+    "source": "https://harddrop.com/wiki/TKI_3_Opening",
+    "fumen": "v115@HhglBeBtAeQ4CeglywBtR4RphlwwzhQ4RpJeAgl",
+    "sourceFumen": "v115@HhglBeBtAeQ4CeglywBtR4RphlwwzhQ4RpJeAgWJAx?82TAS4sdDHBAAAEgQ4BtGeR4BtGeQ4i0Ieg0Yei0DeglBeB?tg0Q4CeglywBtR4RpAeglwwxSwhgHQ4RpJeAAPeAmC0dEFb?EwCPJ98AwnoRBNnceEFbcfEzoSTAylAAAYgwDBPGexDBPGe?wDiHIegHAeg0Ieg0glBeBtAeQ4Aeh0glxwQahWR4RpAeglw?wxSQLgHQ4RpJeAAPMADSceEs488AQ+yQEEhg0BeglBeBtAe?Q4h0AeglywBtR4QpwSAeglwwxSwhgHQ4xSJeAAPaAGXhyEp?488AwnoRBNnceEFbcfEzoSTAylAAA1gg0Ieg0Geglh0BtAe?Q4CeglywBtQ4whRpAeglwwxSwhgHwhxSJeAAPGAEOZyDsoB?AAJhglIeglGeg0hlBtAewhMeAAPfAmLVrDTPqDEloo2AFbu?fEzQ0CEsW98AQ+T7BFr4AA",
+    "finish": {
+      "piece": "t",
+      "lines": 2
+    }
+  },
+  {
+    "id": "mko",
+    "name": "MKO Stacking",
+    "note": "First-bag shell with T held. The T-spin continuation is not included.",
+    "source": "https://harddrop.com/wiki/MKO_Stacking",
+    "fumen": "v115@9gQ4EeAtBewhR4CeBtBewhg0Q4CeAtglRpwhi0Aeil?RpwhJeAgl",
+    "sourceFumen": "v115@9gQ4EeAtBewhR4CeBtBewhg0Q4CeAtglRpwhi0Aeil?RpwhJeAgWJAx82TAS4sdDHBAAA9gwhEeAtBeQ4xhCeBtBeQ?4glwhCeAtg0xwQ4ilAei0xwQ4JeAAPSAUS88AwM7vAzs78A?1no2AQ1AAA+ghlAeh0AeRpCeglAeg0BeRpCeglAeg0YeAAP?GAUouXEp9BAA4gAtEehWAehWAexSCegWAegWBexSCeQpwwQ?aHewwPeAAPDAUNSBArgglBeRpwhBeilBeRpwhh0A8BtywA8?whg0C8BtwwAtA8whg0A8AeA8BeAPAtAeB8CeA8AeAtBeB8K?eAAPSAFbuzCuoAVBjA3TASI3LEwGCAAqgR4GeR4ywAtzhA8?glAewwAtwhwwglQpA8h0BeAtxwglwSglBeglaeAAPLANS54?Djoo2AL4JDA"
+  },
+  {
+    "id": "pco",
+    "name": "Perfect Clear Opener",
+    "note": "First-bag shell with I held. This is setup practice; a perfect clear is not guaranteed.",
+    "source": "https://harddrop.com/wiki/Perfect_Clear_Opener",
+    "fumen": "v115@9gBtEei0wwBtDeRpg0xwR4CeRpglwwR4DeilJeAgl",
+    "sourceFumen": "v115@9gBtEeilwwBtDeRpglxwR4CeRpg0wwR4Dei0JeAgWJ?Ax82TAS4sdDHBAAA9gBtEei0QpBtDexwg0RpxhCexwglQpx?hDeilJeAAPYAIoMoDFb8KCFbkRBU1REBFrnRASY03BDhwhI?ewhIewhIewhMeAAPaAwCckDF388AwN88AQx2vAx178A1no2?AQ1AAA"
+  },
+  {
+    "id": "albatross",
+    "name": "Albatross Special",
+    "note": "First-bag shell with T held. Later bags and attack continuation are not included.",
+    "source": "https://shiwehi.com/tetris/template/albatrossspecial.php",
+    "fumen": "v115@AhBtDewhQ4CeBti0whR4AeRpilg0whAeQ4AeRpglCe?whJeAgl",
+    "sourceFumen": "v115@AhBtDewhQ4CeBti0whR4AeRpilg0whAeQ4AeRpglCe?whJeAgHAhBtDeQ4whywBtilQ4xhywi0glQ4AewhAexwg0Ce?Q4JeAAAvhAAAA1ghlAeAtGeglBtDeh0AeglAtQ4zhg0DeR4?RpAeg0EeQ4RpKeAAA1gh0AeAtGeg0BtDehlwwg0AtwhT4gl?xwBexhxwAeglAewwCewhxwKeAAAvhAAAA1gQ4IeR4AeAtwh?FeQ4BtwhglRpg0CeAtAewhglRpi0CewhhlKeAAA1gwhIexh?AeAtQ4CeywwhBtQ4g0xwglwwBeAtAeQ4g0xwilCeQ4h0KeA?AAvhAAAA"
+  },
+  {
+    "id": "dt",
+    "name": "DT Cannon",
+    "note": "First-bag construction. The later double and triple are not included.",
+    "source": "https://harddrop.com/wiki/Double_Triple_Cannon_Opener",
+    "fumen": "v115@3gwwHeywwhGeR4whBtAeRpAeR4glwhg0BtRpAeilwh?i0JeAgl",
+    "sourceFumen": "v115@FgAtg0AeglQ4DeBtg0AeglR4CeAth0AehlQ4XewwHe?ywwhGeR4whBtAeRpAeR4glwhg0BtRpAeilwhi0JeAgWJAx8?2TAS4sdDHBAAAFgAPgHAegWwDDeBPgHAegWxDCeAPhHAehW?wDXeQpHeSpQ4GexhQ4BtAexwAexhg0Q4glBtxwAei0Q4ilJ?eAAAagQ4FehlAeR4FeglBtQ4Bewhh0AeglAeBtRpwhg0FeR?pwhg0ywEewhBewwaeAAPIAGXyGEFb8vBhghlDeR4CeglAtw?SAeR4whh0gWAeA8xSRpwhg0Beg0BtwhRpBeQawwQpAeBtxw?AeglA8wwDexwQ4TeAAPIAGXyGEFbUzBhghlQ4BeAtEeglR4?BtAewhh0gWAeA8Q4AtQpAPgHg0Beg0BtA8BPBeQawwQpAeB?txwAeglA8wwDexwQ4TeAAPIAGXyGEFbs2BhghlQ4AeRpEeg?lR4RpAewhh0gWAewhQ4AtBewhg0Beg0xhAtAeAtBeQawwQp?AewhAtxwAeglA8wwDexwQ4TeAAPIAGXyGEFbE6B1gh0whAe?xwEeg0xhxwAeQ4hlAeg0AewhBtAeQ4glFeBtQ4TeAAPXAmL?VrDTPqDEloo2AGsrGEFbkzDFMdCA"
+  },
+  {
+    "id": "sdpc",
+    "name": "Single Double PC",
+    "note": "First-bag SDPC construction. Later bags and PC solutions are not included.",
+    "source": "https://harddrop.com/wiki/SingleYou",
+    "fumen": "v115@7gQ4AewhGeR4whh0CeywQ4whg0ilBtwwRpwhg0glCe?BtRpJeAgl",
+    "sourceFumen": "v115@7gQ4AewhGeR4whh0CeywQ4whg0ilBtwwRpwhg0glCe?BtRpJeAgWJAx82TAS4sdDHBAAAFhwhAeQ4GexhQ4hlCeSpw?hQ4glg0CeBtxwJeAAAogwhGeRpwhilCeQ4Rpwhglg0DeR4A?ewhAei0CeQ4EeBtIeBtNeAAPEAz203Bqgg0HegWAtgWGeAt?BeglGeCPjeAAPeAz203BtMN5Duoo2Avno2AQmSeDtuSTASI?T7B02AAAngg0BegHEewSQpAeglAPglDeRpAeAPwSQpgWGex?hgWjeAAPeAlE3rDuNONEuoo2Avno2APoo2ACS0rDFbssCzO?BAAlgxhQLGeBtAPwhiWDehWwhgWQpwSFewhAeRpg0IeRaHe?QpQaAPNeAAPLAN3GlDo+88AQ4PBAfgwhEeTawhIewhIewhw?eAAPeAN3GlDo+88AQ4HSASIaRASIPICheswB1ItJEF8BAAn?gRpFeBPxhGehlAtAeAPhlEeAtAeAPhWIexhHexSOeAAPLAN?3GlDo+88AQ4PBAfgQaEehlQagWQaEeglQpAegWQaFexSQLQ?aAthWEeQLAeAthlTeBtNeAAPjAlEvXEhoo2Azo2hEwoo2AF?bOVBZFk9AFrnRASY03BFr4AAlgiWQaFegWxSQaFewDwSAtQ?awhgHDewDgWQag0wDBegHCegWwSQawDgWgHhWAtAPwSRLwD?gWgHAeDPRLJeAAPJAzOukDr9N5DOBAAA",
+    "finish": {
+      "piece": "t",
+      "lines": 1
+    }
+  }
+]

@@ -232,7 +232,8 @@ test('practice imports fault scenes, enforces targets, resets the whole set and 
 });
 
 test('ordinary practice retries the current scene and supports older trainer replay snapshots', async () => {
-  const replay: any = makeReplay();
+  const source = new TrainerGame(instant(), 942562); source.start(); mistake(source); tap(source, 'hardDrop'); mistake(source);
+  const replay: any = { ...source.export(), events: source.events }; delete replay.timeline;
   for (const placement of replay.placements) delete placement.snapshot;
   const set = await loadPractice(readReplay(replay, 'legacy')[0], instant());
   const game = new TrainerGame(instant(), 1, set); game.start();

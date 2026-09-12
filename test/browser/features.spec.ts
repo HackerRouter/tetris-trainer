@@ -41,6 +41,7 @@ test('standalone filtered drills reset the board, keep counting and can be ended
 });
 
 test('history ranks repeated faults, launches focused practice, and saved replays seek and play', async ({ page }) => {
+  await page.addInitScript(() => { const key = 'tetrio-trainer-settings-v1', settings = JSON.parse(localStorage.getItem(key)!); settings.training.practiceFinesseEnabled = false; localStorage.setItem(key, JSON.stringify(settings)); });
   await page.goto('/'); await page.locator('#start').click();
   for (let i = 0; i < 2; i++) {
     for (const key of ['ArrowLeft', 'ArrowRight', 'Space']) { await page.keyboard.press(key); await page.waitForTimeout(25); }
@@ -50,6 +51,10 @@ test('history ranks repeated faults, launches focused practice, and saved replay
   await page.screenshot({ path: 'test-results/fault-statistics.png', fullPage: true });
   await page.locator('#fault-top').click(); await expect(page.locator('#fault-selection')).toHaveText('1 selected');
   await page.locator('#train-faults').click(); await expect(page.locator('#mode-label')).toHaveText('FOCUSED FAULT DRILLS');
+  await expect(page.locator('#finesse-toggle')).toBeChecked();
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight'); await page.keyboard.press('Space');
+  await expect(page.locator('#faults')).toHaveText('1'); await expect(page.locator('#pieces')).toHaveText('0');
+  await expect(page.locator('#time')).toHaveText('0:00.000'); await expect(page.locator('#demo-popup')).toBeVisible();
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   await page.getByRole('link', { name: 'Statistics', exact: true }).click(); await expect(page.locator('#session-rows tr')).toHaveCount(2);
   await page.locator('#session-rows').getByRole('button', { name: 'Watch', exact: true }).last().click();
@@ -64,6 +69,19 @@ test('native replay export downloads a real event envelope after verification', 
   await page.goto('/'); await page.locator('#start').click(); await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   const pending = page.waitForEvent('download'); await page.locator('#download-native').click(); const download = await pending;
   expect(download.suggestedFilename()).toMatch(/\.ttr$/); await expect(page.locator('#message')).toContainText('verified locally');
+});
+
+test('left-clicking a manually paused board resumes without placing a piece', async ({ page }) => {
+  await page.goto('/'); await page.locator('#start').click(); await page.locator('#pause').click();
+  await expect(page.locator('#overlay-value')).toHaveText('Paused'); const time = await page.locator('#time').textContent();
+  await page.locator('#board').click({ button: 'right' }); await expect(page.locator('#overlay-value')).toHaveText('Paused');
+  await expect(page.locator('#time')).toHaveText(time!);
+  await page.locator('#board').click(); await expect(page.locator('#board-overlay')).toBeHidden();
+  await expect(page.locator('#time')).not.toHaveText(time!); await expect(page.locator('#pieces')).toHaveText('0');
+  await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowRight'); await page.keyboard.press('Space');
+  await expect(page.locator('#retry-status')).toBeVisible();
+  await page.locator('#pause').click(); await page.locator('#board').click();
+  await expect(page.locator('#retry-status')).toBeVisible(); await expect(page.locator('#time')).toHaveText('0:00.000');
 });
 
 test('history imports are atomic and repeated imports keep one session per ID', async ({ page }) => {

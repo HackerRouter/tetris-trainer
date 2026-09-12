@@ -52,5 +52,5 @@ export function makeDrillSet(settings: Settings, filter = defaultDrillFilter): P
     }
     scenes.push(structuredClone(deck.pop()!));
   }
-  return { name: 'Pure finesse drills', kind: 'pure', scenes, customRules, loop: !filter.rounds };
+  return { name: 'Pure finesse drills', kind: 'pure', scenes, customRules, loop: !filter.rounds, finesseEnabled: true };
 }

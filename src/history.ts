@@ -64,7 +64,7 @@ export function focusedDrills(groups: FaultGroup[], settings: Settings, original
     if (!scene) throw new Error('This fault needs its original stack. Enable "Use original boards" to practice it.');
     return scene;
   });
-  return { name: 'Selected finesse faults', kind: 'focused', scenes, customRules, loop: true };
+  return { name: 'Selected finesse faults', kind: 'focused', scenes, customRules, loop: true, finesseEnabled: true };
 }
 
 export class HistoryStore {

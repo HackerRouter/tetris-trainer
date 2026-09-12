@@ -1,17 +1,21 @@
+import { OpenersPage, suggestionCard } from './openers-page';
 import { defaultDrillFilter, makeDrillSet, type DrillFilter } from './drills';
 import { faultGroups, focusedDrills, HistoryStore, type FaultGroup, type SessionRecord, type TrainerReplay } from './history';
 import { buildPlayback, type Playback } from './playback';
-import { drawBoard } from './renderer';
+import { drawScene } from './renderer';
+import { drawNativePreview } from './ui-assets';
+import type { CustomRules, ModeRules } from './modes';
 import { readReplay, type ReplayTrack } from './replay';
 import { downloadJson, type Settings } from './settings';
 import { formatTime } from './time';
 import type { PracticeSet } from './practice';
 
-type Callbacks = { settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
+type Callbacks = { freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const cell = (text: string | number) => { const td = document.createElement('td'); td.textContent = String(text); return td; };
 
 export class Pages {
+  private openersPage: OpenersPage;
   private sessions: SessionRecord[] = [];
   private groups: FaultGroup[] = [];
   private selected = new Set<string>();
@@ -23,6 +27,11 @@ export class Pages {
   private loading = 0;
   constructor(private history: HistoryStore, private callbacks: Callbacks) {
     this.drills(); this.statistics(); this.replays();
+    this.openersPage = new OpenersPage({ settings: callbacks.settings, rules: callbacks.rules, practice: set => this.beginPractice(set), freeBuild: (seed, rules, suggestions) => {
+      location.hash = 'play'; callbacks.freeBuild(seed, rules);
+      const references = el('opener-references'); references.hidden = false;
+      el('opener-reference-cards').replaceChildren(...suggestions.map(suggestion => suggestionCard(suggestion, () => this.beginPractice(suggestion.route.set))));
+    } });
     window.addEventListener('hashchange', () => this.route());
     document.addEventListener('drop', event => {
       if (this.page !== 'replays' || !event.dataTransfer?.files.length) return;
@@ -33,15 +42,16 @@ export class Pages {
     });
     this.route();
   }
-  get page() { const page = location.hash.slice(1); return ['drills', 'statistics', 'replays'].includes(page) ? page : 'play'; }
+  get page() { const page = location.hash.slice(1); return ['drills', 'openers', 'statistics', 'replays'].includes(page) ? page : 'play'; }
   private route() {
     const hint = document.querySelector('.config-hint');
     if (hint) hint.textContent = this.page === 'replays' ? 'Drop a trainer JSON or TETR.IO replay here. TTC files still open the config importer.' : 'Drop a TETR.IO .ttc config anywhere on this page to import your settings.';
-    for (const name of ['play', 'drills', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
+    for (const name of ['play', 'drills', 'openers', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
     document.querySelectorAll<HTMLAnchorElement>('.page-nav a').forEach(link => {
       if (link.hash === `#${this.page}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
     if (this.page !== 'play') { this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
+    if (this.page === 'openers') this.openersPage.refresh();
     if (this.page === 'statistics') void this.refreshHistory();
     if (this.page !== 'replays') this.playing = false;
   }
@@ -121,7 +131,12 @@ export class Pages {
   }
   private selection() { el<HTMLButtonElement>('train-faults').disabled = !this.selected.size; el('fault-selection').textContent = `${this.selected.size} selected`; }
   private replays() {
-    el('replays-page').innerHTML = `<h2 id="replays-title">Replay player</h2><p class="muted">Load or drop trainer JSON, TETR.IO .ttr or .ttrm. Choose a player / round for multiplayer recordings. Playback uses recorded simulation time; thinking and manual pauses do not add empty waiting time.</p><div class="page-toolbar"><button id="player-import">Open replay</button><button id="player-current" class="secondary">Watch current / last session</button><input id="player-file" type="file" accept=".json,.ttr,.ttrm" hidden><label>Player / round<select id="player-track" disabled></select></label></div><p id="player-status" role="status"></p><div id="player-content" hidden><h3 id="player-title"></h3><div class="replay-layout"><canvas id="player-board" width="300" height="690" aria-label="Replay board"></canvas><section><div class="page-toolbar"><button id="player-play">Play</button><button id="player-back" class="secondary" aria-label="Previous frame">−1 frame</button><button id="player-forward" class="secondary" aria-label="Next frame">+1 frame</button></div><label class="select-row">Playback speed<select id="player-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label><label for="player-seek">Position</label><input id="player-seek" type="range" min="0" max="0" step="0.0166666667" value="0"><p id="player-time"></p><p id="player-info"></p><p id="player-event" role="status"></p><p class="muted">Use the slider to seek or step through the recorded frames. Statistics → Watch opens a saved session here.</p></section></div></div>`;
+    el('replays-page').innerHTML = `<h2 id="replays-title">Replay player</h2><p class="muted">Load or drop trainer JSON, TETR.IO .ttr or .ttrm. Choose a player / round for multiplayer recordings. Playback uses recorded simulation time; thinking and manual pauses do not add empty waiting time.</p><div class="page-toolbar"><button id="player-import">Open replay</button><button id="player-current" class="secondary">Watch current / last session</button><input id="player-file" type="file" accept=".json,.ttr,.ttrm" hidden><label>Player / round<select id="player-track" disabled></select></label></div><p id="player-status" role="status"></p><div id="player-content" hidden><h3 id="player-title"></h3><div class="replay-layout"><div id="player-tetrion"></div><section class="player-controls"><strong id="player-mode"></strong><div class="page-toolbar"><button id="player-play">Play</button><button id="player-back" class="secondary" aria-label="Previous frame">−1 frame</button><button id="player-forward" class="secondary" aria-label="Next frame">+1 frame</button></div><label class="select-row">Playback speed<select id="player-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label><label for="player-seek">Position</label><input id="player-seek" type="range" min="0" max="0" step="0.0166666667" value="0"><p id="player-time"></p><label class="check-row"><input id="player-audio" type="checkbox" checked>Replay sound effects</label><div class="stats"><div>Inputs<strong id="player-inputs">0</strong></div><div>Holds<strong id="player-holds">0</strong></div><div>Training faults<strong id="player-faults">0</strong></div><div>Perfect placements<strong id="player-perfects">0</strong></div></div><p id="player-info"></p><p id="player-event" role="status"></p><p class="muted">Use the slider to seek or step through the recorded frames. Statistics → Watch opens a saved session here.</p></section></div></div>`;
+    const tetrion = document.querySelector('#play-page .tetrion')!.cloneNode(true) as HTMLElement;
+    tetrion.querySelectorAll<HTMLElement>('[id]').forEach(node => { node.id = node.id === 'time' ? 'player-clock' : `player-${node.id}`; });
+    tetrion.querySelector('#player-board-overlay')!.remove();
+    tetrion.querySelectorAll('.native-frame').forEach(panel => panel.classList.remove('native-frame'));
+    el('player-tetrion').append(tetrion);
     el('player-import').addEventListener('click', () => el<HTMLInputElement>('player-file').click());
     el('player-file').addEventListener('change', () => { const file = el<HTMLInputElement>('player-file').files?.[0]; if (file) void this.loadFile(file); el<HTMLInputElement>('player-file').value = ''; });
     el('player-current').addEventListener('click', () => {
@@ -144,7 +159,16 @@ export class Pages {
     try {
       const playback = await buildPlayback(track, this.callbacks.settings(), text => { if (token !== this.loading) throw new Error('Playback loading canceled.'); this.replayStatus(text); });
       if (token !== this.loading) return;
-      this.playback = playback; this.position = 0; el('player-content').hidden = false; el('player-title').textContent = track.name;
+      this.playback = playback; this.position = 0;
+      el('player-mode').textContent = playback.modeName;
+      el('player-hold-panel').hidden = !playback.rules.hold; el('player-next-panel').hidden = !playback.rules.nextCount;
+      el<HTMLCanvasElement>('player-next-preview').height = Math.max(1, playback.rules.nextCount) * 90;
+      el('player-line-goal').textContent = playback.rules.goals.lines ? `/ ${playback.rules.goals.lines}` : '';
+      el('player-faults').textContent = String(playback.trainingFaults);
+      el('player-faults').parentElement!.title = 'All original training faults remain in Statistics. Removed attempts are not replayed.';
+      const tetrion = el('player-tetrion').firstElementChild as HTMLElement;
+      tetrion.style.gridTemplateColumns = `150fr ${playback.engine.board.width * 30}fr 150fr`;
+      tetrion.querySelectorAll<HTMLElement>('.left-column,.right-column').forEach(column => { column.style.paddingTop = '60%'; }); el('player-content').hidden = false; el('player-title').textContent = track.name;
       el<HTMLInputElement>('player-seek').max = String(playback.duration);
       const canvas = el<HTMLCanvasElement>('player-board'); canvas.width = playback.engine.board.width * 30; canvas.height = (playback.engine.board.height + 3) * 30;
       this.replayStatus('Ready.'); this.drawPlayback();
@@ -152,7 +176,13 @@ export class Pages {
   }
   update(now: number) {
     if (this.page !== 'replays' || !this.playback) return;
+    const before = this.position;
     if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) this.playing = false; }
+    if (el<HTMLInputElement>('player-audio').checked && this.position > before) {
+      const names = new Set<string>();
+      for (const frame of this.playback.frames) if (frame.time > before && frame.time <= this.position) for (const name of frame.sounds) names.add(name);
+      for (const name of names) this.callbacks.sound(name);
+    }
     this.last = now; this.drawPlayback();
   }
   private drawPlayback() {
@@ -160,7 +190,12 @@ export class Pages {
     let lo = 0, hi = replay.frames.length - 1;
     while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (replay.frames[mid].time <= this.position) lo = mid; else hi = mid - 1; }
     const frame = replay.frames[lo];
-    drawBoard(el<HTMLCanvasElement>('player-board'), replay.engine, frame.board, frame.piece, null, this.callbacks.settings().display);
+    drawScene(el<HTMLCanvasElement>('player-board'), el<HTMLCanvasElement>('player-hold-preview'), el<HTMLCanvasElement>('player-next-preview'), replay.engine, replay.rules, replay.settings.display, frame, (this.position - frame.effectTime) * 1000);
+    drawNativePreview(el<HTMLCanvasElement>('player-hold-frame'), 'hold'); drawNativePreview(el<HTMLCanvasElement>('player-next-frame'), 'next');
+    el('player-clock').textContent = formatTime(this.position * 1000);
+    el('player-pieces').textContent = String(frame.pieces); el('player-lines').textContent = String(frame.lines);
+    el('player-pps').textContent = this.position ? (frame.pieces / this.position).toFixed(2) : '0.00';
+    el('player-inputs').textContent = String(frame.inputs); el('player-holds').textContent = String(frame.holds); el('player-perfects').textContent = String(frame.perfects);
     el('player-play').textContent = this.playing ? 'Pause' : 'Play'; el<HTMLInputElement>('player-seek').value = String(this.position);
     el('player-time').textContent = `${formatTime(this.position * 1000)} / ${formatTime(replay.duration * 1000)}`;
     el('player-info').textContent = `Pieces: ${frame.pieces} · Lines: ${frame.lines} · Hold: ${frame.hold?.toUpperCase() ?? '—'} · Next: ${frame.next.join(' ').toUpperCase()}`;

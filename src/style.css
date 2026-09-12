@@ -41,3 +41,29 @@ h1,h2,.board-stats strong,#overlay-value{font-family:HUN,Config,sans-serif;font-
 #player-board { width: 100%; height: auto; }
 #player-seek { width: 100%; }
 @media (max-width: 650px) { .summary-cards { grid-template-columns: repeat(2, 1fr); } .replay-layout { grid-template-columns: 1fr; } #player-board { max-width: 280px; margin: auto; } }
+
+.replay-layout { grid-template-columns: minmax(0, 1.7fr) minmax(200px, 1fr); gap: 20px; }
+.player-controls { min-width: 0; padding-top: 45px; }
+#player-tetrion { min-width: 0; }
+#player-board { max-width: none; }
+#player-clock { font-size: clamp(12px, 2vw, 25px); letter-spacing: -.7px; }
+#player-info { font-size: 12px; line-height: 1.7; color: #91a4bf; }
+#player-time { font-variant-numeric: tabular-nums; }
+@media(max-width:950px) { .replay-layout { grid-template-columns: minmax(0,620px); justify-content: center; } .player-controls { padding-top: 0; } }
+
+.opener-catalog { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin: 20px 0; }
+.opener-card { text-align: left; padding: 10px; min-width: 0; }
+.opener-card canvas { border-radius: 3px; margin-bottom: 10px; }
+.opener-card strong,.opener-card small { display: block; }
+.opener-card small { color: #95a8c1; margin-top: 5px; font-size: 11px; }
+.opener-card[aria-pressed=true],.opener-route button[aria-current=step] { border-color: #a9dcd0; background: #223b40; }
+.opener-workbench { display: grid; grid-template-columns: minmax(0,1fr) minmax(170px,260px); gap: 28px; border-top: 1px solid #34445f; padding-top: 15px; }
+.opener-workbench a { color: #a9dcd0; font-size: 12px; }
+.opener-preview canvas { max-width: 200px; margin: 0 auto; }
+.opener-preview ol { padding-left: 20px; font-size: 12px; line-height: 1.6; }
+.opener-route { padding-left: 22px; }
+.opener-route li { padding: 3px 0; }
+#opener-import { display: grid; gap: 12px; margin-top: 20px; }
+#opener-import textarea { width: 100%; resize: vertical; background: #0b1322; color: #e4ecfa; border: 1px solid #42516e; padding: 12px; font: 13px/1.5 monospace; }
+#opener-status { font-size: 13px; line-height: 1.5; color: #bfd8d4; }
+@media(max-width:650px) { .opener-catalog { grid-template-columns: repeat(2,minmax(0,1fr)); } .opener-workbench { grid-template-columns: 1fr; } .opener-preview { border-top: 1px solid #34445f; padding-top: 20px; } }

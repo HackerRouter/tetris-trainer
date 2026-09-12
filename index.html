@@ -5,7 +5,7 @@
   <div class="app">
     <header><div><span class="eyebrow">FOCUSED PRACTICE</span><h1>Tetris <span>Trainer</span></h1></div><div class="header-tools"><button id="config-open" class="secondary">Import TETR.IO config</button><button id="settings-open" class="secondary">Settings</button></div></header>
     <p class="config-hint muted">Drop a TETR.IO .ttc config anywhere on this page to import your settings.</p>
-    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#drills">Finesse drills</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
+    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#drills">Finesse drills</a><a href="#openers">Openers</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
     <main id="play-page">
       <section class="play-area">
         <div class="tetrion">
@@ -20,6 +20,8 @@
         <p id="retry-status" class="muted" role="status" hidden>Timer paused. Press a game key to continue.</p>
       </section>
       <aside>
+        <section id="opener-references" hidden><h3>Opening references</h3><p class="muted">Try a construction freely. Click its diagram to restart with assisted targets.</p><div id="opener-reference-cards" class="opener-catalog"></div></section>
+        <p id="opener-hold-hint" class="muted" hidden>This step starts with Hold. Swap first, then match the outlined target.</p>
         <div class="mode-picker"><img id="mode-icon" src="/tetrio/ui/sprint.svg" width="32" height="32" alt=""><label for="mode-select">Game mode<select id="mode-select"><option value="sprint">40L Sprint</option><option value="custom">Custom / Zen</option></select></label></div>
         <button id="custom-open" class="secondary wide" hidden>Custom rules</button>
         <div class="toolbar"><button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button></div>
@@ -40,6 +42,7 @@
       </aside>
     </main>
     <section id="drills-page" class="page-content" hidden aria-labelledby="drills-title"></section>
+    <section id="openers-page" class="page-content" hidden aria-labelledby="openers-title"></section>
     <section id="statistics-page" class="page-content" hidden aria-labelledby="statistics-title"></section>
     <section id="replays-page" class="page-content" hidden aria-labelledby="replays-title"></section>
   </div>

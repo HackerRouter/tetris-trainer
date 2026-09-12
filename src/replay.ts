@@ -8,7 +8,7 @@ import { customDefaults, modeDefinitions, randomizers, rotationSystems, validate
 import { RoomRuntime } from './room-runtime';
 
 type Raw = Record<string, any>;
-export type ReplayTrack = { name: string; kind: 'trainer' | 'native'; data: Raw; date?: string; endStats?: Raw };
+export type ReplayTrack = { name: string; kind: 'trainer' | 'native'; data: Raw; date?: string; endStats?: Raw; training?: Raw };
 const object = (value: unknown): Raw => value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Raw : {};
 const symbols = new Set(['i', 'o', 't', 's', 'z', 'j', 'l']);
 const keys = new Set(['moveLeft', 'moveRight', 'rotateCW', 'rotateCCW', 'rotate180', 'softDrop', 'hardDrop', 'hold']);
@@ -26,7 +26,7 @@ export function readReplay(value: unknown, name: string): ReplayTrack[] {
       let end: Raw | undefined;
       for (let index = node.events.length - 1; index >= 0; index--) if (node.events[index].type === 'end') { end = node.events[index]; break; }
       const username = node.options?.username ?? full?.data?.options?.username;
-      tracks.push({ name: username && !label.toLowerCase().includes(String(username).toLowerCase()) ? `${label} · ${username}` : label, kind: 'native', data: node, date: root.ts, endStats: node.results?.stats ?? (!root.ismulti ? root.endcontext : undefined) ?? end?.data?.export?.stats ?? end?.data?.stats });
+      tracks.push({ name: username && !label.toLowerCase().includes(String(username).toLowerCase()) ? `${label} · ${username}` : label, kind: 'native', data: node, date: root.ts, training: root.trainer?.training, endStats: node.results?.stats ?? (!root.ismulti ? root.endcontext : undefined) ?? end?.data?.export?.stats ?? end?.data?.stats });
     } else if (Array.isArray(node.replays)) {
       node.replays.forEach((replay: Raw, index: number) => visit(replay, `${label} · ${node.board?.[index]?.user?.username ?? `Player ${index + 1}`}`, depth + 1));
     } else if (Array.isArray(node.rounds)) {
@@ -157,6 +157,7 @@ function nativeConfig(options: Raw, track: ReplayTrack): EngineInitializeParams 
   config.misc.allowed.hold = options.display_hold !== false;
   config.misc.movement.lockResets = number('lockresets', 15);
   config.misc.movement.lockTime = number('locktime', 30);
+  config.misc.movement.infinite = !!(options.infinite_movement ?? options.infinitemovement);
   config.misc.stride = !!options.stride;
   if (track.date && Number.isFinite(Date.parse(track.date))) config.misc.date = new Date(track.date);
   const opponents = new Set<number>();
@@ -169,7 +170,7 @@ function nativeConfig(options: Raw, track: ReplayTrack): EngineInitializeParams 
   return config;
 }
 
-export async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (text: string) => void, observe?: (engine: Engine) => void): Promise<PracticeSet> {
+export async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (text: string) => void, observe?: (engine: Engine, rules: ModeRules, room: RoomRuntime) => void): Promise<PracticeSet> {
   const columns = new Map<number, number>(), interactionIds = new Map<string, number>();
   const events: Game.Replay.Frame[] = track.data.events.map((event: Raw) => {
     if (event.type !== 'ige') return event;
@@ -195,14 +196,30 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
   const config = nativeConfig(options, { ...track, data: { ...track.data, events } });
   const engine = new Engine(config);
   if ([...columns.values()].some(column => column >= engine.board.width)) throw new Error('Replay garbage column is outside the board.');
-  const customRules = validateCustomRules({ ...structuredClone(customDefaults), gravity: config.gravity.value, lockDelay: config.misc.movement.lockTime, lockResets: config.misc.movement.lockResets, infiniteLock: false, bag: config.queue.type, hold: config.misc.allowed.hold, infiniteHold: config.misc.infiniteHold, allow180: config.misc.allowed.spin180, topout: 'stop', advanced: { ...customDefaults.advanced, width: config.board.width, height: config.board.height, kickSet: config.kickTable, hardDrop: config.misc.allowed.hardDrop, bombs: config.garbage.bombs, entryDelay: options.are ?? 0, lineClearDelay: options.lineclear_are ?? 0 } });
+  const customRules = validateCustomRules({ ...structuredClone(customDefaults), gravity: config.gravity.value, lockDelay: config.misc.movement.infinite ? Math.min(600, config.misc.movement.lockTime) : config.misc.movement.lockTime, lockResets: config.misc.movement.lockResets, infiniteLock: config.misc.movement.infinite, bag: config.queue.type, hold: config.misc.allowed.hold, infiniteHold: config.misc.infiniteHold, allow180: config.misc.allowed.spin180, topout: 'stop', advanced: { ...customDefaults.advanced, width: config.board.width, height: config.board.height, kickSet: config.kickTable, hardDrop: config.misc.allowed.hardDrop, bombs: config.garbage.bombs, entryDelay: options.are ?? 0, lineClearDelay: options.lineclear_are ?? 0 } });
   const rules = modeDefinitions.custom.rules({ ...settings, custom: customRules });
+  rules.nextCount = Math.max(0, Math.min(6, options.nextcount ?? 5));
+  rules.goals.lines = options.objective_type === 'lines' ? Number(options.objective_count ?? 40) : 0;
+  rules.name = rules.goals.lines === 40 ? '40 LINE SPRINT' : 'CUSTOM REPLAY';
+  Object.assign(rules.advanced, { shadow: options.display_shadow !== false, spinBonuses: config.options.spinBonuses, comboTable: config.options.comboTable, allClear: !!config.pc, b2bChaining: config.b2b.chaining, b2bCharging: !!config.b2b.charging, gravityIncrease: config.gravity.increase, gravityMargin: config.gravity.marginTime / 60 });
+  customRules.nextCount = rules.nextCount; customRules.lineGoal = rules.goals.lines;
+  customRules.advanced = structuredClone(rules.advanced);
   const room = new RoomRuntime(engine, rules, false, config.queue.seed);
   if (columns.size) {
     const tank = engine.garbageQueue.tank.bind(engine.garbageQueue);
     engine.garbageQueue.tank = (...args) => tank(...args).map(garbage => ({ ...garbage, column: columns.get(garbage.id) ?? garbage.column }));
   }
   if (initial?.data?.game?.board) engine.board.state = boardState([...initial.data.game.board].reverse(), engine.board.width, engine.board.height);
+  else if (options.map) {
+    if (typeof options.map !== 'string') throw new Error('Native replay has an invalid board map.');
+    const [field, queue = '', hold = ''] = options.map.toLowerCase().replace(/\s/g, '').split('?');
+    const width = engine.board.width, height = engine.board.height;
+    if (field.length % width || field.length > width * (height + 20) || /[^_#ijlostz]/.test(field)) throw new Error('Native replay uses an unsupported board map.');
+    const rows = Array.from({ length: field.length / width }, (_, y) => [...field.slice(y * width, (y + 1) * width)].map(tile => tile === '_' ? null : tile === '#' ? 'gb' : tile));
+    while (rows.length < height) rows.unshift(Array(width).fill(null));
+    engine.board.state = boardState(rows.reverse(), width, height);
+    if (queue || hold) throw new Error('Native replay maps with an embedded queue or Hold are not supported yet.');
+  }
   let previous = -1;
   for (const event of events) {
     if (!Number.isInteger(event.frame) || event.frame < previous || event.frame > 216000) throw new Error('Replay has unordered frames or exceeds one hour.');
@@ -229,15 +246,16 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
     locking = null;
   });
   let index = 0;
-  observe?.(engine);
+  observe?.(engine, rules, room);
   while (index < events.length) {
     const batch: Game.Replay.Frame[] = [];
     while (index < events.length && events[index].frame === engine.frame) batch.push(events[index++]);
     const end = batch.find(event => event.type === 'end');
+    if (track.data.options && end && !batch.some(event => ['keydown', 'keyup', 'ige'].includes(event.type))) break;
     room.beforeTick(engine.frame);
     const result = engine.tick(batch.filter(event => event.type !== 'end'));
     priorInputs.push(...result.keys.slice(keyOffset)); keyOffset = 0;
-    observe?.(engine);
+    observe?.(engine, rules, room);
     if (end) break;
     if (engine.toppedOut && events.at(-1)!.frame - engine.frame > 10) throw new Error(`Replay simulation diverged near frame ${engine.frame}. This game version or mode is not supported.`);
     if (engine.frame % 600 === 0) { progress?.(`Analyzing ${track.name} · ${Math.round(engine.frame / Math.max(1, events.at(-1)!.frame) * 100)}%`); await new Promise(resolve => setTimeout(resolve, 0)); }
@@ -254,7 +272,7 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
 }
 
 export async function loadPractice(track: ReplayTrack, settings: Settings, progress?: (text: string) => void): Promise<PracticeSet> {
-  const set = track.kind === 'trainer' ? trainerScenes(track, settings) : await nativeScenes(track, settings, progress);
+  const set = track.training ? trainerScenes({ ...track, data: track.training, kind: 'trainer' }, settings) : track.kind === 'trainer' ? trainerScenes(track, settings) : await nativeScenes(track, settings, progress);
   if (!set.scenes.length) throw new Error('No finesse faults found in this replay under the d-002 rules.');
   return set;
 }
