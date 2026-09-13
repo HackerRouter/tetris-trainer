@@ -74,3 +74,33 @@ test('random-bag suggestions obey real Hold order and assisted construction surv
     assert.equal(playback.frames.at(-1)!.pieces, game.practice!.completed);
   }
 });
+
+test('structural variants preserve the complete occupied shape but vary piece assignments', () => {
+  const rules = modeDefinitions.sprint.rules(settings), opener = openerCatalog.find(opener => opener.id === 'dt')!;
+  const original = compileOpener(opener, settings, rules, options), variants = new Set<string>();
+  const mask = (route: typeof original) => route.diagram.map(({ x, y }) => `${x},${y}`).sort();
+  for (let seed = 1; seed <= 8; seed++) {
+    const route = compileOpener(opener, settings, rules, { ...options, isomers: true, variantSeed: seed * 1738197 });
+    assert.deepEqual(mask(route), mask(original));
+    assert.deepEqual(route.diagram.map(tile => tile.symbol).sort(), original.diagram.map(tile => tile.symbol).sort());
+    variants.add(JSON.stringify(route.diagram.sort((a, b) => a.y - b.y || a.x - b.x)));
+  }
+  assert.ok(variants.size > 1, 'Different seeds select genuinely different colored tilings');
+  const tki = compileOpener(openerCatalog[0], settings, rules, options);
+  assert.equal(tki.diagram.length, tki.set.scenes.length * 4);
+  assert.equal(new Set(mask(tki)).size, tki.diagram.length);
+});
+
+test('completed opener practice keeps its field and queue for continued play and clean playback', async () => {
+  const fumen = encoder.encode([{ field: Field.create(), operation: { type: 'O', x: 4, y: 0, rotation: 'spawn' } }, { operation: { type: 'O', x: 4, y: 2, rotation: 'spawn' } }]);
+  const route = compileOpener({ id: 'continue', name: 'Continue', fumen, note: '', source: '' }, settings, modeDefinitions.sprint.rules(settings), { ...options, continueAfter: true, variantSeed: 17 });
+  const game = new TrainerGame(settings, undefined, route.set); game.start();
+  tap(game, 'hardDrop'); const next = game.engine.queue.slice(0, 1)[0]; tap(game, 'hardDrop');
+  assert.equal(game.practice!.finished, true); assert.equal(game.status, 'playing'); assert.equal(game.target, null);
+  assert.equal(game.engine.falling.symbol, next); assert.equal(game.engine.board.state.flat().filter(Boolean).length, 8);
+  tap(game, 'hold'); assert.equal(game.holds, 1);
+  tap(game, 'hardDrop'); assert.equal(game.engine.stats.pieces, 3); assert.equal(game.practice!.completed, 2);
+  const playback = await buildPlayback(readReplay(game.export(), 'Continued opener')[0], settings);
+  assert.deepEqual(tiles(playback.engine.board.state), tiles(game.engine.board.state));
+  assert.equal(playback.frames.at(-1)!.pieces, 3); assert.equal(playback.frames.at(-1)!.target, null);
+});

@@ -22,7 +22,10 @@ tap(retry, 'moveLeft'); tap(retry, 'moveRight'); tap(retry, 'hardDrop'); tap(ret
 tap(retry, 'hardDrop'); assert.equal(retry.undo(), true); tap(retry, 'moveRight'); tap(retry, 'hardDrop');
 const customSettings = structuredClone(settings); customSettings.custom.gravity = 0; customSettings.custom.advanced.width = 4; customSettings.custom.advanced.height = 26; customSettings.custom.advanced.map = '##..\n##..';
 const custom = new TrainerGame(customSettings, 17, undefined, 'custom'); custom.start(); tap(custom, 'moveRight'); tap(custom, 'hardDrop'); assert.equal(custom.engine.stats.lines, 2); tap(custom, 'hardDrop');
-const cases = [['sprint-hold', sprint], ['retry-undo', retry], ['custom-map', custom]] as const;
+const chargedSettings = structuredClone(settings); chargedSettings.training.countdownSeconds = 1; chargedSettings.handling.arr = 0; chargedSettings.handling.dcd = 0;
+const charged = new TrainerGame(chargedSettings, 17); charged.start(); charged.input.press('moveLeft'); tick(charged, 61); charged.input.release('moveLeft'); tick(charged); tap(charged, 'hardDrop');
+const cases = [['sprint-hold', sprint], ['retry-undo', retry], ['custom-map', custom], ['charged-das', charged]].map(([name, game]) => [name as string, (game as TrainerGame).export()] as const);
+try { cases.push(['provided-sprint', JSON.parse(await readFile('TEMP/DATA/sprint-training-1789183748709.json', 'utf8'))]); } catch (error) { if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error; }
 const browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
 const context = await browser.newContext({ serviceWorkers: 'block' });
 await context.route('**/*', async route => {
@@ -39,22 +42,23 @@ try {
   await page.waitForFunction(() => !!(window as any).__nativeLoad && !!(window as any).__nativeTest);
   await mkdir('TEMP', { recursive: true });
   const results: unknown[] = [];
-  for (const [name, game] of cases) {
-    const file = await exportNative(structuredClone(game.export()));
+  for (const [name, replay] of cases) {
+    const file = await exportNative(structuredClone(replay));
     const result = await page.evaluate(file => {
       const scope = window as any, { ReplayFile, Replay, Game } = scope.__nativeTest;
       const loaded = ReplayFile.Update(file);
       scope.__nativeLoad(loaded, { back: 'home' });
       const game = new Game('replay', { replay: new Replay(loaded.replay) });
       game.setGame(loaded.replay.options); game.setHeadless(true); game.startGame(); game.doAllFrames();
-      return { stats: JSON.parse(JSON.stringify(game.state.stats)), board: JSON.parse(JSON.stringify(game.state.board)), results: document.getElementById('results_stats_overview')!.textContent };
+      return { stats: JSON.parse(JSON.stringify(game.state.stats)), board: JSON.parse(JSON.stringify(game.state.board)), counters: [1, 2, 3, 4, 5].map(i => game.state.setoptions[`slot_counter${i}`]), results: document.getElementById('results_stats_overview')!.textContent };
     }, file);
     assert.ok(result.results?.includes('PIECES'), `${name}: result page loaded`);
-    assert.equal(result.stats.piecesplaced, game.engine.stats.pieces, `${name}: piece count`);
-    assert.equal(result.stats.lines, game.engine.stats.lines, `${name}: line count`);
-    assert.deepEqual(result.board, [...game.engine.board.state].reverse().map(row => row.map(tile => tile?.mino ?? null)), `${name}: final board`);
+    assert.equal(result.stats.piecesplaced, replay.result.pieces, `${name}: piece count`);
+    assert.equal(result.stats.lines, replay.result.lines, `${name}: line count`);
+    assert.deepEqual(result.counters, ['stopwatch', 'lines', 'pieces', 'keys', 'finesse'], `${name}: native counter configuration`);
+    assert.deepEqual(result.board, [...replay.finalSnapshot.board].reverse().map(row => row.map(tile => tile?.mino ?? null)), `${name}: final board`);
     await writeFile(`TEMP/native-${name}.ttr`, JSON.stringify(file));
-    results.push({ name, pieces: result.stats.piecesplaced, lines: result.stats.lines, boardMatches: true, loaderPassed: true });
+    results.push({ name, pieces: result.stats.piecesplaced, lines: result.stats.lines, frames: file.replay.frames, finaltime: file.replay.results.stats.finaltime, counters: result.counters, boardMatches: true, loaderPassed: true });
     console.log(`PASS ${name}: native loader, ${result.stats.piecesplaced} pieces, ${result.stats.lines} lines and final board`);
   }
   await writeFile('TEMP/native-client-verification.json', JSON.stringify({ clientId, checkedAt: new Date().toISOString(), results }, null, 2));

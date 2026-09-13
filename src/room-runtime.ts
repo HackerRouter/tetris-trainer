@@ -23,6 +23,7 @@ export class RoomRuntime {
   }
 
   get waiting() { return this.state.delay > 0 || this.state.wake; }
+  setPractice(value: boolean) { this.practice = value; }
 
   refill() {
     const a = this.rules.advanced, board = this.engine.board;

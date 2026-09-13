@@ -170,7 +170,7 @@ function nativeConfig(options: Raw, track: ReplayTrack): EngineInitializeParams 
   return config;
 }
 
-export async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (text: string) => void, observe?: (engine: Engine, rules: ModeRules, room: RoomRuntime) => void): Promise<PracticeSet> {
+export async function nativeScenes(track: ReplayTrack, settings: Settings, progress?: (text: string) => void, observe?: (engine: Engine, rules: ModeRules, room: RoomRuntime, perfects: number) => void): Promise<PracticeSet> {
   const columns = new Map<number, number>(), interactionIds = new Map<string, number>();
   const events: Game.Replay.Frame[] = track.data.events.map((event: Raw) => {
     if (event.type !== 'ige') return event;
@@ -230,7 +230,7 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
     }
   }
   let snapshot = engine.snapshot({ isUndoRedo: true });
-  let priorInputs: Game.Key[] = [], keyOffset = 0;
+  let priorInputs: Game.Key[] = [], keyOffset = 0, perfects = 0;
   let locking: { snapshot: EngineSnapshot; target: Cell[]; inputs: Game.Key[]; offset: number } | null = null;
   const scenes: PracticeScene[] = [];
   engine.events.on('falling.lock.pre', () => { locking = { snapshot, target: engine.falling.absoluteBlocks, inputs: priorInputs, offset: keyOffset }; });
@@ -240,13 +240,14 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
       const inputs = [...locking.inputs, ...result.keysPresses.slice(locking.offset)];
       const path = findFinesse(engine, locking.snapshot, locking.target);
       if (path && countFinesseInputs(inputs) > path.cost) scenes.push(sceneFrom(locking.snapshot, locking.target, settings, `native-${engine.frame}-${scenes.length}`, rules));
+      else if (path) perfects++;
     }
     room.locked(result);
     snapshot = engine.snapshot({ isUndoRedo: true });
     locking = null;
   });
   let index = 0;
-  observe?.(engine, rules, room);
+  observe?.(engine, rules, room, perfects);
   while (index < events.length) {
     const batch: Game.Replay.Frame[] = [];
     while (index < events.length && events[index].frame === engine.frame) batch.push(events[index++]);
@@ -255,7 +256,7 @@ export async function nativeScenes(track: ReplayTrack, settings: Settings, progr
     room.beforeTick(engine.frame);
     const result = engine.tick(batch.filter(event => event.type !== 'end'));
     priorInputs.push(...result.keys.slice(keyOffset)); keyOffset = 0;
-    observe?.(engine, rules, room);
+    observe?.(engine, rules, room, perfects);
     if (end) break;
     if (engine.toppedOut && events.at(-1)!.frame - engine.frame > 10) throw new Error(`Replay simulation diverged near frame ${engine.frame}. This game version or mode is not supported.`);
     if (engine.frame % 600 === 0) { progress?.(`Analyzing ${track.name} · ${Math.round(engine.frame / Math.max(1, events.at(-1)!.frame) * 100)}%`); await new Promise(resolve => setTimeout(resolve, 0)); }

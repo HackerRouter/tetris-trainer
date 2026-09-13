@@ -1,3 +1,4 @@
+import { clearedRows } from './board-effects';
 import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engine';
 import { copyPiece, type Cell } from './finesse';
 import type { TrainerGame } from './game';
@@ -88,7 +89,7 @@ function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string
 
 const effects = new WeakMap<TrainerGame, { placements: number; since: number }>();
 
-export type PlacementEffect = { cells: Cell[]; piece: string; hardDrop: boolean; lines: number };
+export type PlacementEffect = { rows: number[]; cells: Cell[]; piece: string; hardDrop: boolean; lines: number };
 type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null };
 
 export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, engine: Engine, rules: ModeRules, display: Settings['display'], scene: Scene, age: number) {
@@ -111,7 +112,7 @@ function drawPlacementEffect(canvas: HTMLCanvasElement, engine: Engine, placemen
       ctx.fillStyle = '#ffffff'; ctx.fillRect(px, py, size, size);
       if (placement.hardDrop) { const beam = ctx.createLinearGradient(0, py - size * 5, 0, py); beam.addColorStop(0, 'transparent'); beam.addColorStop(1, colors[placement.piece] ?? '#ffffff'); ctx.fillStyle = beam; ctx.fillRect(px + size * .3, py - size * 5, size * .4, size * 5); }
     }
-    if (placement.lines) { ctx.globalAlpha = strength * .12; ctx.fillStyle = '#ffffff'; ctx.fillRect(0, size * 3, canvas.width, size * engine.board.height); }
+    if (placement.lines) { ctx.globalAlpha = strength * .12; ctx.fillStyle = '#ffffff'; for (const y of placement.rows) ctx.fillRect(0, (engine.board.height + 2 - y) * size, canvas.width, size); }
     ctx.restore();
   }
 }
@@ -123,6 +124,6 @@ export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, nex
   drawScene(canvas, hold, next, engine, game.rules, game.settings.display, {
     board: engine.board.state, piece: game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), target: game.target,
     hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, game.rules.nextCount),
-    effect: placement?.accepted ? { cells: placement.cells, piece: placement.piece, hardDrop: placement.inputs.includes('hardDrop'), lines: placement.result.lines } : null
+    effect: placement?.accepted ? { rows: placement.clearedRows ?? clearedRows(placement.snapshot.board, placement.cells), cells: placement.cells, piece: placement.piece, hardDrop: placement.inputs.includes('hardDrop'), lines: placement.result.lines } : null
   }, now - effects.get(game)!.since);
 }

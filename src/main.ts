@@ -52,6 +52,7 @@ const panel = new SettingsPanel(next => {
 
 let resumeAfterCustom = false;
 const customPanel = new CustomPanel(rules => {
+  pages.opening.clear();
   settings = { ...settings, custom: rules };
   localStorage.setItem(storageKey, JSON.stringify(settings));
   selectMode('custom');
@@ -62,7 +63,7 @@ const customPanel = new CustomPanel(rules => {
 });
 
 function selectMode(mode: ModeId) {
-  modePending = !!game.practice || mode !== game.rules.id;
+  modePending = !!game.practice || !!freeSession || mode !== game.rules.id;
   selectedMode = mode;
   element<HTMLSelectElement>('mode-select').value = mode;
   localStorage.setItem('tetrio-trainer-mode', mode);
@@ -70,6 +71,7 @@ function selectMode(mode: ModeId) {
 }
 element<HTMLSelectElement>('mode-select').value = selectedMode;
 element('mode-select').addEventListener('change', () => {
+  pages.opening.clear();
   selectMode(element<HTMLSelectElement>('mode-select').value as ModeId);
   message.textContent = selectedMode === 'custom' ? 'Adjust Custom rules, then start a session.' : 'Start a new 40-line sprint.';
   element('mode-select').blur();
@@ -85,10 +87,12 @@ element('clear-field').addEventListener('click', () => {
 element('finish-session').addEventListener('click', () => { game.finish(); pressed.clear(); element('finish-session').blur(); });
 element('finesse-toggle').addEventListener('change', () => {
   const enabled = element<HTMLInputElement>('finesse-toggle').checked;
-  game.setFinesseEnabled(enabled); pressed.clear();
-  if (game.practice) settings.training.practiceFinesseEnabled = enabled;
-  else if (game.rules.id === 'custom') settings.custom.finesse = enabled;
-  else settings.training.finesseEnabled = enabled;
+  game.setFinesseEnabled(enabled); pages.opening.finesse(enabled); if (freeSession) freeSession.rules.finesse = enabled; pressed.clear();
+  if (!pages.opening.active) {
+    if (game.practice) settings.training.practiceFinesseEnabled = enabled;
+    else if (game.rules.id === 'custom') settings.custom.finesse = enabled;
+    else settings.training.finesseEnabled = enabled;
+  }
   localStorage.setItem(storageKey, JSON.stringify(settings));
   message.textContent = enabled ? 'Perfect finesse enabled for this mode. Faults restore the placement and timer.' : `Finesse retries disabled for this mode.${game.practice ? ' Match each scene target to advance.' : ' Placements are accepted without a finesse check.'}`;
   element('finesse-toggle').blur();
@@ -172,7 +176,7 @@ function start(practice?: PracticeSet, session?: { seed: number; rules: CustomRu
     const action = (['moveLeft', 'moveRight'] as const).find(action => bindingCodes(game.settings, action).includes(code));
     if (action) { pressed.set(code, action); game.input.press(action); }
   }
-  message.textContent = practice ? 'Match every outlined target with perfect finesse.' : game.rules.id === 'custom' ? 'Custom session started. Use Clear board to reset the field, or Finish session to save a result.' : 'Clear 40 lines. Fault retries also restore the timer.';
+  message.textContent = practice ? `Match every outlined target${game.rules.finesse ? ' with perfect finesse' : ''}.` : game.rules.id === 'custom' ? 'Custom session started. Use Clear board to reset the field, or Finish session to save a result.' : 'Clear 40 lines. Fault retries also restore the timer.';
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
 
@@ -185,19 +189,39 @@ function pause() {
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
 
-element('start').addEventListener('click', () => start(modePending ? undefined : game.practice?.set));
+function restartGame() { if (!modePending && pages.opening.restart()) return; pages.opening.clear(); start(modePending ? undefined : game.practice?.set); }
+element('start').addEventListener('click', restartGame);
 element('pause').addEventListener('click', pause);
 canvas.addEventListener('click', event => {
   if (event.button === 0 && game.status === 'paused' && !panel.open && !customPanel.open && !importing) pause();
 });
-element('sprint').addEventListener('click', () => { selectMode('sprint'); start(); });
-element('download').addEventListener('click', () => { if (game.startedAt) downloadJson(game.export(), `${game.rules.id}-training-${Date.now()}.json`); });
+element('sprint').addEventListener('click', () => { pages.opening.clear(); selectMode('sprint'); start(); });
+element('download').addEventListener('click', () => { if (game.startedAt) downloadJson(game.export(), `${game.rules.id}-training-${Date.now()}.json`); element('download').blur(); });
+let exporting = false;
 element('download-native').addEventListener('click', async () => {
-  const button = element<HTMLButtonElement>('download-native'); button.disabled = true;
-  try { const replay = await exportNative(structuredClone(game.export())); downloadJson(replay, `trainer-${Date.now()}.ttr`); message.textContent = 'TETR.IO replay exported and verified locally. Retried and undone attempts were removed; JSON keeps the full training history.'; }
-  catch (error) { message.textContent = (error as Error).message; }
+  if (exporting) return;
+  exporting = true; const button = element<HTMLButtonElement>('download-native'); button.disabled = true;
+  element('export-status').textContent = 'Verifying the effective recording...';
+  try { const replay = await exportNative(structuredClone(game.export())); downloadJson(replay, `trainer-${Date.now()}.ttr`); element('export-status').textContent = message.textContent = 'TETR.IO replay exported and verified locally. Retried and undone attempts were removed; JSON keeps the full training history.'; }
+  catch (error) { element('export-status').textContent = message.textContent = (error as Error).message; }
+  finally { exporting = false; button.disabled = false; button.blur(); }
+});
+element('convert-replay').addEventListener('click', () => element<HTMLInputElement>('convert-replay-file').click());
+element('convert-replay-file').addEventListener('change', async () => {
+  const input = element<HTMLInputElement>('convert-replay-file'), file = input.files?.[0]; if (!file) return;
+  input.value = ''; const button = element<HTMLButtonElement>('convert-replay'); button.disabled = true;
+  element('conversion-status').textContent = 'Reading and verifying replay...';
+  try {
+    if (file.size > 20000000) throw new Error('Replay files must be smaller than 20 MB.');
+    const track = readReplay(JSON.parse(await file.text()), file.name)[0];
+    if (track.kind !== 'trainer') throw new Error('This is already a native recording. Choose a trainer JSON for conversion.');
+    const native = await exportNative(track.data as ReturnType<TrainerGame['export']>);
+    downloadJson(native, `${file.name.replace(/\.json$/i, '')}.ttr`);
+    element('conversion-status').textContent = 'Converted and verified. The original recording was not changed.';
+  } catch (error) { element('conversion-status').textContent = (error as Error).message; }
   finally { button.disabled = false; }
 });
+
 function undo() { if (game.undo()) { pressed.clear(); accumulator = 0; last = performance.now(); saved = false; message.textContent = 'Placement and timer restored.'; } }
 element('undo').addEventListener('click', () => { undo(); element('undo').blur(); });
 
@@ -209,6 +233,7 @@ async function practiceTrack(track: ReplayTrack) {
   try {
     const set = await loadPractice(track, settings, text => { element('practice-status').textContent = text; });
     element('practice-status').textContent = `${set.scenes.length} fault scenes loaded. ${settings.training.strictPractice ? 'A finesse fault restarts the entire set.' : 'Complete one scene at a time.'}`;
+    pages.opening.clear();
     start(set);
   } catch (error) { element('practice-status').textContent = (error as Error).message; }
   finally { importing = false; }
@@ -248,7 +273,7 @@ document.addEventListener('keydown', event => {
   event.preventDefault();
   if (event.repeat || pressed.has(event.code)) return;
   pressed.set(event.code, action);
-  if (action === 'restart') { start(modePending ? undefined : game.practice?.set); return; }
+  if (action === 'restart') { restartGame(); return; }
   if (action === 'pause') { pause(); return; }
   if (game.status === 'playing' || (game.status === 'countdown' && (action === 'moveLeft' || action === 'moveRight'))) game.input.press(action, accumulator / (1000 / 60));
 });
@@ -268,7 +293,8 @@ function refresh() {
   tetrion.style.maxWidth = `${(engine.board.width + 10) * 31}px`;
   const goals = game.rules.goals, custom = game.rules.id === 'custom' && !game.practice;
   element<HTMLInputElement>('finesse-toggle').checked = game.rules.finesse;
-  element('finesse-scope').textContent = `${game.practice ? 'Fault practice' : custom ? 'Custom' : '40L Sprint'} · Applies immediately`;
+  element<HTMLInputElement>('think-toggle').checked = game.settings.training.justThink; element<HTMLSelectElement>('think-style').value = game.settings.training.thinkStyle;
+  element('finesse-scope').textContent = `${pages.opening.active ? 'Openers' : game.practice ? 'Fault practice' : custom ? 'Custom' : '40L Sprint'} · Applies immediately`;
   element('finesse-help').textContent = game.rules.finesse ? 'Finesse faults undo the placement and timer. Saved separately for this mode.' : `Finesse checks and automatic finesse retries are off.${game.practice ? ' Scene targets are still required.' : ''}`;
   sound.sync(game);
   element('audio-status').textContent = sound.status;
@@ -289,13 +315,13 @@ function refresh() {
   progress.hidden = game.practice?.set.loop === true || (!game.practice && !Object.values(goals).some(Boolean));
   progress.max = game.practice?.set.scenes.length ?? (custom ? 1 : 40);
   progress.value = game.practice?.index ?? (custom ? Math.max(...ratios) : engine.stats.lines);
-  element('pieces').textContent = String(game.practice?.completed ?? engine.stats.pieces);
+  element('pieces').textContent = String((game.practice && !game.practice.finished ? game.practice.completed : engine.stats.pieces));
   element('mode-label').textContent = game.practice ? game.practice.set.kind === 'opener' ? 'OPENER PRACTICE' : game.practice.set.kind === 'pure' ? 'PURE FINESSE DRILLS' : game.practice.set.kind === 'focused' ? 'FOCUSED FAULT DRILLS' : 'FAULT PRACTICE' : game.rules.name;
-  element('opener-hold-hint').hidden = !game.practice?.set.scenes[game.practice.index]?.holdFirst;
+  element('opener-hold-hint').hidden = !(game.practice?.set.scenes[game.practice.index]?.holdFirst && game.engine.falling.symbol !== game.practice.set.scenes[game.practice.index].guideSnapshot?.falling.symbol);
   element('mode-rules').hidden = !custom;
   element('mode-rules').textContent = `${engine.board.width} × ${engine.board.height} · ${engine.kickTableName} · ${game.rules.bag} · ${Number(engine.dynamic.gravity.get().toFixed(4))} G · ${game.rules.infiniteLock ? 'Manual lock' : `${game.rules.lockDelay}f lock delay`} · ${game.rules.finesse ? 'Perfect finesse' : 'Finesse off'}. ${[goals.lines ? `${goals.lines} lines` : '', goals.pieces ? `${goals.pieces} pieces` : '', goals.seconds ? formatTime(goals.seconds * 1000) : ''].filter(Boolean).join(' / ') || 'Endless session'}. Seed: ${game.seed}. Boards cleared: ${game.boardResets}. Attack: ${engine.stats.garbage.attack}. Sent: ${engine.stats.garbage.sent}. Pending garbage: ${engine.garbageQueue.size}. Garbage cleared: ${engine.stats.garbage.cleared}.${game.rules.advanced.garbageRefill ? ` Refill: ${game.rules.advanced.garbageRefill} rows.` : ""}${game.rules.advanced.handlingOverride ? ` Room handling: ARR ${engine.handling.arr}, DAS ${engine.handling.das}, SDF ${engine.handling.sdf}.` : ''}${game.rules.advanced.sequence ? ` Authored queue${game.rules.advanced.repeatSequence ? ' (repeating)' : ''}.` : ''}`;
   element('sprint').hidden = !game.practice && !custom;
-  element('practice-progress').textContent = game.practice ? game.practice.set.loop ? `${game.practice.completed} completed · Endless` : `${game.practice.index} / ${game.practice.set.scenes.length}` : '';
+  element('practice-progress').textContent = game.practice ? game.practice.finished && game.practice.set.continueAfter ? 'Construction complete | Continue playing' : game.practice.set.loop ? `${game.practice.completed} completed · Endless` : `${game.practice.index} / ${game.practice.set.scenes.length}` : '';
   element('pps').textContent = game.elapsedMs ? (engine.stats.pieces * 1000 / game.elapsedMs).toFixed(2) : '0.00';
   element('inputs').textContent = String(game.inputs); element('holds').textContent = String(game.holds);
   element('faults').textContent = String(game.faults); element('perfects').textContent = String(game.perfects);
@@ -321,7 +347,7 @@ function refresh() {
     element('coach-title').textContent = game.fault.reason === 'target' ? 'Match the outlined target' : 'Try a shorter path';
     element('solution').textContent = `${game.fault.reason === 'target' ? 'That placement does not match the required target. ' : `${game.fault.actual} inputs used · ${game.fault.path.cost} needed. `}${path.join(' → ')}${game.fault.path.drop === 'soft' ? '. This target requires a tuck or spin after lowering the piece.' : ''}`;
   }
-  element('target-policy').textContent = game.practice || !game.settings.training.allowDifferentTarget ? 'Place the current piece in the outlined target to continue. Hold is unavailable until then.' : 'The outline marks your last target. You can choose a different placement.';
+  element('target-policy').textContent = game.practice && !game.practice.finished ? `Place the required piece in the outlined target to continue.${game.practice.set.allowHold ? ' Use Hold when the guide requests it.' : ' Hold is unavailable until then.'}` : !game.settings.training.allowDifferentTarget ? 'Place the current piece in the outlined target to continue. Hold is unavailable until then.' : 'The outline marks your last target. You can choose a different placement.';
   element('results').textContent = `Max combo: ${game.maxCombo} · Max B2B: ${game.maxB2B} · Target misses: ${game.targetMisses} · Unverified placements: ${game.unverified}${game.practice ? ` · Set restarts: ${game.practice.restarts}` : ''}. ${Object.entries(game.clears).map(([key, n]) => `${key}: ${n}`).join(' · ')}`;
   element('hold-panel').hidden = !game.rules.hold;
   element('next-panel').hidden = game.rules.nextCount === 0;
@@ -347,7 +373,7 @@ function animate(now: number) {
   refresh(); demo.update(now, game); pages.update(now); requestAnimationFrame(animate);
 }
 
-const pages = new Pages(history, { freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });
+const pages = new Pages(history, { game: () => game, freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });
 window.addEventListener('pagehide', () => { saveReplay(); });
 if (loaded.message) message.textContent = loaded.message;
 requestAnimationFrame(animate);

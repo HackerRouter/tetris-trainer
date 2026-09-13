@@ -11,7 +11,6 @@ export async function exportNative(replay: TrainerReplay) {
   if (!replay.startedAt || !replay.placements.length) throw new Error('Place at least one piece before exporting a TETR.IO replay.');
   const rules = replay.modeRules, a = rules.advanced, tape = replayTimeline(replay);
   if (replay.mode === 'fault-practice' || a.garbageRefill || a.garbageInterval || a.sequence || replay.events.some(event => event.type === 'clear-field')) throw new Error('This session uses scene changes, garbage refill, timed solo packets, an authored queue or board clearing. Export trainer JSON to preserve it; native export currently supports ordinary Sprint and Custom sessions with retries and undo.');
-  if (replay.events.some(event => event.type === 'das-precharge')) throw new Error('This recording starts with charged countdown DAS. Export trainer JSON to preserve that input buffer; native export requires starting without a held movement key.');
   const engine = createEngine(replay.settings, replay.seed, rules);
   applyModeSetup(engine, rules, replay.seed);
   if (engine.board.state.some(row => row.some(tile => tile?.mino === 'bomb'))) throw new Error('Native export cannot preserve an initial bomb map yet. Export trainer JSON for this session.');
@@ -35,7 +34,11 @@ export async function exportNative(replay: TrainerReplay) {
   const release = (frame: number) => gameKeys.forEach(key => inputs.push({ frame, type: 'keyup', data: { key, subframe: 0 } }));
   for (const event of tape.events) {
     if (event.frame >= tape.frames) continue;
-    if (event.type === 'keydown' || event.type === 'keyup') inputs.push(structuredClone(event) as Game.Replay.Frame);
+    if (event.type === 'das-precharge') {
+      const charge = event.data.charge, active = charge.lastShift === -1 ? charge.lShift : charge.rShift;
+      if (active.das < engine.handling.das || engine.handling.dcd !== 0 || engine.handling.arr !== 0) throw new Error('This recording has partial or nonzero-ARR countdown DAS that native export cannot reproduce exactly yet. Keep the trainer JSON; fully charged zero-ARR / zero-DCD countdown movement is supported.');
+      for (const key of event.data.inputs) inputs.push({ frame: event.frame, type: 'keydown', data: { key, subframe: 0, hoisted: true } });
+    } else if (event.type === 'keydown' || event.type === 'keyup') inputs.push(structuredClone(event) as Game.Replay.Frame);
     else if (event.type === 'release-all') release(event.frame);
   }
   const end = tape.frames;

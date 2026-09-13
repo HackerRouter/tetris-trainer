@@ -57,7 +57,7 @@ test('history ranks repeated faults, launches focused practice, and saved replay
   await expect(page.locator('#time')).toHaveText('0:00.000'); await expect(page.locator('#demo-popup')).toBeVisible();
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   await page.getByRole('link', { name: 'Statistics', exact: true }).click(); await expect(page.locator('#session-rows tr')).toHaveCount(2);
-  await page.locator('#session-rows').getByRole('button', { name: 'Watch', exact: true }).last().click();
+  await page.locator('#session-rows').getByRole('button', { name: 'Watch', exact: true }).first().click();
   await expect(page.locator('#player-status')).toHaveText('Ready.'); await expect(page.locator('#player-content')).toBeVisible();
   await page.screenshot({ path: 'test-results/replay-player.png', fullPage: true });
   await page.locator('#player-play').click(); await expect(page.locator('#player-time')).not.toHaveText(/^0:00.000 \/ /);

@@ -1,4 +1,6 @@
-import { OpenersPage, suggestionCard } from './openers-page';
+import { OpeningTraining } from './opening-training';
+import type { TrainerGame } from './game';
+import { OpenersPage } from './openers-page';
 import { defaultDrillFilter, makeDrillSet, type DrillFilter } from './drills';
 import { faultGroups, focusedDrills, HistoryStore, type FaultGroup, type SessionRecord, type TrainerReplay } from './history';
 import { buildPlayback, type Playback } from './playback';
@@ -10,11 +12,12 @@ import { downloadJson, type Settings } from './settings';
 import { formatTime } from './time';
 import type { PracticeSet } from './practice';
 
-type Callbacks = { freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
+type Callbacks = { game: () => TrainerGame; freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const cell = (text: string | number) => { const td = document.createElement('td'); td.textContent = String(text); return td; };
 
 export class Pages {
+  readonly opening: OpeningTraining;
   private openersPage: OpenersPage;
   private sessions: SessionRecord[] = [];
   private groups: FaultGroup[] = [];
@@ -27,11 +30,8 @@ export class Pages {
   private loading = 0;
   constructor(private history: HistoryStore, private callbacks: Callbacks) {
     this.drills(); this.statistics(); this.replays();
-    this.openersPage = new OpenersPage({ settings: callbacks.settings, rules: callbacks.rules, practice: set => this.beginPractice(set), freeBuild: (seed, rules, suggestions) => {
-      location.hash = 'play'; callbacks.freeBuild(seed, rules);
-      const references = el('opener-references'); references.hidden = false;
-      el('opener-reference-cards').replaceChildren(...suggestions.map(suggestion => suggestionCard(suggestion, () => this.beginPractice(suggestion.route.set))));
-    } });
+    this.opening = new OpeningTraining(callbacks);
+    this.openersPage = new OpenersPage({ settings: callbacks.settings, rules: callbacks.rules, random: () => this.opening.startRandom(), single: opener => this.opening.startSingle(opener) });
     window.addEventListener('hashchange', () => this.route());
     document.addEventListener('drop', event => {
       if (this.page !== 'replays' || !event.dataTransfer?.files.length) return;
@@ -50,7 +50,7 @@ export class Pages {
     document.querySelectorAll<HTMLAnchorElement>('.page-nav a').forEach(link => {
       if (link.hash === `#${this.page}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
-    if (this.page !== 'play') { this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
+    if (this.page !== 'play') { this.opening.suspend(); this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
     if (this.page === 'openers') this.openersPage.refresh();
     if (this.page === 'statistics') void this.refreshHistory();
     if (this.page !== 'replays') this.playing = false;
@@ -75,7 +75,7 @@ export class Pages {
       } catch (error) { el('drill-status').textContent = (error as Error).message; }
     });
   }
-  private beginPractice(set: PracticeSet) { location.hash = 'play'; this.callbacks.practice(set); }
+  private beginPractice(set: PracticeSet) { this.opening.clear(); el('opener-references').hidden = true; location.hash = 'play'; this.callbacks.practice(set); }
   private statistics() {
     el('statistics-page').innerHTML = `<h2 id="statistics-title">Finesse statistics</h2><p class="muted">History is stored only in this browser. Sessions include unfinished games; use the filters to compare like sessions. Every inefficient attempt counts, including retries and mistakes recorded with checking off.</p><div class="page-toolbar"><label>Mode<select id="stats-mode"><option value="">All modes</option><option value="40l-finesse">40L Sprint</option><option value="custom">Custom</option><option value="fault-practice">Drills / fault practice</option></select></label><label>Status<select id="stats-state"><option value="">All sessions</option><option value="complete">Completed</option><option value="topout">Top outs</option></select></label><button id="stats-refresh" class="secondary">Refresh</button><button id="history-export" class="secondary">Export history backup</button><button id="history-import" class="secondary">Import history backup</button><input id="history-file" type="file" accept=".json" hidden></div><p id="statistics-status" role="status"></p><div id="history-summary" class="summary-cards"></div><h3>Most frequent faults</h3><p class="muted">Grouped by piece, target column / shape and rotation system. Repeated retries remain separate attempts. Empty-board drills train placement habits; enable original boards for stack-dependent tucks and spins.</p><div class="page-toolbar"><button id="fault-top" class="secondary">Select top 5</button><button id="fault-none" class="secondary">Clear selection</button><label class="check-row"><input id="fault-original" type="checkbox">Use original boards</label><button id="train-faults" disabled>Practice selected faults</button><span id="fault-selection" role="status">0 selected</span></div><div class="table-scroll"><table><thead><tr><th>Select</th><th>Rank</th><th>Placement</th><th>Faults</th><th>Extra inputs</th><th>Frequency</th></tr></thead><tbody id="fault-rows"></tbody></table></div><h3>Sessions</h3><div class="table-scroll"><table><thead><tr><th>Date / mode</th><th>Status</th><th>Attempts</th><th>Faults</th><th>Perfect %</th><th>Time</th><th>Actions</th></tr></thead><tbody id="session-rows"></tbody></table></div><p class="muted">Perfect % uses verified attempts. Unknown paths and target-only mistakes are excluded. Backups contain full recordings; keep one before clearing browser data.</p>`;
     el('stats-refresh').addEventListener('click', () => void this.refreshHistory());
@@ -131,11 +131,10 @@ export class Pages {
   }
   private selection() { el<HTMLButtonElement>('train-faults').disabled = !this.selected.size; el('fault-selection').textContent = `${this.selected.size} selected`; }
   private replays() {
-    el('replays-page').innerHTML = `<h2 id="replays-title">Replay player</h2><p class="muted">Load or drop trainer JSON, TETR.IO .ttr or .ttrm. Choose a player / round for multiplayer recordings. Playback uses recorded simulation time; thinking and manual pauses do not add empty waiting time.</p><div class="page-toolbar"><button id="player-import">Open replay</button><button id="player-current" class="secondary">Watch current / last session</button><input id="player-file" type="file" accept=".json,.ttr,.ttrm" hidden><label>Player / round<select id="player-track" disabled></select></label></div><p id="player-status" role="status"></p><div id="player-content" hidden><h3 id="player-title"></h3><div class="replay-layout"><div id="player-tetrion"></div><section class="player-controls"><strong id="player-mode"></strong><div class="page-toolbar"><button id="player-play">Play</button><button id="player-back" class="secondary" aria-label="Previous frame">−1 frame</button><button id="player-forward" class="secondary" aria-label="Next frame">+1 frame</button></div><label class="select-row">Playback speed<select id="player-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label><label for="player-seek">Position</label><input id="player-seek" type="range" min="0" max="0" step="0.0166666667" value="0"><p id="player-time"></p><label class="check-row"><input id="player-audio" type="checkbox" checked>Replay sound effects</label><div class="stats"><div>Inputs<strong id="player-inputs">0</strong></div><div>Holds<strong id="player-holds">0</strong></div><div>Training faults<strong id="player-faults">0</strong></div><div>Perfect placements<strong id="player-perfects">0</strong></div></div><p id="player-info"></p><p id="player-event" role="status"></p><p class="muted">Use the slider to seek or step through the recorded frames. Statistics → Watch opens a saved session here.</p></section></div></div>`;
+    el('replays-page').innerHTML = `<h2 id="replays-title">Replay player</h2><p class="muted">Load or drop trainer JSON, TETR.IO .ttr or .ttrm. Choose a player / round for multiplayer recordings. Playback uses recorded simulation time; thinking and manual pauses do not add empty waiting time.</p><div class="page-toolbar"><button id="player-import">Open replay</button><button id="player-current" class="secondary">Watch current / last session</button><input id="player-file" type="file" accept=".json,.ttr,.ttrm" hidden><label>Player / round<select id="player-track" disabled></select></label></div><p id="player-status" role="status"></p><div id="player-content" hidden><h3 id="player-title"></h3><div class="replay-layout"><div id="player-tetrion"></div><section class="player-controls"><strong id="player-mode"></strong><div class="page-toolbar"><button id="player-play">Play</button><button id="player-back" class="secondary" aria-label="Previous frame">−1 frame</button><button id="player-forward" class="secondary" aria-label="Next frame">+1 frame</button></div><label class="select-row">Playback speed<select id="player-speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></label><label for="player-seek">Position</label><input id="player-seek" type="range" min="0" max="0" step="any" value="0"><p id="player-time"></p><label class="check-row"><input id="player-audio" type="checkbox" checked>Replay sound effects</label><div class="stats"><div>Inputs<strong id="player-inputs">0</strong></div><div>Holds<strong id="player-holds">0</strong></div><div>Training faults<strong id="player-faults">0</strong></div><div>Perfect placements<strong id="player-perfects">0</strong></div></div><p id="player-info"></p><p id="player-event" role="status"></p><p class="muted">Use the slider to seek or step through the recorded frames. Statistics → Watch opens a saved session here.</p></section></div></div>`;
     const tetrion = document.querySelector('#play-page .tetrion')!.cloneNode(true) as HTMLElement;
     tetrion.querySelectorAll<HTMLElement>('[id]').forEach(node => { node.id = node.id === 'time' ? 'player-clock' : `player-${node.id}`; });
     tetrion.querySelector('#player-board-overlay')!.remove();
-    tetrion.querySelectorAll('.native-frame').forEach(panel => panel.classList.remove('native-frame'));
     el('player-tetrion').append(tetrion);
     el('player-import').addEventListener('click', () => el<HTMLInputElement>('player-file').click());
     el('player-file').addEventListener('change', () => { const file = el<HTMLInputElement>('player-file').files?.[0]; if (file) void this.loadFile(file); el<HTMLInputElement>('player-file').value = ''; });
@@ -145,7 +144,7 @@ export class Pages {
     });
     el('player-track').addEventListener('change', () => void this.openTrack(this.tracks[Number(el<HTMLSelectElement>('player-track').value)]));
     el('player-play').addEventListener('click', () => { if (!this.playback) return; if (this.position >= this.playback.duration) this.position = 0; this.playing = !this.playing; this.last = performance.now(); });
-    el('player-seek').addEventListener('input', () => { this.playing = false; this.position = Number(el<HTMLInputElement>('player-seek').value); this.drawPlayback(); });
+    el('player-seek').addEventListener('input', () => { this.playing = false; const value = Number(el<HTMLInputElement>('player-seek').value), end = this.playback?.duration ?? 0; this.position = Math.abs(value - end) < 1e-7 ? end : value; this.drawPlayback(); });
     for (const [id, direction] of [['player-back', -1], ['player-forward', 1]] as const) el(id).addEventListener('click', () => { this.playing = false; this.position = Math.max(0, Math.min(this.playback?.duration ?? 0, this.position + direction / 60)); this.drawPlayback(); });
   }
   private replayStatus(message: string) { el('player-status').textContent = message; }
@@ -175,12 +174,16 @@ export class Pages {
     } catch (error) { if (token === this.loading) this.replayStatus((error as Error).message); }
   }
   update(now: number) {
+    if (this.page === 'play') this.opening.update(this.callbacks.game());
     if (this.page !== 'replays' || !this.playback) return;
     const before = this.position;
     if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) this.playing = false; }
     if (el<HTMLInputElement>('player-audio').checked && this.position > before) {
       const names = new Set<string>();
-      for (const frame of this.playback.frames) if (frame.time > before && frame.time <= this.position) for (const name of frame.sounds) names.add(name);
+      const frames = this.playback.frames;
+      let lo = 0, hi = frames.length;
+      while (lo < hi) { const mid = Math.floor((lo + hi) / 2); if (frames[mid].time <= before) lo = mid + 1; else hi = mid; }
+      for (let i = lo; i < frames.length && frames[i].time <= this.position; i++) for (const name of frames[i].sounds) names.add(name);
       for (const name of names) this.callbacks.sound(name);
     }
     this.last = now; this.drawPlayback();

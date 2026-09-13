@@ -1,3 +1,4 @@
+import { clearedRows } from './board-effects';
 import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engine';
 import type { Game } from '@haelp/teto/types';
 import { createEngine } from './engine';
@@ -24,12 +25,12 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
   let previous: { x: number; y: number; rotation: number } | null = null;
   const collect = (engine: Engine, label = '') => {
     if (!lastEngine) {
-      let cells: Cell[] = [];
-      engine.events.on('falling.lock.pre', () => { cells = engine.falling.absoluteBlocks; });
+      let cells: Cell[] = [], rows: number[] = [];
+      engine.events.on('falling.lock.pre', () => { cells = engine.falling.absoluteBlocks; rows = clearedRows(engine.board.state, cells); });
       engine.events.on('falling.new', ({ isHold }) => { if (isHold) { holds++; sounds.push('hold'); } });
       engine.events.on('falling.lock', result => {
         const hardDrop = result.keysPresses.includes('hardDrop');
-        effect = { cells, piece: result.mino, hardDrop, lines: result.lines };
+        effect = { rows, cells, piece: result.mino, hardDrop, lines: result.lines };
         effectTime = (engine.frame + 1) / 60;
         sounds.push(...placementSounds(engine, result, hardDrop)); completed++;
       });
@@ -53,8 +54,8 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
     let lastFrame = 0;
     const keys = track.data.events.filter((event: any) => event.type === 'keydown');
     let keyIndex = 0;
-    await nativeScenes(track, settings, progress, (engine, mode, runtime) => {
-      rules = mode; room = runtime;
+    await nativeScenes(track, settings, progress, (engine, mode, runtime, count) => {
+      rules = mode; room = runtime; perfects = count;
       while (keyIndex < keys.length && keys[keyIndex].frame < engine.frame) { inputs++; keyIndex++; }
       lastFrame = engine.frame; collect(engine);
     });
@@ -88,7 +89,8 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
           previous = null;
           if (event.type === 'practice-scene') { target = data.target ?? replay.placements.find(p => p.accepted && p.snapshot.falling.symbol === snapshot.falling.symbol)?.cells ?? null; label = `Scene ${data.index + 1}`; }
           if (event.type === 'clear-field') { sounds.push('boardappear'); label = 'Clear board'; }
-        } else if (event.type === 'placement') {
+        } else if (event.type === 'practice-complete') { room.setPractice(false); target = null; label = 'Construction complete'; }
+        else if (event.type === 'placement') {
           const placement = replay.placements[data.index];
           if (!placement?.accepted) throw new Error('Invalid effective placement marker.');
           if (placement.finesse && placement.finesseInputs <= placement.finesse.cost) perfects++;
