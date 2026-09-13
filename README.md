@@ -2,15 +2,27 @@
 
 This finesse trainer supports 40L, configurable solo modes and replay fault practice.
 
+I'm still pretty new to this game (and I only play 40L rn unfortunately) and the rate limit of ChatGPT Plus users is really annoying. So I won't be able to identify and fix most bugs in time.
+
+Feel free to contribute to this trainer. Submit your pull request, or issue, or feature request.
+
+Though I do not think anyone is reading this, haha!
+
 ------
 
 **FUNCTIONS TL;DR:**
 
 1. Finesse practice mode;
-2. Finesse auto detection and rollback mechanism;
-3. Supports tetrio recording import.
+2. Openers practice;
+3. Finesse auto detection and rollback mechanism;
+4. Supports tetrio recording import, export and replay.
+5. Everyone loves statistics!
 
 ------
+
+The goal of the development of this trainer... HMM.
+
+For fun. I think so.
 
 > *Allllright! That's it for HackerRouter, now it's GPT-6 Astra's turn!*
 
