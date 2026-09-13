@@ -1,3 +1,4 @@
+import { openSection } from './workspace-controls';
 import { test, expect, type Page } from '@playwright/test';
 import { encoder, Field } from 'tetris-fumen';
 import { defaults } from '../../src/settings';
@@ -17,7 +18,7 @@ async function followupFixture(page: Page) {
   await page.locator('#opener-import-name').fill('PC Followup Test'); await page.locator('#opener-fumen').fill(fumen); await page.getByRole('button', { name: 'Validate and save Fumen' }).click();
   await expect(page.locator('#opener-import-status')).toHaveText('Validated and saved locally.');
   await page.locator('#opener-followups').check(); await page.locator('#opener-start').click();
-  await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE'); await page.locator('#continuation-depth').selectOption('4');
+  await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE'); await openSection(page, '#continuation-settings'); await page.locator('#continuation-depth').selectOption('4');
   await page.keyboard.press('Space'); await expect(page.locator('#practice-progress')).toContainText('Continue');
   await expect(page.locator('#continuation-status')).toContainText('playable continuation', { timeout: 15000 });
   await expect(page.locator('#continuation-routes button').first()).toBeVisible();

@@ -1,3 +1,4 @@
+import { openSection } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { defaults, type Settings } from '../../src/settings';
 import { TrainerGame } from '../../src/game';
@@ -139,7 +140,7 @@ test('last completed game can start a fault practice set and mobile layout stays
   }, { settings: instant(), replay: { ...twoFaults(), status: 'complete' } });
   await page.setViewportSize({ width: 390, height: 844 }); await page.goto('/');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.locator('#practice-last').click();
+  await openSection(page, '#fault-practice-tools'); await page.locator('#practice-last').click();
   await expect(page.locator('#practice-progress')).toHaveText('0 / 2');
   await page.locator('#settings-open').click();
   expect(await page.locator('#settings-dialog').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);

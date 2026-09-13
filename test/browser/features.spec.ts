@@ -1,3 +1,4 @@
+import { clickFileTool, openSection } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { defaults } from '../../src/settings';
 import { TrainerGame } from '../../src/game';
@@ -14,7 +15,7 @@ test('Just think offers both styles on the page and freezes each new piece by de
   await expect(page.locator('#retry-status')).toContainText('Just think');
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   const paused = await page.locator('#time').textContent(); await page.waitForTimeout(200); await expect(page.locator('#time')).toHaveText(paused!);
-  await page.locator('#think-style').selectOption('input');
+  await openSection(page, '#training-options'); await page.locator('#think-style').selectOption('input');
   const before = await page.locator('#time').textContent(); await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(100); await page.keyboard.up('ArrowLeft');
   await expect(page.locator('#time')).not.toHaveText(before!); await page.waitForTimeout(50);
   const after = await page.locator('#time').textContent(); await page.waitForTimeout(150); await expect(page.locator('#time')).toHaveText(after!);
@@ -67,7 +68,7 @@ test('history ranks repeated faults, launches focused practice, and saved replay
 
 test('native replay export downloads a real event envelope after verification', async ({ page }) => {
   await page.goto('/'); await page.locator('#start').click(); await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
-  const pending = page.waitForEvent('download'); await page.locator('#download-native').click(); const download = await pending;
+  const pending = page.waitForEvent('download'); await clickFileTool(page, '#download-native'); const download = await pending;
   expect(download.suggestedFilename()).toMatch(/\.ttr$/); await expect(page.locator('#message')).toContainText('verified locally');
 });
 

@@ -1,3 +1,4 @@
+import { openSection } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -47,7 +48,7 @@ test('4-WIDE renders at the right aspect ratio with a complete replayable finess
   await expect(page.locator('#demo-step')).toContainText('Complete');
   await page.locator('#demo-replay').click(); await expect(page.locator('#demo-step')).toHaveText('Start here');
   await page.locator('#pause').click(); await page.screenshot({ path: 'test-results/room-4wide-finesse.png', fullPage: true });
-  await page.locator('#practice-last').click(); await expect(page.locator('#practice-status')).toContainText('1 fault scenes loaded');
+  await openSection(page, '#fault-practice-tools'); await page.locator('#practice-last').click(); await expect(page.locator('#practice-status')).toContainText('1 fault scenes loaded');
   await expect(page.locator('#board')).toHaveAttribute('width', '120');
   await page.keyboard.press('Space'); await expect(page.locator('#overlay-value')).toHaveText('Practice complete');
 });

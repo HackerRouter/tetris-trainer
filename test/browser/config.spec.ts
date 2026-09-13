@@ -1,3 +1,4 @@
+import { clickFileTool } from './workspace-controls';
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -22,7 +23,7 @@ async function drop(page: Page, text: string, name = 'config.ttc') {
 test('the supplied TTC imports from the main file picker, persists and drives actual keys', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('/');
-  const chooser = page.waitForEvent('filechooser'); await page.locator('#config-open').click();
+  const chooser = page.waitForEvent('filechooser'); await clickFileTool(page, '#config-open');
   await (await chooser).setFiles(fixture);
   await expect(page.locator('#settings-status')).toContainText('TETR.IO config imported');
   await expect(page.locator('#arr')).toHaveValue('0'); await expect(page.locator('#das')).toHaveValue('5');
@@ -39,7 +40,7 @@ test('the supplied TTC imports from the main file picker, persists and drives ac
   await page.keyboard.press('ArrowUp'); await expect(page.locator('#pieces')).toHaveText('1');
   await page.keyboard.press('Space'); await expect(page.locator('#holds')).toHaveText('1');
   await page.keyboard.press('Escape');
-  const downloadPromise = page.waitForEvent('download'); await page.locator('#download').click();
+  const downloadPromise = page.waitForEvent('download'); await clickFileTool(page, '#download');
   const replay = JSON.parse(await readFile((await (await downloadPromise).path())!, 'utf8'));
   expect(replay.settings.tetrioConfig).toEqual(JSON.parse(await readFile(fixture, 'utf8')));
   expect(replay.placements[0].inputs).toEqual(['hardDrop']);
@@ -74,7 +75,7 @@ test('alternate movement keys stay held until the last physical key is released'
   await page.keyboard.down('ArrowLeft'); await page.keyboard.down('j'); await page.keyboard.up('ArrowLeft');
   await page.waitForTimeout(250); await page.keyboard.up('j'); await page.keyboard.press('ArrowUp');
   await expect(page.locator('#pieces')).toHaveText('1');
-  const pending = page.waitForEvent('download'); await page.locator('#download').click();
+  const pending = page.waitForEvent('download'); await clickFileTool(page, '#download');
   const replay = JSON.parse(await readFile((await (await pending).path())!, 'utf8'));
   expect(Math.min(...replay.placements[0].cells.map((cell: number[]) => cell[0]))).toBe(0);
   expect(replay.placements[0].inputs).toEqual(['moveLeft', 'hardDrop']);

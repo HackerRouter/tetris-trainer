@@ -1,10 +1,12 @@
 import './style.css';
+import './workspace.css';
 import { TrainerGame } from './game';
 import { drawGame } from './renderer';
 import { SettingsPanel } from './settings-panel';
 import { actions, bindingCodes, bindingLabel, downloadJson, loadSettings, storageKey, type Action } from './settings';
 import { formatTime } from './time';
 import { DemoPanel } from './demo';
+import { PracticeGuide } from './practice-guide';
 import { loadPractice, readReplay, type ReplayTrack } from './replay';
 import type { PracticeSet } from './practice';
 import { placementSteps } from './guide';
@@ -20,6 +22,7 @@ const element = <T extends HTMLElement = HTMLElement>(id: string) => document.ge
 const canvas = element<HTMLCanvasElement>('board');
 const holdCanvas = element<HTMLCanvasElement>('hold-preview'), nextCanvas = element<HTMLCanvasElement>('next-preview');
 const demo = new DemoPanel();
+const practiceGuide = new PracticeGuide();
 const loaded = loadSettings(localStorage);
 let settings = loaded.settings;
 let selectedMode: ModeId = localStorage.getItem('tetrio-trainer-mode') === 'custom' ? 'custom' : 'sprint';
@@ -36,6 +39,23 @@ const message = element('message');
 let tracks: ReplayTrack[] = [], importing = false;
 let lastReplay: unknown = null;
 try { lastReplay = JSON.parse(localStorage.getItem('tetrio-trainer-last-replay') || 'null'); } catch {}
+const toolsDialog = element<HTMLDialogElement>('tools-dialog');
+let resumeAfterTools: TrainerGame | null = null;
+
+function finishTools() {
+  const previous = resumeAfterTools; resumeAfterTools = null;
+  if (previous === game && pages.page === 'play' && !panel.open && !customPanel.open) game.resume();
+  accumulator = 0; last = performance.now();
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+}
+function closeTools() { toolsDialog.close(); finishTools(); }
+element('tools-open').addEventListener('click', () => {
+  resumeAfterTools = game.active ? game : null;
+  game.pause(); pressed.clear(); toolsDialog.showModal();
+});
+element('tools-close').addEventListener('click', closeTools);
+toolsDialog.addEventListener('close', finishTools);
+window.addEventListener('hashchange', () => { if (toolsDialog.open) closeTools(); });
 
 const panel = new SettingsPanel(next => {
   localStorage.setItem(storageKey, JSON.stringify(next));
@@ -125,7 +145,7 @@ function openSettings() {
   game.pause(); pressed.clear(); panel.show(settings);
 }
 element('settings-open').addEventListener('click', openSettings);
-element('config-open').addEventListener('click', () => { openSettings(); panel.chooseFile(); });
+element('config-open').addEventListener('click', () => { closeTools(); openSettings(); panel.chooseFile(); });
 document.addEventListener('dragover', event => {
   if (!event.dataTransfer?.types.includes('Files')) return;
   event.preventDefault(); event.dataTransfer.dropEffect = 'copy';
@@ -138,6 +158,7 @@ document.addEventListener('drop', event => {
   if (!event.dataTransfer?.files.length) return;
   event.preventDefault(); document.body.classList.remove('file-drag');
   if (importing) { message.textContent = 'Wait for replay analysis to finish before importing settings.'; return; }
+  if (toolsDialog.open) closeTools();
   openSettings();
   if (event.dataTransfer.files.length !== 1) { panel.importError('Drop one settings file at a time.'); return; }
   void panel.importFile(event.dataTransfer.files[0]);
@@ -266,7 +287,7 @@ function editable(target: EventTarget | null) {
 
 document.addEventListener('keydown', event => {
   if (pages.page !== 'play') return;
-  if (panel.open || customPanel.open || editable(event.target) || event.isComposing) return;
+  if (panel.open || customPanel.open || toolsDialog.open || editable(event.target) || event.isComposing) return;
   if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ' && game.rules.undo) { event.preventDefault(); if (!event.repeat) undo(); return; }
   const action = (Object.keys(actions) as Action[]).find(key => bindingCodes(game.settings, key).includes(event.code));
   if (!action) return;
@@ -289,8 +310,9 @@ addEventListener('pagehide', saveReplay);
 function refresh() {
   const engine = game.engine;
   const tetrion = document.querySelector<HTMLElement>('.tetrion')!;
-  tetrion.style.gridTemplateColumns = `minmax(0,5fr) minmax(0,${engine.board.width}fr) minmax(0,5fr)`;
-  tetrion.style.maxWidth = `${(engine.board.width + 10) * 31}px`;
+  tetrion.style.gridTemplateColumns = `minmax(0,3fr) minmax(0,${engine.board.width}fr) minmax(0,3fr)`;
+  tetrion.style.setProperty('--tetrion-columns', String(engine.board.width + 6));
+  tetrion.style.setProperty('--board-rows', String(engine.board.height + 3));
   const goals = game.rules.goals, custom = game.rules.id === 'custom' && !game.practice;
   element<HTMLInputElement>('finesse-toggle').checked = game.rules.finesse;
   element<HTMLInputElement>('think-toggle').checked = game.settings.training.justThink; element<HTMLSelectElement>('think-style').value = game.settings.training.thinkStyle;
@@ -317,6 +339,11 @@ function refresh() {
   progress.value = game.practice?.index ?? (custom ? Math.max(...ratios) : engine.stats.lines);
   element('pieces').textContent = String((game.practice && !game.practice.finished ? game.practice.completed : engine.stats.pieces));
   element('mode-label').textContent = game.practice ? game.practice.set.kind === 'opener' ? 'OPENER PRACTICE' : game.practice.set.kind === 'pure' ? 'PURE FINESSE DRILLS' : game.practice.set.kind === 'focused' ? 'FOCUSED FAULT DRILLS' : 'FAULT PRACTICE' : game.rules.name;
+  const modeSelect = element<HTMLSelectElement>('mode-select');
+  let activeMode = modeSelect.querySelector<HTMLOptionElement>('option[value="active-session"]');
+  if (!activeMode) { activeMode = new Option('', 'active-session'); activeMode.disabled = true; modeSelect.add(activeMode); }
+  activeMode.hidden = modePending || (!game.practice && !freeSession);
+  if (!activeMode.hidden) { activeMode.textContent = game.practice ? game.practice.set.kind === 'opener' ? 'Opener practice' : 'Finesse drills' : 'Random opening'; modeSelect.value = 'active-session'; }
   element('opener-hold-hint').hidden = !(game.practice?.set.scenes[game.practice.index]?.holdFirst && game.engine.falling.symbol !== game.practice.set.scenes[game.practice.index].guideSnapshot?.falling.symbol);
   element('mode-rules').hidden = !custom;
   element('mode-rules').textContent = `${engine.board.width} × ${engine.board.height} · ${engine.kickTableName} · ${game.rules.bag} · ${Number(engine.dynamic.gravity.get().toFixed(4))} G · ${game.rules.infiniteLock ? 'Manual lock' : `${game.rules.lockDelay}f lock delay`} · ${game.rules.finesse ? 'Perfect finesse' : 'Finesse off'}. ${[goals.lines ? `${goals.lines} lines` : '', goals.pieces ? `${goals.pieces} pieces` : '', goals.seconds ? formatTime(goals.seconds * 1000) : ''].filter(Boolean).join(' / ') || 'Endless session'}. Seed: ${game.seed}. Boards cleared: ${game.boardResets}. Attack: ${engine.stats.garbage.attack}. Sent: ${engine.stats.garbage.sent}. Pending garbage: ${engine.garbageQueue.size}. Garbage cleared: ${engine.stats.garbage.cleared}.${game.rules.advanced.garbageRefill ? ` Refill: ${game.rules.advanced.garbageRefill} rows.` : ""}${game.rules.advanced.handlingOverride ? ` Room handling: ARR ${engine.handling.arr}, DAS ${engine.handling.das}, SDF ${engine.handling.sdf}.` : ''}${game.rules.advanced.sequence ? ` Authored queue${game.rules.advanced.repeatSequence ? ' (repeating)' : ''}.` : ''}`;
@@ -370,7 +397,7 @@ function animate(now: number) {
   if (game.placements.length !== historyPlacements && now - lastHistorySave > 5000) {
     historyPlacements = game.placements.length; lastHistorySave = now; void saveHistory();
   }
-  refresh(); demo.update(now, game); pages.update(now); requestAnimationFrame(animate);
+  refresh(); demo.update(now, game); practiceGuide.update(game); pages.update(now); requestAnimationFrame(animate);
 }
 
 const pages = new Pages(history, { game: () => game, freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });

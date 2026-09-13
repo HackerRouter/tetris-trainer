@@ -1,3 +1,4 @@
+import { clickFileTool, openSection } from './workspace-controls';
 import { test, expect, type Page } from '@playwright/test';
 import { encoder, Field } from 'tetris-fumen';
 import { defaults } from '../../src/settings';
@@ -8,7 +9,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(settings => { if (!localStorage.getItem('tetrio-trainer-settings-v1')) localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)); }, { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } });
 });
 async function recording(page: Page) {
-  const pending = page.waitForEvent('download'); await page.locator('#download').click();
+  const pending = page.waitForEvent('download'); await clickFileTool(page, '#download');
   return JSON.parse(await readFile((await (await pending).path())!, 'utf8'));
 }
 async function importOpener(page: Page) {
@@ -21,7 +22,7 @@ async function importOpener(page: Page) {
 test('catalog search, import, mirroring and narrow layouts remain usable', async ({ page }) => {
   await page.goto('/#openers'); await expect(page.locator('#opener-count')).toContainText('479 constructions');
   await page.locator('#opener-search').fill('TKI'); await expect(page.locator('#opener-catalog .opener-card')).not.toHaveCount(0);
-  await page.locator('#opener-mirror').check(); await expect(page.locator('#opener-start')).toBeEnabled();
+  await openSection(page, '#opener-training-options'); await page.locator('#opener-mirror').check(); await expect(page.locator('#opener-start')).toBeEnabled();
   await page.locator('#opener-search').fill('nonexistentzzzzz'); await expect(page.locator('#opener-empty')).toBeVisible();
   await importOpener(page); await expect(page.locator('#opener-name')).toHaveText('Two O pieces');
   await page.locator('#opener-fumen').fill('invalid'); await page.getByRole('button', { name: 'Validate and save Fumen' }).click();
@@ -31,7 +32,7 @@ test('catalog search, import, mirroring and narrow layouts remain usable', async
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
-test('random opening keeps candidate diagrams to the right and remembers toggles across seeds and reloads', async ({ page }) => {
+test('random opening keeps candidate diagrams to the left and remembers toggles across seeds and reloads', async ({ page }) => {
   test.setTimeout(60000);
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto('/#openers'); await page.locator('#opener-deal').click();
@@ -39,7 +40,7 @@ test('random opening keeps candidate diagrams to the right and remembers toggles
   await expect(page.locator('#opener-reference-cards .opener-card')).not.toHaveCount(0);
   await expect(page.locator('#opener-keep-board')).toBeChecked();
   const board = (await page.locator('#board').boundingBox())!, cards = (await page.locator('#opener-reference-cards').boundingBox())!;
-  expect(cards.x).toBeGreaterThan(board.x + board.width);
+  expect(cards.x + cards.width).toBeLessThan(board.x);
   await page.locator('#finesse-toggle').uncheck(); await page.locator('#think-toggle').check();
   const first = await recording(page); await page.keyboard.press('r');
   await expect.poll(async () => page.locator('#opener-reference-status').textContent(), { timeout: 30000 }).not.toContain(String(first.seed));

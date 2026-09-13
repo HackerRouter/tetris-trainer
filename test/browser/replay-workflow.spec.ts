@@ -1,3 +1,4 @@
+import { clickFileTool } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -51,7 +52,7 @@ test('a newly completed 40L session downloads through the actual export button',
   }, source);
   expect(result.status).toBe('complete'); expect(result.lines).toBe(40); expect(result.pieces).toBe(101);
   await expect(page.locator('#overlay-value')).toHaveText('40 lines complete');
-  const pending = page.waitForEvent('download'); await page.locator('#download-native').click();
+  const pending = page.waitForEvent('download'); await clickFileTool(page, '#download-native');
   const file = JSON.parse(await readFile((await (await pending).path())!, 'utf8'));
   expect(file.replay.results.stats.finaltime).toBe(result.time); expect(file.replay.results.stats.lines).toBe(40);
   await expect(page.locator('#export-status')).toContainText('exported and verified');

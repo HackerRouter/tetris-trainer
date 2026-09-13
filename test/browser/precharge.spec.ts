@@ -1,3 +1,4 @@
+import { clickFileTool } from './workspace-controls';
 import { test, expect, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -5,7 +6,7 @@ import { defaults } from '../../src/settings';
 const settings = { ...defaults, handling: { ...defaults.handling, das: 20, dcd: 4 }, training: { ...defaults.training, countdownSeconds: .5 } };
 
 async function replay(page: Page) {
-  const pending = page.waitForEvent('download'); await page.locator('#download').click();
+  const pending = page.waitForEvent('download'); await clickFileTool(page, '#download');
   return JSON.parse(await readFile((await (await pending).path())!, 'utf8'));
 }
 

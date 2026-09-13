@@ -17,9 +17,10 @@ export class DemoPanel {
   private steps: HTMLElement[] = [];
   private index = 0;
   private since = 0;
+  private completed = 0;
 
   constructor() {
-    document.querySelector('.finesse-control')!.after(this.popup);
+    document.getElementById('guidance-slot')!.prepend(this.popup);
     document.getElementById('demo-close')!.addEventListener('click', event => { this.popup.hidden = true; (event.currentTarget as HTMLElement).blur(); });
     document.getElementById('demo-replay')!.addEventListener('click', event => { this.index = 0; this.since = performance.now(); (event.currentTarget as HTMLElement).blur(); });
   }
@@ -27,6 +28,7 @@ export class DemoPanel {
   update(now: number, game: TrainerGame) {
     if (game.demonstration !== this.source) {
       this.source = game.demonstration;
+      this.completed = game.practice?.completed ?? 0;
       this.popup.hidden = !this.source;
       if (this.source) {
         document.getElementById('demo-title')!.textContent = `${game.practice ? 'Scene' : 'Piece'} ${this.source.sceneNumber} · Correct placement`;
@@ -43,6 +45,7 @@ export class DemoPanel {
         this.index = 0; this.since = now;
       }
     }
+    if (game.practice && game.practice.completed > this.completed) this.popup.hidden = true;
     if (this.popup.hidden || !this.source || !this.engine) return;
     while (now - this.since >= this.frames[this.index].duration) {
       this.since += this.frames[this.index].duration; this.index = (this.index + 1) % this.frames.length;

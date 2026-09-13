@@ -100,6 +100,9 @@ test('all-clear text animates in live play and replay without extending the reco
   await expect(page.locator('#player-tetrion .action-text-layer')).toHaveAttribute('aria-label', /ALL CLEAR/);
   const end = await page.locator('#player-time').textContent(); await page.waitForTimeout(450); expect(await page.locator('#player-time').textContent()).toBe(end);
   await page.screenshot({ path: 'TEMP/replay-all-clear.png', fullPage: true });
+  await page.waitForTimeout(2200);
+  await expect(page.locator('#player-tetrion .action-text-layer')).not.toHaveAttribute('aria-label', /ALL CLEAR/);
+  expect(await page.locator('#player-time').textContent()).toBe(end);
   await page.locator('#player-seek').fill('0'); await page.locator('#player-seek').dispatchEvent('input');
   await expect(page.locator('#player-tetrion .action-text-layer')).toHaveAttribute('aria-label', '');
 });

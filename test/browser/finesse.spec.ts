@@ -1,3 +1,4 @@
+import { clickFileTool } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -23,7 +24,7 @@ test('d-002 rotation counting, hard-drop coaching and retry work through real ke
   await expect(page.locator('#pieces')).toHaveText('1');
   await expect(page.locator('#perfects')).toHaveText('1');
   await expect(page.locator('#coach')).not.toBeVisible();
-  const downloadPromise = page.waitForEvent('download'); await page.locator('#download').click();
+  const downloadPromise = page.waitForEvent('download'); await clickFileTool(page, '#download');
   const download = await downloadPromise;
   const replay = JSON.parse(await readFile((await download.path())!, 'utf8'));
   expect(replay.finesseRules.name).toBe('d-002');

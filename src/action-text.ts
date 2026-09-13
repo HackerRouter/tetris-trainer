@@ -42,7 +42,7 @@ export function drawActionText(board: HTMLCanvasElement, engine: Engine, items: 
   const bounds = board.getBoundingClientRect(), parent = holder.getBoundingClientRect(), size = bounds.width / engine.board.width;
   const left = bounds.left - parent.left, top = bounds.top - parent.top + size * 3, height = size * engine.board.height;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches, labels = actionLabels(items);
-  const pc = [...items].reverse().find(item => item.action.pc && item.age >= 0 && item.age < 5000);
+  const pc = [...items].reverse().find(item => item.action.pc && item.age >= 0 && item.age < 2500);
   canvas.setAttribute('aria-label', [...labels.map(line => line.text), ...(pc ? ['ALL CLEAR'] : [])].join(' · ') || '');
   const text = (value: string, x: number, y: number, fontSize: number, color: string, maxWidth: number) => {
     ctx.font = `700 ${fontSize}px Config, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
@@ -57,7 +57,7 @@ export function drawActionText(board: HTMLCanvasElement, engine: Engine, items: 
     text(label.text, 0, 0, label.size * scale, label.color, area * .94); ctx.restore();
   }
   if (!pc) return;
-  const t = pc.age / 5000, entrance = Math.min(1, t / .1), exit = Math.min(1, (1 - t) / .2);
+  const t = pc.age / 2500, entrance = Math.min(1, t / .1), exit = Math.min(1, (1 - t) / .2);
   const pulse = reduced ? 1 : t < .1 ? .5 + entrance * .7 : t < .15 ? 1.2 - (t - .1) : 1.175 - (t - .15) * .22;
   ctx.save(); ctx.beginPath(); ctx.rect(left + 2, top, bounds.width - 4, height); ctx.clip();
   ctx.translate(left + bounds.width / 2, top + height / 2); ctx.rotate(reduced ? 0 : (1 - entrance) * -.085); ctx.scale(pulse, pulse);

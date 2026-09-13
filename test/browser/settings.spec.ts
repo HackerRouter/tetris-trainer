@@ -1,3 +1,4 @@
+import { clickFileTool } from './workspace-controls';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
@@ -112,7 +113,7 @@ test('fault returns the actual shape to spawn and permits a new target', async (
   await page.keyboard.press('ArrowLeft'); await page.waitForTimeout(25); await page.keyboard.press('Space');
   await expect(page.locator('#pieces')).toHaveText('1');
   await expect(page.locator('#coach')).not.toBeVisible();
-  const downloadPromise = page.waitForEvent('download'); await page.locator('#download').click();
+  const downloadPromise = page.waitForEvent('download'); await clickFileTool(page, '#download');
   const download = await downloadPromise;
   const replay = JSON.parse(await readFile((await download.path())!, 'utf8'));
   expect(replay.placements.length).toBe(2);
