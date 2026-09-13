@@ -1,3 +1,4 @@
+import { actionText, type ActionText } from './action-text';
 import { clearedRows } from './board-effects';
 import { type Engine, type EngineSnapshot, type LockRes } from '@haelp/teto/engine';
 import type { Game } from '@haelp/teto/types';
@@ -21,6 +22,7 @@ export class TrainerGame {
   rules: ModeRules;
   room: RoomRuntime;
   boardResets = 0;
+  actionEffects: ActionText[] = [];
   input = new FrameInput();
   status: 'ready' | 'countdown' | 'playing' | 'paused' | 'complete' | 'topout' = 'ready';
   seed: number;
@@ -115,6 +117,7 @@ export class TrainerGame {
   }
 
   private restore(checkpoint: Checkpoint) {
+    this.actionEffects = [];
     this.engine.fromSnapshot(checkpoint.snapshot);
     this.timerFrames = checkpoint.timerFrames;
     this.room.restore(checkpoint.room, this.timerFrames, checkpoint.snapshot.frame);
@@ -233,6 +236,7 @@ export class TrainerGame {
         }
       }
     } else {
+      this.actionEffects = [...this.actionEffects.filter(item => item.frame >= this.engine.frame - 300), actionText(this.engine, result)].slice(-64);
       this.undoStack.push(locking.checkpoint);
       if (enabled) { if (finesse) this.perfects++; else this.unverified++; }
       this.fault = null;

@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
     const original = crypto.getRandomValues.bind(crypto); let next = 0;
     Object.defineProperty(crypto, 'getRandomValues', { value: (view: any) => { if (view instanceof Uint32Array && view.length === 1 && next < 4) { view[0] = [16, 16, 28, 79][next++]; return view; } return original(view); } });
   }, { ...defaults, training: { ...defaults.training, countdownSeconds: 0, justThink: true } });
-  await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: `${await response.text()}\nwindow.__testCurrent = () => game;` }); });
+  await page.route('**/src/main.ts*', async route => { const response = await route.fetch(); await route.fulfill({ response, body: `${await response.text()}\nwindow.__testCurrent = () => game;` }); });
 });
 
 async function followupFixture(page: Page) {
@@ -19,7 +19,7 @@ async function followupFixture(page: Page) {
   await page.locator('#opener-followups').check(); await page.locator('#opener-start').click();
   await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE'); await page.locator('#continuation-depth').selectOption('4');
   await page.keyboard.press('Space'); await expect(page.locator('#practice-progress')).toContainText('Continue');
-  await expect(page.locator('#continuation-status')).toContainText('valid continuation', { timeout: 15000 });
+  await expect(page.locator('#continuation-status')).toContainText('playable continuation', { timeout: 15000 });
   await expect(page.locator('#continuation-routes button').first()).toBeVisible();
 }
 
@@ -49,7 +49,7 @@ test('continuation worker provides a live PC hint, full instructions and a route
 test('different placements are accepted, stale routes are discarded and continuation preferences survive a new seed', async ({ page }) => {
   await followupFixture(page);
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('2'); await expect(page.locator('#faults')).toHaveText('0');
-  await expect(page.locator('#continuation-status')).toContainText('No route found', { timeout: 15000 });
+  await expect(page.locator('#continuation-status')).toContainText('No published stage', { timeout: 15000 });
   expect(await page.evaluate(() => (window as any).__testCurrent().hintTarget)).toBeNull(); await expect(page.locator('#continuation-routes button')).toHaveCount(0);
   await page.locator('#continuation-seeded').uncheck(); await expect(page.locator('#continuation-scope')).toContainText('Visible queue', { timeout: 15000 });
   await page.keyboard.press('r'); await expect(page.locator('#pieces')).toHaveText('0');

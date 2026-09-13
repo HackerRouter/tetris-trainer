@@ -1,3 +1,4 @@
+import { drawActionText, type TimedActionText, type ActionText } from './action-text';
 import { clearedRows } from './board-effects';
 import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engine';
 import { copyPiece, type Cell } from './finesse';
@@ -90,7 +91,7 @@ function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string
 const effects = new WeakMap<TrainerGame, { placements: number; since: number }>();
 
 export type PlacementEffect = { rows: number[]; cells: Cell[]; piece: string; hardDrop: boolean; lines: number };
-type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null };
+type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null; actions?: TimedActionText[] };
 
 export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, engine: Engine, rules: ModeRules, display: Settings['display'], scene: Scene, age: number) {
   if (canvas.width !== engine.board.width * 30 || canvas.height !== (engine.board.height + 3) * 30) {
@@ -100,6 +101,7 @@ export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, ne
   drawPreviews(hold, engine, [scene.hold], display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
   drawPreviews(next, engine, scene.next);
   drawPlacementEffect(canvas, engine, scene.effect, age);
+  drawActionText(canvas, engine, scene.actions ?? []);
 }
 
 function drawPlacementEffect(canvas: HTMLCanvasElement, engine: Engine, placement: PlacementEffect | null, age: number) {
@@ -117,12 +119,15 @@ function drawPlacementEffect(canvas: HTMLCanvasElement, engine: Engine, placemen
   }
 }
 
+const actionTimes = new WeakMap<ActionText, number>();
+
 export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, game: TrainerGame) {
   const engine = game.engine, now = performance.now(), previous = effects.get(game);
   if (!previous || previous.placements !== game.placements.length) effects.set(game, { placements: game.placements.length, since: now });
   const placement = game.placements.at(-1);
   drawScene(canvas, hold, next, engine, game.rules, game.settings.display, {
     board: engine.board.state, piece: game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), target: game.target,
+    actions: game.actionEffects.map(action => { if (!actionTimes.has(action)) actionTimes.set(action, now); return { action, age: now - actionTimes.get(action)! }; }),
     hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, game.rules.nextCount),
     effect: placement?.accepted ? { rows: placement.clearedRows ?? clearedRows(placement.snapshot.board, placement.cells), cells: placement.cells, piece: placement.piece, hardDrop: placement.inputs.includes('hardDrop'), lines: placement.result.lines } : null
   }, now - effects.get(game)!.since);

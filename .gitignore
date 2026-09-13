@@ -3,3 +3,17 @@ dist/
 test-results/
 playwright-report/
 TEMP/
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+*.log
+npm-debug.log*
+coverage/
+*.tsbuildinfo
+
+.env
+.env.*
+*.local

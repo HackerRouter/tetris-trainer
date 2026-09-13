@@ -19,7 +19,7 @@ async function importOpener(page: Page) {
 }
 
 test('catalog search, import, mirroring and narrow layouts remain usable', async ({ page }) => {
-  await page.goto('/#openers'); await expect(page.locator('#opener-count')).toContainText('478 constructions');
+  await page.goto('/#openers'); await expect(page.locator('#opener-count')).toContainText('479 constructions');
   await page.locator('#opener-search').fill('TKI'); await expect(page.locator('#opener-catalog .opener-card')).not.toHaveCount(0);
   await page.locator('#opener-mirror').check(); await expect(page.locator('#opener-start')).toBeEnabled();
   await page.locator('#opener-search').fill('nonexistentzzzzz'); await expect(page.locator('#opener-empty')).toBeVisible();

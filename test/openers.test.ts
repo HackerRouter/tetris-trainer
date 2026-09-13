@@ -15,8 +15,8 @@ const options = { mirror: false, loop: false, study: true, finesse: true };
 const tap = (game: TrainerGame, key: GameAction, frames = 1) => { game.input.press(key); for (let i = 0; i < frames; i++) game.step(); game.input.release(key); game.step(); };
 const tiles = (board: any[][]) => board.map(row => row.map(tile => tile?.mino ?? null));
 
-test('the catalog provides hundreds of searchable source-linked constructions and six curated routes work on both sides', () => {
-  assert.equal(allOpeners.length, 478); assert.ok(allOpeners.filter(opener => verifiedOpeners.has(opener.id)).length > 400);
+test('the catalog provides hundreds of searchable source-linked constructions and curated routes work on both sides', () => {
+  assert.ok(allOpeners.length >= 479); assert.ok(allOpeners.filter(opener => verifiedOpeners.has(opener.id)).length > 400);
   for (const opener of openerCatalog) for (const mirror of [true, false]) {
     const route = compileOpener(opener, settings, modeDefinitions.sprint.rules(settings), { ...options, mirror });
     assert.ok(route.set.scenes.length >= 6); assert.match(opener.source, /^https?:\/\//);

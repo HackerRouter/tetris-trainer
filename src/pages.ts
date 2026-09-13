@@ -143,9 +143,9 @@ export class Pages {
       catch (error) { this.replayStatus((error as Error).message); }
     });
     el('player-track').addEventListener('change', () => void this.openTrack(this.tracks[Number(el<HTMLSelectElement>('player-track').value)]));
-    el('player-play').addEventListener('click', () => { if (!this.playback) return; if (this.position >= this.playback.duration) this.position = 0; this.playing = !this.playing; this.last = performance.now(); });
-    el('player-seek').addEventListener('input', () => { this.playing = false; const value = Number(el<HTMLInputElement>('player-seek').value), end = this.playback?.duration ?? 0; this.position = Math.abs(value - end) < 1e-7 ? end : value; this.drawPlayback(); });
-    for (const [id, direction] of [['player-back', -1], ['player-forward', 1]] as const) el(id).addEventListener('click', () => { this.playing = false; this.position = Math.max(0, Math.min(this.playback?.duration ?? 0, this.position + direction / 60)); this.drawPlayback(); });
+    el('player-play').addEventListener('click', () => { if (!this.playback) return; this.effectTail = null; if (this.position >= this.playback.duration) this.position = 0; this.playing = !this.playing; this.last = performance.now(); });
+    el('player-seek').addEventListener('input', () => { this.playing = false; this.effectTail = null; const value = Number(el<HTMLInputElement>('player-seek').value), end = this.playback?.duration ?? 0; this.position = Math.abs(value - end) < 1e-7 ? end : value; this.drawPlayback(); });
+    for (const [id, direction] of [['player-back', -1], ['player-forward', 1]] as const) el(id).addEventListener('click', () => { this.playing = false; this.effectTail = null; this.position = Math.max(0, Math.min(this.playback?.duration ?? 0, this.position + direction / 60)); this.drawPlayback(); });
   }
   private replayStatus(message: string) { el('player-status').textContent = message; }
   private async loadFile(file: File) {
@@ -158,7 +158,7 @@ export class Pages {
     try {
       const playback = await buildPlayback(track, this.callbacks.settings(), text => { if (token !== this.loading) throw new Error('Playback loading canceled.'); this.replayStatus(text); });
       if (token !== this.loading) return;
-      this.playback = playback; this.position = 0;
+      this.playback = playback; this.position = 0; this.effectTail = null;
       el('player-mode').textContent = playback.modeName;
       el('player-hold-panel').hidden = !playback.rules.hold; el('player-next-panel').hidden = !playback.rules.nextCount;
       el<HTMLCanvasElement>('player-next-preview').height = Math.max(1, playback.rules.nextCount) * 90;
@@ -177,7 +177,7 @@ export class Pages {
     if (this.page === 'play') this.opening.update(this.callbacks.game());
     if (this.page !== 'replays' || !this.playback) return;
     const before = this.position;
-    if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) this.playing = false; }
+    if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) { this.playing = false; this.effectTail = now; } }
     if (el<HTMLInputElement>('player-audio').checked && this.position > before) {
       const names = new Set<string>();
       const frames = this.playback.frames;
@@ -188,12 +188,14 @@ export class Pages {
     }
     this.last = now; this.drawPlayback();
   }
+  private effectTail: number | null = null;
   private drawPlayback() {
     const replay = this.playback; if (!replay) return;
     let lo = 0, hi = replay.frames.length - 1;
     while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (replay.frames[mid].time <= this.position) lo = mid; else hi = mid - 1; }
     const frame = replay.frames[lo];
-    drawScene(el<HTMLCanvasElement>('player-board'), el<HTMLCanvasElement>('player-hold-preview'), el<HTMLCanvasElement>('player-next-preview'), replay.engine, replay.rules, replay.settings.display, frame, (this.position - frame.effectTime) * 1000);
+    const visualTime = this.position + (this.effectTail === null ? 0 : Math.max(0, performance.now() - this.effectTail) / 1000);
+    drawScene(el<HTMLCanvasElement>('player-board'), el<HTMLCanvasElement>('player-hold-preview'), el<HTMLCanvasElement>('player-next-preview'), replay.engine, replay.rules, replay.settings.display, { ...frame, actions: frame.actionEffects.map(action => ({ action, age: (visualTime - action.frame / 60) * 1000 })) }, (visualTime - frame.effectTime) * 1000);
     drawNativePreview(el<HTMLCanvasElement>('player-hold-frame'), 'hold'); drawNativePreview(el<HTMLCanvasElement>('player-next-frame'), 'next');
     el('player-clock').textContent = formatTime(this.position * 1000);
     el('player-pieces').textContent = String(frame.pieces); el('player-lines').textContent = String(frame.lines);

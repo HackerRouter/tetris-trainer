@@ -1,3 +1,4 @@
+import { actionText, type ActionText } from './action-text';
 import { clearedRows } from './board-effects';
 import type { Engine, EngineSnapshot, TetrominoSnapshot } from '@haelp/teto/engine';
 import type { Game } from '@haelp/teto/types';
@@ -13,7 +14,7 @@ import { placementSounds } from './sound-events';
 import type { Cell } from './finesse';
 import type { PlacementEffect } from './renderer';
 
-export type PlaybackFrame = { time: number; board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; hold: string | null; holdLocked: boolean; next: string[]; pieces: number; lines: number; inputs: number; holds: number; perfects: number; target: Cell[] | null; effect: PlacementEffect | null; effectTime: number; label: string; sounds: string[] };
+export type PlaybackFrame = { actionEffects: ActionText[]; time: number; board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; hold: string | null; holdLocked: boolean; next: string[]; pieces: number; lines: number; inputs: number; holds: number; perfects: number; target: Cell[] | null; effect: PlacementEffect | null; effectTime: number; label: string; sounds: string[] };
 export type Playback = { name: string; engine: Engine; frames: PlaybackFrame[]; duration: number; rules: ModeRules; settings: Settings; trainingFaults: number; modeName: string };
 
 export async function buildPlayback(track: ReplayTrack, settings: Settings, progress?: (text: string) => void): Promise<Playback> {
@@ -22,6 +23,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
   let rules = modeDefinitions.sprint.rules(settings), displaySettings = settings, room: RoomRuntime | undefined;
   let inputs = 0, holds = 0, completed = 0, perfects = 0, target: Cell[] | null = null;
   let effect: PlacementEffect | null = null, effectTime = -1, sounds: string[] = [];
+  let actionEffects: ActionText[] = [];
   let previous: { x: number; y: number; rotation: number } | null = null;
   const collect = (engine: Engine, label = '') => {
     if (!lastEngine) {
@@ -29,6 +31,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
       engine.events.on('falling.lock.pre', () => { cells = engine.falling.absoluteBlocks; rows = clearedRows(engine.board.state, cells); });
       engine.events.on('falling.new', ({ isHold }) => { if (isHold) { holds++; sounds.push('hold'); } });
       engine.events.on('falling.lock', result => {
+        actionEffects = [...actionEffects.filter(item => item.frame >= engine.frame - 300), actionText(engine, result)].slice(-64);
         const hardDrop = result.keysPresses.includes('hardDrop');
         effect = { rows, cells, piece: result.mino, hardDrop, lines: result.lines };
         effectTime = (engine.frame + 1) / 60;
@@ -45,7 +48,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
       if (piece.y < previous.y && engine.input.keys.softDrop) sounds.push('softdrop');
     }
     previous = { x: piece.x, y: piece.y, rotation: piece.rotation };
-    const state: PlaybackFrame = { time: engine.frame / 60, board, piece: engine.toppedOut || room?.waiting ? null : piece.snapshot(), hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, rules.nextCount), pieces: track.kind === 'trainer' && track.data.practice ? completed : engine.stats.pieces, lines: engine.stats.lines, inputs, holds, perfects, target, effect, effectTime, label, sounds };
+    const state: PlaybackFrame = { actionEffects, time: engine.frame / 60, board, piece: engine.toppedOut || room?.waiting ? null : piece.snapshot(), hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, rules.nextCount), pieces: track.kind === 'trainer' && track.data.practice ? completed : engine.stats.pieces, lines: engine.stats.lines, inputs, holds, perfects, target, effect, effectTime, label, sounds };
     if (frames.at(-1)?.time === state.time) { state.sounds = [...frames.at(-1)!.sounds, ...sounds]; frames[frames.length - 1] = state; }
     else frames.push(state);
     sounds = [];
@@ -73,9 +76,9 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
     const engine = createEngine(replay.settings, replay.seed, rules), practice = replay.mode === 'fault-practice';
     room = new RoomRuntime(engine, rules, practice, replay.seed);
     applyModeSetup(engine, rules, replay.seed); room.refill();
-    engine.events.on('falling.lock', result => { room!.locked(result); room!.refill(); });
     let index = 0;
     collect(engine);
+    engine.events.on('falling.lock', result => { room!.locked(result); room!.refill(); });
     while (engine.frame <= tape.frames) {
       const keys: Game.Replay.Frame[] = [];
       let label = '';
@@ -87,6 +90,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
           const snapshot = structuredClone(data.snapshot); snapshot.__meta.isUndoRedo = true;
           engine.fromSnapshot(snapshot); room.restore(data.room ?? room.state, engine.frame, snapshot.frame);
           previous = null;
+          if (event.type === 'clear-field' || event.type === 'practice-scene') actionEffects = [];
           if (event.type === 'practice-scene') { target = data.target ?? replay.placements.find(p => p.accepted && p.snapshot.falling.symbol === snapshot.falling.symbol)?.cells ?? null; label = `Scene ${data.index + 1}`; }
           if (event.type === 'clear-field') { sounds.push('boardappear'); label = 'Clear board'; }
         } else if (event.type === 'practice-complete') { room.setPractice(false); target = null; label = 'Construction complete'; }

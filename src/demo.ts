@@ -1,12 +1,11 @@
-import type { Engine, TetrominoSnapshot } from '@haelp/teto/engine';
+import type { Engine } from '@haelp/teto/engine';
 import { createEngine } from './engine';
-import { copyPiece } from './finesse';
 import type { TrainerGame } from './game';
 import type { Demonstration } from './practice';
 import { drawBoard } from './renderer';
-import { placementSteps, type GuideStep } from './guide';
+import { placementSteps } from './guide';
 
-type Frame = { piece: TetrominoSnapshot; label: string; duration: number; step: number };
+import { buildDemoFrames, type DemoFrame } from './demo-frames';
 
 export class DemoPanel {
   private popup = document.getElementById('demo-popup')!;
@@ -14,7 +13,7 @@ export class DemoPanel {
   private label = document.getElementById('demo-step')!;
   private source: Demonstration | null = null;
   private engine: Engine | null = null;
-  private frames: Frame[] = [];
+  private frames: DemoFrame[] = [];
   private steps: HTMLElement[] = [];
   private index = 0;
   private since = 0;
@@ -39,7 +38,8 @@ export class DemoPanel {
         document.getElementById('demo-steps')!.replaceChildren(...this.steps);
         document.getElementById('demo-summary')!.textContent = `${this.source.path.cost} finesse input${this.source.path.cost === 1 ? '' : 's'} · ${steps.length} step${steps.length === 1 ? '' : 's'}. Drop inputs are not counted.`;
         document.getElementById('demo-note')!.textContent = this.source.path.drop === 'lock' ? 'Start from the shown position. Follow the steps, soft drop and wait for automatic locking.' : this.source.path.drop === 'soft' ? 'Start from the shown position. Lower the piece only where indicated, then finish with hard drop.' : 'Start from the shown position. Follow the steps in order, then finish with hard drop.';
-        this.frames = this.build(this.source, this.engine, steps);
+        try { this.frames = buildDemoFrames(this.source, this.engine, steps); }
+        catch (error) { this.frames = [{ piece: this.source.snapshot.falling, label: (error as Error).message, duration: 10000, step: -1 }]; }
         this.index = 0; this.since = now;
       }
     }
@@ -56,28 +56,4 @@ export class DemoPanel {
     drawBoard(this.canvas, this.engine, this.source.snapshot.board, frame.piece, this.source.target, { grid: true, ghost: true, ghostOpacity: .25 });
   }
 
-  private build(scene: Demonstration, engine: Engine, steps: GuideStep[]): Frame[] {
-    const board = scene.snapshot.board, piece = copyPiece(engine, scene.snapshot.falling);
-    const frames: Frame[] = [{ piece: piece.snapshot(), label: 'Start here', duration: 1100, step: -1 }];
-    let step = 0;
-    const add = (label: string, duration = 700) => frames.push({ piece: piece.snapshot(), label, duration, step });
-    for (const instruction of steps) {
-      const { move } = instruction;
-      if (move === 'hardDrop') { add('Hard drop', 600); piece.softDrop(board); step++; add('Complete · Replaying shortly', 1800); continue; }
-      if (move === 'waitLock') { add('Wait for automatic lock', Math.max(700, Math.min(2000, engine.misc.movement.lockTime * 1000 / 60))); step++; add('Complete · Replaying shortly', 1800); continue; }
-      if (move === 'dasLeft' || move === 'dasRight') {
-        const direction = move === 'dasLeft' ? 'moveLeft' : 'moveRight';
-        while (piece[direction](board)) add(move === 'dasLeft' ? 'Hold left, then release' : 'Hold right, then release', 150);
-      } else if (move === 'softDrop') {
-        const dropped = copyPiece(engine, piece.snapshot()); dropped.softDrop(board);
-        while (piece.y > dropped.y) { piece.y -= 1; add('Soft drop, then release', 80); }
-      } else if (move === 'down') { for (let row = 0; row < instruction.count; row++) { piece.y -= 1; add('Soft drop one row', 220); } }
-      else if (move === 'rotateCW' || move === 'rotateCCW' || move === 'rotate180') {
-        piece.rotate(board, engine.kickTableName, move === 'rotateCW' ? 1 : move === 'rotateCCW' ? 3 : 2, false);
-        add(move === 'rotateCW' ? 'Rotate CW' : move === 'rotateCCW' ? 'Rotate CCW' : 'Rotate 180°');
-      } else { piece[move](board); add(move === 'moveLeft' ? 'Tap left' : 'Tap right'); }
-      step++;
-    }
-    return frames;
-  }
 }

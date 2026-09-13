@@ -54,5 +54,16 @@
       "piece": "t",
       "lines": 1
     }
+  },
+  {
+    "id": "stickspin",
+    "name": "Stickspin",
+    "note": "T-spin single opening. Published second-bag TSD and third-bag TST branches are available with continuation hints.",
+    "source": "https://harddrop.com/wiki/Stickspin",
+    "fumen": "v115@7gQ4AewhFewwR4whh0DexwQ4whg0ilBtwwRpwhg0gl?CeBtRpJeAgH",
+    "finish": {
+      "piece": "t",
+      "lines": 1
+    }
   }
 ]

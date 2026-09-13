@@ -29,7 +29,7 @@ test('standalone conversion preserves the supplied 40L result and the player has
 
 test('a newly completed 40L session downloads through the actual export button', async ({ page }) => {
   const source = JSON.parse(await readFile(suppliedPath, 'utf8'));
-  await page.route('**/src/main.ts', async route => {
+  await page.route('**/src/main.ts*', async route => {
     const response = await route.fetch(), body = await response.text();
     await route.fulfill({ response, body: `${body}\nwindow.__testSession = (settings, seed) => { game = new TrainerGame(settings, seed); game.start(); return game; };` });
   });

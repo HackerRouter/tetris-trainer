@@ -85,3 +85,5 @@ h1,h2,.board-stats strong,#overlay-value{font-family:HUN,Config,sans-serif;font-
 #continuation-plan [aria-current=step] { color: #a9dcd0; font-weight: bold; }
 #continuation-status, #continuation-step { font-size: 12px; line-height: 1.6; }
 @media (min-width:951px) and (min-height:760px) { #play-page:has(#opener-references:not([hidden])) > .play-area:has(#board[height="690"]) { position: sticky; top: 12px; align-self: start; } }
+
+.tetrion{position:relative}.action-text-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}

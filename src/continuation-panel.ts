@@ -21,6 +21,7 @@ export class ContinuationPanel {
   private optionsKey = '';
   private goal: ContinuationGoal = 'pc';
   private baseline = 0;
+  private baselinePc = 0;
   private token = 0;
   private routes: ContinuationRoute[] = [];
   private selected: ContinuationRoute | null = null;
@@ -29,7 +30,7 @@ export class ContinuationPanel {
   private available = false;
   constructor() {
     el('opener-reference-status').after(el('opener-continuations'));
-    el('opener-continuations').innerHTML = `<h3>Continuation hints</h3><label class="check-row"><input id="continuation-enabled" type="checkbox">Suggest follow-up placements</label><div id="continuation-options" hidden><label class="select-row">Goal<select id="continuation-goal"><option value="auto">Opener default</option value="pc">Perfect clear</option><option value="tspin">T-spin clear</option><option value="tsd">T-spin double</option><option value="two-tspins">Two T-spin clears</option><option value="two-tsd">Two T-spin doubles</option></select></label><label class="select-row">Search horizon<select id="continuation-depth"><option value="4">4 pieces</option><option value="7">7 pieces</option><option value="10">10 pieces</option><option value="14">14 pieces</option></select></label><label class="check-row"><input id="continuation-seeded" type="checkbox">Use seeded future pieces beyond Next</label><p class="muted">Off uses only current, Hold and visible Next. Plans use this mode's board and rotation/spin rules. They do not predict gravity or lock timing; Just think helps you follow the steps. Mini clears count for T-spin clears.</p><button id="continuation-search" class="secondary small">Find routes from this board</button><button id="continuation-clear" class="secondary small" hidden>Hide placement hint</button><p id="continuation-status" role="status"></p><p id="continuation-scope" class="muted"></p><div id="continuation-routes" class="opener-catalog"></div><section id="continuation-guide" hidden><h4 id="continuation-route-name"></h4><p class="muted">Hints are optional. A different placement updates the search without undoing your move.</p><canvas id="continuation-board" aria-label="Continuation step preview"></canvas><p id="continuation-step"></p><div class="page-toolbar"><button id="continuation-prev" class="secondary small">Previous step</button><button id="continuation-next" class="secondary small">Next step</button><button id="continuation-animate" class="secondary small">Animate this step</button></div><ol id="continuation-inputs"></ol><ol id="continuation-plan"></ol></section></div>`;
+    el('opener-continuations').innerHTML = `<h3>Continuation hints</h3><label class="check-row"><input id="continuation-enabled" type="checkbox">Suggest follow-up placements</label><div id="continuation-options" hidden><label class="select-row">Goal<select id="continuation-goal"><option value="auto">Published opener continuations</option><option value="pc">Perfect clear</option><option value="tspin">T-spin clear</option><option value="tsd">T-spin double</option><option value="two-tspins">Two T-spin clears</option><option value="two-tsd">Two T-spin doubles</option></select></label><label class="select-row">Search horizon<select id="continuation-depth"><option value="4">4 pieces</option><option value="7">7 pieces</option><option value="10">10 pieces</option><option value="14">14 pieces</option></select></label><label class="check-row"><input id="continuation-seeded" type="checkbox">Use seeded future pieces beyond Next</label><p class="muted">Off uses only current, Hold and visible Next. Plans use this mode's board and rotation/spin rules. They do not predict gravity or lock timing; Just think helps you follow the steps. Mini clears count for T-spin clears. Published opener continuations shows alternate milestones and automatically advances to the next stage. A PC setup still depends on the following queue.</p><button id="continuation-search" class="secondary small">Find routes from this board</button><button id="continuation-clear" class="secondary small" hidden>Hide placement hint</button><p id="continuation-status" role="status"></p><p id="continuation-scope" class="muted"></p><div id="continuation-routes" class="opener-catalog"></div><section id="continuation-guide" hidden><h4 id="continuation-route-name"></h4><a id="continuation-source" target="_blank" rel="noopener noreferrer" hidden>Published reference</a><p class="muted">Hints are optional. A different placement updates the search without undoing your move.</p><canvas id="continuation-board" aria-label="Continuation step preview"></canvas><p id="continuation-step"></p><div class="page-toolbar"><button id="continuation-prev" class="secondary small">Previous step</button><button id="continuation-next" class="secondary small">Next step</button><button id="continuation-animate" class="secondary small">Animate this step</button></div><ol id="continuation-inputs"></ol><ol id="continuation-plan"></ol></section></div>`;
     for (const id of ['continuation-enabled', 'continuation-goal', 'continuation-depth', 'continuation-seeded']) el(id).addEventListener('change', () => {
       saveOpeningOptions({ continuations: el<HTMLInputElement>('continuation-enabled').checked, continuationGoal: el<HTMLSelectElement>('continuation-goal').value as ReturnType<typeof openingOptions>['continuationGoal'], continuationDepth: Number(el<HTMLSelectElement>('continuation-depth').value), seededLookahead: el<HTMLInputElement>('continuation-seeded').checked });
       this.reset(); el(id).blur();
@@ -67,14 +68,18 @@ export class ContinuationPanel {
     if (this.game !== game || this.opener?.id !== opener?.id || optionKey !== this.optionsKey) {
       this.reset(); this.game = game; this.opener = opener; this.optionsKey = optionKey;
       this.goal = options.continuationGoal === 'auto' ? /perfect|\bpc\b|sdpc/i.test(opener?.name ?? '') ? 'pc' : /dt cannon|albatross|double triple/i.test(opener?.name ?? '') ? 'two-tspins' : 'tspin' : options.continuationGoal;
-      this.baseline = this.count(game);
+      this.baseline = this.count(game); this.baselinePc = game.clears.pc ?? 0;
     }
     this.available = visible && completed && options.continuations;
     el<HTMLButtonElement>('continuation-search').disabled = !this.available;
     if (!this.available) { if (this.worker || this.selected || this.key) this.reset(); el('continuation-status').textContent = 'Complete the opening with Keep board enabled to search its follow-ups.'; return; }
     if (['complete', 'topout'].includes(game.status)) { this.cancel(); game.hintTarget = null; el('continuation-status').textContent = 'This game has ended. Restart to train another opening.'; return; }
     const progress = Math.max(0, this.count(game) - this.baseline), needed = this.goal.startsWith('two-') ? 2 : 1;
-    if (progress >= needed) { this.cancel(); game.hintTarget = null; el('continuation-status').textContent = `${labels[this.goal]} complete. Find routes again to start another goal on this board.`; return; }
+    if ((options.continuationGoal === 'auto' && (game.clears.pc ?? 0) > this.baselinePc) || (options.continuationGoal !== 'auto' && progress >= needed)) {
+      this.cancel(); game.hintTarget = null; el('continuation-clear').hidden = true;
+      if (this.selected && this.step < this.selected.steps.length) { this.step = this.selected.steps.length; this.preview = this.step - 1; this.renderRoutes(); this.drawGuide(); }
+      el('continuation-status').textContent = `${options.continuationGoal === 'auto' ? 'Perfect clear' : labels[this.goal]} complete. Find routes again to start another goal on this board.`; return;
+    }
     const key = `${this.liveKey(game)}:${progress}:${game.rules.finesse}`;
     if (key === this.key) return;
     this.cancel(); this.key = key;
@@ -85,8 +90,8 @@ export class ContinuationPanel {
     }
     this.routes = []; this.renderRoutes();
     const token = this.token, requestGoal = needed - progress === 1 && this.goal.startsWith('two-') ? this.goal === 'two-tsd' ? 'tsd' : 'tspin' : this.goal;
-    el('continuation-status').textContent = `Searching ${labels[this.goal].toLowerCase()} alternatives…`;
-    el('continuation-scope').textContent = `${progress} / ${needed} goals · Up to ${options.continuationDepth} placements · ${options.seededLookahead ? 'Uses this seed’s future queue' : 'Visible queue only'}`;
+    el('continuation-status').textContent = options.continuationGoal === 'auto' ? 'Checking published continuation branches against this board and queue...' : `Searching ${labels[this.goal].toLowerCase()} alternatives...`;
+    el('continuation-scope').textContent = `${options.continuationGoal === 'auto' ? 'Published stages' : `${progress} / ${needed} goals`} · Up to ${options.continuationDepth} placements · ${options.seededLookahead ? 'Uses this seed’s future queue' : 'Visible queue only'}`;
     let worker: Worker;
     try { worker = new Worker(new URL('./continuation-worker.ts', import.meta.url), { type: 'module' }); }
     catch { el('continuation-status').textContent = 'This browser could not start the search worker. Gameplay is still available.'; return; }
@@ -97,11 +102,11 @@ export class ContinuationPanel {
       if (event.data.error) { el('continuation-status').textContent = event.data.error; return; }
       const result = event.data.result as ContinuationResult; this.routes = result.routes; this.renderRoutes();
       el('continuation-status').textContent = result.message;
-      el('continuation-scope').textContent = `${labels[this.goal]} · ${progress} / ${needed} · ${result.queue.join(' ').toUpperCase()} · ${result.seeded ? 'Seeded future' : 'Visible queue'} · ${result.checked} placements checked in ${(result.elapsedMs / 1000).toFixed(1)}s`;
+      el('continuation-scope').textContent = `${options.continuationGoal === 'auto' ? 'Published stages' : `${labels[this.goal]} · ${progress} / ${needed}`} · ${result.queue.join(' ').toUpperCase()} · ${result.seeded ? 'Seeded future' : 'Visible queue'} · ${result.checked} placements checked in ${(result.elapsedMs / 1000).toFixed(1)}s`;
       if (this.routes.length) this.select(this.routes[0]);
     };
     worker.onerror = () => { if (token === this.token) { this.cancel(); el('continuation-status').textContent = 'The continuation worker could not run. Find routes again to retry.'; } };
-    try { worker.postMessage({ context: analysisContext(game.rules, game.settings, game.engine.snapshot({ isUndoRedo: true })), goal: requestGoal, depth: options.continuationDepth, seeded: options.seededLookahead }); }
+    try { worker.postMessage({ context: analysisContext(game.rules, game.settings, game.engine.snapshot({ isUndoRedo: true })), goal: requestGoal, depth: options.continuationDepth, seeded: options.seededLookahead, opener: this.opener ?? undefined, auto: options.continuationGoal === 'auto' }); }
     catch (error) { this.cancel(); el('continuation-status').textContent = (error as Error).message; }
   }
   private select(route: ContinuationRoute) {
@@ -117,7 +122,7 @@ export class ContinuationPanel {
       const button = document.createElement('button'); button.className = 'opener-card secondary'; button.setAttribute('aria-pressed', String(this.selected?.id === route.id));
       if (this.game) { const key = this.liveKey(this.game); button.disabled = !route.steps.some(step => continuationStateKey(step.scene.snapshot) === key || (step.scene.guideSnapshot && continuationStateKey(step.scene.guideSnapshot) === key)); }
       const canvas = document.createElement('canvas'); canvas.width = 200; canvas.height = 120; canvas.setAttribute('aria-hidden', 'true');
-      const title = document.createElement('strong'); title.textContent = `Route ${i + 1} · ${route.steps.length} pieces`;
+      const title = document.createElement('strong'); title.textContent = `${route.name ?? `Route ${i + 1}`} · ${route.steps.length} pieces`;
       const summary = document.createElement('small'); summary.textContent = `${route.lines} lines · ${route.spins} T-spin clears${route.pc ? ' · PC' : ''}`;
       const tiles: { x: number; y: number; symbol: string }[] = [], rowIds = route.steps[0].scene.snapshot.board.map((_, y) => y);
       let nextRow = rowIds.length;
@@ -136,8 +141,11 @@ export class ContinuationPanel {
     if (!this.selected || !this.game) return;
     const route = this.selected, step = route.steps[this.preview], scene = step.scene, snapshot = scene.guideSnapshot ?? scene.snapshot;
     el('continuation-guide').hidden = false;
-    el('continuation-route-name').textContent = `${labels[this.goal]} · ${route.steps.length} planned placements`;
-    el('continuation-step').textContent = `Preview ${this.preview + 1} / ${route.steps.length} · ${step.piece.toUpperCase()} · ${step.lines} lines${step.spin !== 'none' ? ` · ${step.spin} spin` : ''}${step.pc ? ' · Perfect clear' : ''}. Live target: step ${this.step + 1}.`;
+    const reference = el<HTMLAnchorElement>('continuation-source');
+    reference.hidden = !route.source || !/^https?:\/\//.test(route.source);
+    if (!reference.hidden) reference.href = route.source!;
+    el('continuation-route-name').textContent = `${route.name ?? labels[this.goal]} · ${route.steps.length} planned placements`;
+    el('continuation-step').textContent = `Preview ${this.preview + 1} / ${route.steps.length} · ${step.piece.toUpperCase()} · ${step.lines} lines${step.spin !== 'none' ? ` · ${step.spin} spin` : ''}${step.pc ? ' · Perfect clear' : ''}. ${this.step >= route.steps.length ? 'Route complete.' : `Live target: step ${this.step + 1}.`}`;
     el<HTMLButtonElement>('continuation-prev').disabled = this.preview === 0; el<HTMLButtonElement>('continuation-next').disabled = this.preview === route.steps.length - 1;
     const engine = createEngine(this.game.settings, 1, this.game.rules), canvas = el<HTMLCanvasElement>('continuation-board'); canvas.width = engine.board.width * 20; canvas.height = (engine.board.height + 3) * 20;
     drawBoard(canvas, engine, snapshot.board, snapshot.falling, scene.target, this.game.settings.display);

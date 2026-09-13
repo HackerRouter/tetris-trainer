@@ -1,0 +1,737 @@
+[
+  {
+    "id": "stickspin",
+    "name": "Stickspin",
+    "source": "https://harddrop.com/wiki/Stickspin",
+    "stages": [
+      {
+        "id": "stickspin-stage-6",
+        "name": "Second Bag",
+        "rows": [
+          "XXX##.XXXX",
+          "XXX###.XXX",
+          "X#####TXXX",
+          "#####TTTX#",
+          "#......###",
+          ".......###",
+          ".........#"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-9",
+        "name": "J → OL",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXXTXXX",
+          "X####TTXXX",
+          "######TXXX",
+          "####...##X",
+          "..##..##.#",
+          ".........#",
+          ".........#",
+          ".........#"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-12",
+        "name": "L → J",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXXTXXX",
+          "X####TTXXX",
+          "######TXXX",
+          "##.#...##X",
+          "#..#..####",
+          "#.......##"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-15",
+        "name": "O → J → L",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXXTXXX",
+          "X####TTXXX",
+          "######TXXX",
+          "####...##X",
+          "####..##..",
+          "#..#......"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-18",
+        "name": "L → O → J",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXXTXXX",
+          "X####TTXXX",
+          "######TXXX",
+          "####...##X",
+          "####..##..",
+          "##........"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-24",
+        "name": "J → O and S → I",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXXTXXX",
+          "X####TTXXX",
+          "######TXXX",
+          "####...##X",
+          "...#..####",
+          "...#....#.",
+          "........#."
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-29",
+        "name": "Delaying the Second Bag T-Spin",
+        "rows": [
+          "XXXXX.XXXX",
+          "XXXXXX.XXX",
+          "XXXXXXTXXX",
+          "XXXXXTTTXX",
+          "X####..XXX",
+          "######.XXX",
+          "####...##X",
+          "####..##..",
+          "#..#......"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-32",
+        "name": "Fourth Bag",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX..XX..",
+          "X..X......"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-33",
+        "name": "Continuations",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "##XX#.XX#X",
+          "#####.###X",
+          "####...##X",
+          "####...##X"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-34",
+        "name": "Continuations",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "##XX.#XX#X",
+          "####.####X",
+          "###...###X",
+          "###...###X"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-35",
+        "name": "Continuations",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX.#XX##",
+          "XX##.#####",
+          "###...####",
+          "###...####"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-36",
+        "name": "Continuations",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX.#XX##",
+          "X##X.#####",
+          "###...####",
+          "###...####"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-39",
+        "name": "DT Cannon",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXXTXXXXX",
+          "XXXTTTXXXX",
+          "XXX..#XXXX",
+          "####.#####",
+          ".....#####",
+          "....##.###",
+          "....#..###"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-40",
+        "name": "DT Cannon",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXXTXXXXX",
+          "XXXTTTXXXX",
+          "XXX#..XXXX",
+          "####.#####",
+          "####...###",
+          "...##..###",
+          "....#....#"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-41",
+        "name": "Floating T-Spin Double",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXX.XXXXX",
+          "XXX...XXXX",
+          "XXX##TXXXX",
+          "####TTT###",
+          "####..####",
+          "#.....####",
+          "#......#.."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-42",
+        "name": "Floating T-Spin Double",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXX.XXXXX",
+          "XXX...XXXX",
+          "XXXT##XXXX",
+          "##TTT#####",
+          "###..#####",
+          "###.....##",
+          "........##"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-43",
+        "name": "Perfect clear|Perfect Clear after 12 Lines",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXXX#XXXXX",
+          "XXX###XXXX",
+          "XXX###XXXX"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-44",
+        "name": "Trinity/STSD",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX..XX##",
+          "##XX..####",
+          "####.#####",
+          ".###.....#",
+          ".#.##....."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-45",
+        "name": "Trinity/STSD",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX..XX##",
+          "##XX..####",
+          ".###.#####",
+          ".###.....#",
+          ".####....."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-46",
+        "name": "Imperial Cross",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTT.XXX",
+          "##XX#TXX#X",
+          "#####...#X",
+          "######..#X",
+          "#####...#X",
+          "#........."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-47",
+        "name": "Imperial Cross",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTT.XXX",
+          "##XX#TXX#X",
+          "#####...#X",
+          "######..#X",
+          "####.#..#X",
+          ".#........"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-48",
+        "name": "T-Spin Triple",
+        "rows": [
+          "XXXXXTXXXX",
+          "XX#X#TTXXX",
+          "X##X#TXXXX",
+          "X####...XX",
+          "######..##",
+          ".##.##..##",
+          "....#....."
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-49",
+        "name": "T-Spin Triple",
+        "rows": [
+          "XXXXXTXXXX",
+          "XX#X#TTXXX",
+          "X##X#TXXXX",
+          "X####...XX",
+          "#.####..##",
+          "#..###...#",
+          "#........#",
+          "#........."
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "stickspin-stage-53",
+        "name": "Perfect Clear after 8 lines",
+        "rows": [
+          "XXXXX#XXXX",
+          "XXXXXX#XXX",
+          "X######XXX",
+          "#######XXX",
+          "#########X"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-60",
+        "name": "L → J",
+        "rows": [
+          "XXXXX#XXXX",
+          "XX#X###XXX",
+          "X##X##XXXX",
+          "X#######XX"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-65",
+        "name": "L → O → J",
+        "rows": [
+          "XXXXX#XXXX",
+          "XXXX###XXX",
+          "XXXX##XX##",
+          "XX########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-70",
+        "name": "T → Z and S → J → O / T → S and IZ → L → O",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "##XX.#XX#X",
+          "####.####X",
+          "#.....###X",
+          "#.....###X",
+          "........##",
+          "........##"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-71",
+        "name": "T → Z and S → J → O / T → S and IZ → L → O",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "##XX#.XX#X",
+          "#####.###X",
+          "####.....X",
+          "####.....X",
+          "##........",
+          "##........"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-73",
+        "name": "T → Z and S → J → O / T → S and IZ → L → O",
+        "rows": [
+          "XXXXX#XXXX",
+          "XXXXX#XXXX",
+          "XXXX#####X",
+          "XXXX#####X",
+          "XX########",
+          "XX########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-83",
+        "name": "S → T → JL",
+        "rows": [
+          "X######XXX",
+          "XX#####XXX",
+          "#X#######X",
+          "#########X"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "stickspin-stage-91",
+        "name": "T → I and J → L",
+        "rows": [
+          "XXXXXTXXXX",
+          "XXXXTTTXXX",
+          "XXXX#.XX##",
+          "X##X#.####",
+          "#####...##",
+          "#####.....",
+          ".##......."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "stickspin-stage-95",
+        "name": "T → I and J → L",
+        "rows": [
+          "XXXXX#XXXX",
+          "XXXXX#XXXX",
+          "XXXXX###XX",
+          "XXXXX#####",
+          "#XX#######",
+          "##########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      }
+    ]
+  },
+  {
+    "id": "db-377",
+    "name": "Mountainous Stacking 2",
+    "source": "https://harddrop.com/wiki/Mountainous_Stacking#Mountainous_Stacking_2",
+    "stages": [
+      {
+        "id": "db-377-stage-2",
+        "name": "Setup A",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###....###",
+          "####.....#",
+          "##.......#",
+          "##.......#"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-4",
+        "name": "Setup A",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXX####XXX",
+          "XXXX#####X",
+          "XX#######X",
+          "XX#######X"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-7",
+        "name": "Setup B",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###....##.",
+          "####......",
+          "####......",
+          "####......"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-9",
+        "name": "Setup B",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXX####XX#",
+          "XXXX######",
+          "XXXX######",
+          "XXXX######"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-12",
+        "name": "Setup C",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###...####",
+          "####..#..#",
+          "####......"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-14",
+        "name": "Setup C",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXX###XXXX",
+          "XXXX##X##X",
+          "XXXX######",
+          "##########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-17",
+        "name": "Setup D",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###...####",
+          "####..####",
+          "........##"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-20",
+        "name": "Setup D",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXX###XXXX",
+          "XXXX##XXXX",
+          "########XX",
+          "##########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-23",
+        "name": "Bonus setup 1",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###....##.",
+          "####......",
+          "####......"
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-25",
+        "name": "Bonus setup 1",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXX####XX#",
+          "XXXX######",
+          "XXXX######",
+          "##########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-28",
+        "name": "Compromise",
+        "rows": [
+          "XXXX.XXXXX",
+          "XXXTXXXXXX",
+          "XXXTT##X##",
+          "XX#T######",
+          "###...####",
+          "####..#..#",
+          "##........",
+          ".##......."
+        ],
+        "goal": "tspin",
+        "spinLines": 3
+      },
+      {
+        "id": "db-377-stage-30",
+        "name": "Compromise",
+        "rows": [
+          "XXXXTXXXXX",
+          "XXXTTTXXXX",
+          "XXXX..X##X",
+          "XX##...###",
+          "#XX##..###",
+          "####......",
+          "####......",
+          "###......."
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "db-377-stage-33",
+        "name": "Compromise",
+        "rows": [
+          "XXXX.#XXXX",
+          "XXXX.##XXX",
+          "XXXXXT#XXX",
+          "XXXXTTT###",
+          "XXXX..####",
+          "XXX...####",
+          "###......#",
+          "###.......",
+          "##........"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "db-377-stage-35",
+        "name": "Compromise",
+        "rows": [
+          "XXXX#XXXXX",
+          "XXXX#XXXXX",
+          "XXXX##XXXX",
+          "XXX###XXXX",
+          "XXX######X",
+          "XXX#######",
+          "XX########"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      },
+      {
+        "id": "db-377-stage-38",
+        "name": "Setup 2C loop",
+        "rows": [
+          "XXXXTXXXXX",
+          "XXXTTTXXXX",
+          "XXXX..X##X",
+          "XXXX..####",
+          "###...####",
+          "###....##.",
+          ".#........",
+          ".#........"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "db-377-stage-43",
+        "name": "Setup 2C loop",
+        "rows": [
+          "XXXX..XXXX",
+          "XXX##TXXXX",
+          "XXX#TTTXXX",
+          "#X##..###X",
+          "#X#...###X",
+          "#......##X",
+          "#........#",
+          ".......###"
+        ],
+        "goal": "tspin",
+        "spinLines": 2
+      },
+      {
+        "id": "db-377-stage-45",
+        "name": "Setup 2C loop",
+        "rows": [
+          "XXXX##XXXX",
+          "XXXX##XXXX",
+          "XXX###XXXX",
+          "X######XXX",
+          "X########X",
+          "#######XXX"
+        ],
+        "goal": "pc",
+        "spinLines": 0
+      }
+    ]
+  }
+]

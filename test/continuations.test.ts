@@ -40,7 +40,7 @@ test('shortlisting gives stable ordering and changes the actual random-opening c
   const source = await suggestOpeners(settings, rules, deal, options), chosen = source.at(-1)!;
   const next = await suggestOpeners(settings, rules, deal, { ...options, shortlist: [chosen.opener.id] });
   assert.equal(next[0].opener.id, chosen.opener.id);
-  assert.equal(allOpeners.length, 478);
+  assert.equal(allOpeners.length, 479);
 });
 
 test('PC continuations include distinct solutions, use actual Hold/queue and execute through the engine', () => {
