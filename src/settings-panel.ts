@@ -98,6 +98,7 @@ export class SettingsPanel {
     for (const key of ['grid', 'ghost', 'coloredGhost', 'dimLockedHold'] as const) this.field<HTMLInputElement>(key).checked = settings.display[key];
     for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) this.field(key).value = String(settings.display[key] * 100);
     this.field('countdownSeconds').value = String(settings.training.countdownSeconds);
+    this.field('think-style').value = settings.training.thinkStyle;
     this.field('audio-volume').value = String(settings.audio.volume * 100);
     this.field<HTMLInputElement>('audio-enabled').checked = settings.audio.enabled;
     this.field<HTMLInputElement>('audio-ui').checked = settings.audio.ui;
@@ -138,6 +139,7 @@ export class SettingsPanel {
     for (const key of ['grid', 'ghost', 'coloredGhost', 'dimLockedHold'] as const) result.display[key] = this.field<HTMLInputElement>(key).checked;
     for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) result.display[key] = Number(this.field(key).value) / 100;
     result.training.countdownSeconds = this.field('countdownSeconds').value === '' ? NaN : Number(this.field('countdownSeconds').value);
+    result.training.thinkStyle = this.field('think-style').value as Settings['training']['thinkStyle'];
     for (const key of ['allowDifferentTarget', 'undoEnabled', 'infiniteHold', 'strictPractice'] as const) result.training[key] = this.field<HTMLInputElement>(key).checked;
     return validateSettings(result);
   }

@@ -13,11 +13,50 @@ import { sameCells } from '../src/practice.ts';
 import { buildDemoFrames } from '../src/demo-frames.ts';
 import { placementSteps } from '../src/guide.ts';
 import { copyPiece } from '../src/finesse.ts';
+import { searchContinuations } from '../src/continuation-search.ts';
 
 const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
 const options = { mirror: false, loop: false, study: true, finesse: true };
 const tap = (game: TrainerGame, key: GameAction, frames = 1) => { game.input.press(key); for (let i = 0; i < frames; i++) game.step(); game.input.release(key); game.step(); };
 const tiles = (board: any[][]) => board.map(row => row.map(tile => tile?.mino ?? null));
+
+test('opener undo and redo restore scene progress, finished state, board and timer across construction', async () => {
+  const configured = structuredClone(settings); configured.training.undoEnabled = true; configured.training.justThink = true;
+  const fumen = encoder.encode([{ field: Field.create(), operation: { type: 'O', x: 4, y: 0, rotation: 'spawn' } }, { operation: { type: 'O', x: 4, y: 2, rotation: 'spawn' } }]);
+  const route = compileOpener({ id: 'history', name: 'History', fumen, source: '', note: '' }, configured, modeDefinitions.sprint.rules(configured), { ...options, continueAfter: true });
+  const game = new TrainerGame(configured, 17, route.set); game.start();
+  tap(game, 'hardDrop'); const firstTime = game.elapsedMs; tap(game, 'hardDrop'); const endTime = game.elapsedMs;
+  assert.equal(game.practice!.finished, true); assert.ok(game.undo());
+  assert.equal(game.practice!.index, 1); assert.equal(game.practice!.completed, 1); assert.equal(game.practice!.finished, false); assert.equal(game.elapsedMs, firstTime);
+  assert.ok(game.undo()); assert.equal(game.practice!.index, 0); assert.equal(game.engine.board.state.flat().filter(Boolean).length, 0);
+  assert.ok(game.redo()); assert.equal(game.practice!.index, 1); assert.ok(game.redo()); assert.equal(game.practice!.finished, true); assert.equal(game.elapsedMs, endTime);
+  tap(game, 'hardDrop'); assert.ok(game.undo()); assert.equal(game.practice!.finished, true); assert.equal(game.engine.stats.pieces, 2);
+  assert.ok(game.redo()); assert.equal(game.engine.stats.pieces, 3);
+  const playback = await buildPlayback(readReplay(game.export(), 'Opener redo')[0], configured);
+  assert.deepEqual(tiles(playback.engine.board.state), tiles(game.engine.board.state)); assert.equal(playback.duration, game.elapsedMs / 1000);
+});
+
+test('enforced continuation retries its required target for target and finesse faults, while advisory mode accepts alternatives', () => {
+  const configured = structuredClone(settings); configured.training.justThink = true; configured.training.allowDifferentTarget = false;
+  const fumen = encoder.encode([{ field: Field.create('XXXX__XX__XXXX__XX__'), operation: { type: 'O', x: 4, y: 0, rotation: 'spawn' } }]);
+  const route = compileOpener({ id: 'required', name: 'Required', fumen, source: '', note: '' }, configured, modeDefinitions.sprint.rules(configured), { ...options, continueAfter: true });
+  for (const inefficient of [false, true]) {
+    const game = new TrainerGame(configured, 17, route.set); game.start(); tap(game, 'hardDrop');
+    const result = searchContinuations({ context: analysisContext(game.rules, configured, game.engine.snapshot({ isUndoRedo: true })), goal: 'pc', seeded: true, depth: 4 });
+    assert.ok(result.routes.length); const scene = result.routes[0].steps[0].scene;
+    game.setContinuation(scene, true); const before = tiles(game.engine.board.state), time = game.elapsedMs;
+    if (inefficient) { tap(game, 'moveLeft'); tap(game, 'moveRight'); }
+    tap(game, 'hardDrop');
+    assert.equal(game.placements.at(-1)!.accepted, false); assert.deepEqual(tiles(game.engine.board.state), before); assert.equal(game.elapsedMs, time);
+    assert.deepEqual(game.target, scene.target); assert.deepEqual(game.demonstration!.target, scene.target); assert.notDeepEqual(game.target, game.placements.at(-1)!.cells);
+    if (scene.holdFirst) tap(game, 'hold');
+    for (const move of scene.path.moves) tap(game, move === 'dasLeft' ? 'moveLeft' : move === 'dasRight' ? 'moveRight' : move as GameAction, move.startsWith('das') ? 60 : 1);
+    tap(game, 'hardDrop'); assert.equal(game.placements.at(-1)!.accepted, true); assert.equal(game.demonstration, null);
+  }
+  const game = new TrainerGame(configured, 17, route.set); game.start(); tap(game, 'hardDrop');
+  const result = searchContinuations({ context: analysisContext(game.rules, configured, game.engine.snapshot({ isUndoRedo: true })), goal: 'pc', seeded: true, depth: 4 });
+  game.setContinuation(result.routes[0].steps[0].scene, false); tap(game, 'hardDrop'); assert.equal(game.placements.at(-1)!.accepted, true);
+});
 
 test('opener faults retry only the current piece and demonstrate its required target even with strict fault practice enabled', () => {
   const fumen = encoder.encode([{ field: Field.create(), operation: { type: 'O', x: 4, y: 0, rotation: 'spawn' } }, { operation: { type: 'O', x: 4, y: 2, rotation: 'spawn' } }]);

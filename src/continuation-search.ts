@@ -121,7 +121,7 @@ export function searchContinuations(request: ContinuationRequest): ContinuationR
         if (engine.toppedOut || cellKey(lockedTarget) !== cellKey(target)) continue;
         const after = engine.snapshot({ isUndoRedo: true });
         const pc = result.lines > 0 && !after.board.some(row => row.some(Boolean));
-        const scoredSpin = result.mino === 't' && result.spin !== 'none' && (goal === 'two-tsd' || goal === 'tsd' ? result.lines === 2 : result.lines >= 1);
+        const scoredSpin = result.mino === 't' && result.spin !== 'none' && (goal === 'two-tsd' || goal === 'tsd' ? result.spin === 'normal' && result.lines === 2 : result.lines >= 1);
         const scene: PracticeScene = { id: `continuation-${output.checked}`, snapshot: holdFirst ? node.snapshot : snapshot, guideSnapshot: holdFirst ? snapshot : undefined, holdFirst, target, path };
         const step: ContinuationStep = { scene, after, lines: result.lines, spin: result.spin, piece: result.mino, pc };
         const child: Node = { snapshot: after, steps: [...node.steps, step], drawn: node.drawn + 1 + Number(holdFirst && emptyHold), spins: node.spins + Number(scoredSpin), lines: node.lines + result.lines, score: 0 };

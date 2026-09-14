@@ -26,6 +26,7 @@ export class OpeningTraining {
   private observed: TrainerGame | null = null;
   private placements = -1;
   private built = false;
+  private revision = -1;
   constructor(private callbacks: Callbacks) {
     window.addEventListener(shortlistEvent, () => this.render());
     el<HTMLInputElement>('opener-keep-board').checked = openingOptions().continueAfter;
@@ -131,6 +132,8 @@ export class OpeningTraining {
     el('opener-reference-title').textContent = this.session?.kind === 'single' ? 'Opener construction' : 'Candidate openers';
   }
   update(game: TrainerGame) {
+    if (this.revision !== game.revision) { this.revision = game.revision; this.placements = -1; }
+    if (game.practice?.set.kind === 'opener' && !game.practice.finished) this.built = false;
     this.continuations.update(game, this.selected?.opener ?? null, this.built && !this.busy, !!this.session || openingOptions().recommend);
     if (this.busy) return;
     if (game !== this.observed) {

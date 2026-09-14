@@ -48,7 +48,7 @@ test('continuation worker provides a live PC hint, full instructions and a route
 });
 
 test('different placements are accepted, stale routes are discarded and continuation preferences survive a new seed', async ({ page }) => {
-  await followupFixture(page);
+  await followupFixture(page); await page.locator('#continuation-enforce').uncheck();
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('2'); await expect(page.locator('#faults')).toHaveText('0');
   await expect(page.locator('#continuation-status')).toContainText('No published stage', { timeout: 15000 });
   expect(await page.evaluate(() => (window as any).__testCurrent().hintTarget)).toBeNull(); await expect(page.locator('#continuation-routes button')).toHaveCount(0);

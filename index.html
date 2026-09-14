@@ -10,7 +10,7 @@
     <main id="play-page" class="training-workspace">
       <div class="game-toolbar" aria-label="Game controls">
         <div class="mode-picker"><img id="mode-icon" src="/tetrio/ui/sprint.svg" width="24" height="24" alt=""><label for="mode-select" class="visually-hidden">Game mode</label><select id="mode-select"><option value="sprint">40L Sprint</option><option value="custom">Custom / Zen</option></select></div>
-        <button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button><button id="undo" class="secondary" disabled title="Undo placement · Ctrl + Z">Undo</button>
+        <button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button><button id="undo" class="secondary" disabled title="Undo placement · Ctrl + Z">Undo</button><button id="redo" class="secondary" disabled title="Redo placement ? Ctrl + Y">Redo</button>
         <div class="game-switches">
           <label title="Automatically retry finesse faults and restore the timer.">Perfect finesse<input id="finesse-toggle" type="checkbox" role="switch" aria-describedby="finesse-help finesse-scope"></label>
           <label title="Freeze the board and timer while thinking.">Just think<input id="think-toggle" type="checkbox" role="switch" aria-describedby="think-help"></label>
@@ -25,7 +25,7 @@
           <div class="stats"><div>Inputs<strong id="inputs">0</strong></div><div>Holds<strong id="holds">0</strong></div><div>Finesse faults<strong id="faults">0</strong></div><div>Perfect placements<strong id="perfects">0</strong></div></div>
           <details><summary>Session details</summary><div id="results" class="muted"></div><p id="mode-rules" class="muted" hidden></p></details>
         </section>
-        <details id="training-options"><summary>Training options</summary><label class="select-row" for="think-style">Just think style<select id="think-style"><option value="piece">Before each piece</option><option value="input">While operating</option></select></label><p id="think-help" class="muted">Each piece waits for a fresh game input, then runs normally until placed.</p><p id="finesse-scope" class="muted">40L Sprint</p><p id="finesse-help" class="muted">Automatically retry finesse faults and restore the timer.</p><p class="fine-print">Each tap, DAS hold or rotation counts as one finesse input. Hints prefer hard drop when allowed.</p></details>
+        <details id="training-options"><summary>Training options</summary><p id="think-help" class="muted">Each piece waits for a fresh game input, then runs normally until placed.</p><p id="finesse-scope" class="muted">40L Sprint</p><p id="finesse-help" class="muted">Automatically retry finesse faults and restore the timer.</p><p class="fine-print">Each tap, DAS hold or rotation counts as one finesse input. Hints prefer hard drop when allowed.</p></details>
         <button id="custom-open" class="secondary wide" hidden>Custom rules</button><div id="custom-tools" class="toolbar" hidden><button id="clear-field" class="secondary" disabled>Clear board</button><button id="finish-session" class="secondary" disabled>Finish session</button></div>
         <button id="sprint" class="secondary wide" hidden>Back to 40L</button>
         <details id="fault-practice-tools" class="practice-tools"><summary>Practice replay faults</summary><button id="practice-last" class="secondary wide" disabled>Practice last replay</button><button id="practice-import" class="secondary wide">Load replay file</button><input id="replay-file" type="file" accept=".json,.ttr,.ttrm,application/json" hidden><div id="replay-selection" hidden><label for="replay-track">Player / round</label><select id="replay-track"></select><button id="practice-track" class="secondary wide">Start selected practice</button></div><p id="practice-status" class="muted" role="status">Load a trainer JSON or TETR.IO replay to practice its finesse faults.</p></details>
@@ -90,12 +90,13 @@
           <button id="audio-preview" class="secondary small" type="button">Preview sound</button>
         </section>
         <section><h3>Training</h3>
+          <label class="select-row" for="think-style">Just think style<select id="think-style"><option value="piece">Before each piece</option><option value="input">While operating</option></select></label>
           <label class="number-row" for="countdownSeconds"><span>Start countdown<small>0 disables the countdown</small></span><input id="countdownSeconds" type="number" min="0" max="10" step="0.1" required><output>seconds</output></label>
           <label class="check-row"><input id="allowDifferentTarget" type="checkbox"> Allow a different target after a fault</label>
-          <label class="check-row"><input id="undoEnabled" type="checkbox"> Allow undo with Ctrl + Z</label>
+          <label class="check-row"><input id="undoEnabled" type="checkbox"> Allow undo / redo with Ctrl + Z / Ctrl + Y</label>
           <label class="check-row"><input id="infiniteHold" type="checkbox"> Allow unlimited hold</label>
           <label class="check-row"><input id="strictPractice" type="checkbox"> Fault practice: clear all scenes in one attempt</label>
-          <p class="muted">The main page's Perfect finesse switch applies immediately and is saved separately for each mode. Custom rules override undo and hold options. Fault practice requires the outlined target; Hold and undo are unavailable during these drills. Opener training always retries only the current piece, even when strict fault practice is enabled.</p>
+          <p class="muted">The main page's Perfect finesse switch applies immediately and is saved separately for each mode. Custom rules override undo and hold options. Fault practice requires the outlined target; Hold and undo are unavailable during fault drills. Opener undo and redo follow the training option above, including after construction. Opener training always retries only the current piece, even when strict fault practice is enabled.</p>
           <h3>Key bindings</h3><p class="muted">Imported alternate keys are supported. Click a binding, then press a key to replace its keys. Keys cannot be shared between actions.</p><div id="bindings"></div><button id="bind-escape" type="button" class="secondary small">Bind Escape</button> <button id="clear-binding" type="button" class="secondary small">Clear selected binding</button></section>
       </div>
       <p id="settings-status" role="status" aria-live="polite"></p>

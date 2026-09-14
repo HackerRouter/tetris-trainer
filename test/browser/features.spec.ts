@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } });
 });
 
-test('Just think offers both styles on the page and freezes each new piece by default', async ({ page }) => {
+test('Just think keeps its toggle on Play and applies its saved Settings style immediately', async ({ page }) => {
   await page.goto('/'); await expect(page.locator('#think-toggle')).not.toBeChecked(); await expect(page.locator('#think-style')).toHaveValue('piece');
   await page.locator('#think-toggle').check(); await page.locator('#start').click();
   await page.screenshot({ path: 'test-results/think-native-materials.png', fullPage: true });
@@ -15,7 +15,7 @@ test('Just think offers both styles on the page and freezes each new piece by de
   await expect(page.locator('#retry-status')).toContainText('Just think');
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   const paused = await page.locator('#time').textContent(); await page.waitForTimeout(200); await expect(page.locator('#time')).toHaveText(paused!);
-  await openSection(page, '#training-options'); await page.locator('#think-style').selectOption('input');
+  await page.locator('#settings-open').click(); await page.locator('#think-style').selectOption('input'); await page.getByRole('button', { name: 'Save settings', exact: true }).click();
   const before = await page.locator('#time').textContent(); await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(100); await page.keyboard.up('ArrowLeft');
   await expect(page.locator('#time')).not.toHaveText(before!); await page.waitForTimeout(50);
   const after = await page.locator('#time').textContent(); await page.waitForTimeout(150); await expect(page.locator('#time')).toHaveText(after!);

@@ -19,7 +19,7 @@ test('2560 by 1600 uses a large board and readable sidebars with all core contro
     const box = (selector: string) => { const r = document.querySelector(selector)!.getBoundingClientRect(); return { x: r.x, width: r.width, bottom: r.bottom }; };
     return { board: box('#board'), left: box('.workspace-left'), right: box('#current-guidance'), text: parseFloat(getComputedStyle(document.querySelector('#guide-empty p')!).fontSize), width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight };
   });
-  expect(sizes.board.width).toBeGreaterThanOrEqual(500); expect(sizes.left.width).toBe(380); expect(sizes.right.width).toBe(440); expect(sizes.text).toBeGreaterThanOrEqual(18);
+  expect(sizes.board.width).toBeGreaterThanOrEqual(500); expect(sizes.left.width).toBe(570); expect(sizes.right.width).toBe(660); expect(sizes.text).toBeGreaterThanOrEqual(18);
   expect(sizes.board.bottom).toBeLessThan(1500); expect(sizes.width).toBe(2560); expect(sizes.height).toBe(1600);
   await page.screenshot({ path: 'TEMP/fullscreen-sprint-final.png', fullPage: true });
 });

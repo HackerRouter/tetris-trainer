@@ -62,6 +62,8 @@ window.addEventListener('hashchange', () => { if (toolsDialog.open) closeTools()
 const panel = new SettingsPanel(next => {
   localStorage.setItem(storageKey, JSON.stringify(next));
   settings = next;
+  if (game.settings.training.thinkStyle !== next.training.thinkStyle) game.setJustThink(game.settings.training.justThink, next.training.thinkStyle);
+  if (game.practice?.set.kind === 'opener' || game.rules.id === 'sprint') { game.rules.undo = next.training.undoEnabled; game.settings.training.undoEnabled = next.training.undoEnabled; }
   sound.configure(settings.audio);
   message.textContent = 'Settings saved. Start a new game to apply them.';
   if (game.status === 'ready') game = new TrainerGame(settings, undefined, undefined, selectedMode);
@@ -120,9 +122,8 @@ element('finesse-toggle').addEventListener('change', () => {
   element('finesse-toggle').blur();
 });
 element<HTMLInputElement>('think-toggle').checked = settings.training.justThink;
-element<HTMLSelectElement>('think-style').value = settings.training.thinkStyle;
 function changeThinking() {
-  const enabled = element<HTMLInputElement>('think-toggle').checked, style = element<HTMLSelectElement>('think-style').value as 'piece' | 'input';
+  const enabled = element<HTMLInputElement>('think-toggle').checked, style = settings.training.thinkStyle;
   game.setJustThink(enabled, style); pressed.clear(); accumulator = 0;
   settings.training.justThink = enabled; settings.training.thinkStyle = style;
   localStorage.setItem(storageKey, JSON.stringify(settings));
@@ -130,7 +131,6 @@ function changeThinking() {
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
 element('think-toggle').addEventListener('change', changeThinking);
-element('think-style').addEventListener('change', changeThinking);
 document.addEventListener('pointerdown', () => sound.unlock(), { capture: true });
 document.addEventListener('keydown', () => sound.unlock(), { capture: true });
 document.addEventListener('click', event => {
@@ -252,6 +252,8 @@ element('convert-replay-file').addEventListener('change', async () => {
 
 function undo() { if (game.undo()) { pressed.clear(); accumulator = 0; last = performance.now(); saved = false; message.textContent = 'Placement and timer restored.'; } }
 element('undo').addEventListener('click', () => { undo(); element('undo').blur(); });
+function redo() { if (game.redo()) { pressed.clear(); accumulator = 0; last = performance.now(); saved = false; message.textContent = 'Placement and timer redone.'; } }
+element('redo').addEventListener('click', () => { redo(); element('redo').blur(); });
 
 async function practiceTrack(track: ReplayTrack) {
   if (importing) return;
@@ -296,7 +298,7 @@ function editable(target: EventTarget | null) {
 document.addEventListener('keydown', event => {
   if (pages.page !== 'play') return;
   if (panel.open || customPanel.open || toolsDialog.open || editable(event.target) || event.isComposing) return;
-  if ((event.ctrlKey || event.metaKey) && event.code === 'KeyZ' && game.rules.undo) { event.preventDefault(); if (!event.repeat) undo(); return; }
+  if ((event.ctrlKey || event.metaKey) && ['KeyZ', 'KeyY'].includes(event.code)) { event.preventDefault(); if (!event.repeat) { if (event.code === 'KeyY' || event.shiftKey) redo(); else undo(); } return; }
   const action = (Object.keys(actions) as Action[]).find(key => bindingCodes(game.settings, key).includes(event.code));
   if (!action) return;
   event.preventDefault();
@@ -323,7 +325,8 @@ function refresh() {
   tetrion.style.setProperty('--board-rows', String(engine.board.height + 3));
   const goals = game.rules.goals, custom = game.rules.id === 'custom' && !game.practice;
   element<HTMLInputElement>('finesse-toggle').checked = game.rules.finesse;
-  element<HTMLInputElement>('think-toggle').checked = game.settings.training.justThink; element<HTMLSelectElement>('think-style').value = game.settings.training.thinkStyle;
+  element<HTMLInputElement>('think-toggle').checked = game.settings.training.justThink;
+  element('think-help').textContent = game.settings.training.thinkStyle === 'piece' ? 'Each piece waits for a fresh game input, then runs normally until placed.' : 'The board and timer advance on game input and while a game key is held. Release all keys to think.';
   element('finesse-scope').textContent = `${pages.opening.active ? 'Openers' : game.practice ? 'Fault practice' : custom ? 'Custom' : '40L Sprint'} · Applies immediately`;
   element('finesse-help').textContent = game.rules.finesse ? 'Finesse faults undo the placement and timer. Saved separately for this mode.' : `Finesse checks and automatic finesse retries are off.${game.practice ? ' Scene targets are still required.' : ''}`;
   sound.sync(game);
@@ -365,6 +368,7 @@ function refresh() {
   element('start').textContent = modePending ? 'Start selected mode' : game.startedAt ? 'Restart game' : 'Start game';
   element<HTMLButtonElement>('download').disabled = !game.startedAt;
   element<HTMLButtonElement>('undo').disabled = !game.canUndo;
+  element<HTMLButtonElement>('redo').disabled = !game.canRedo;
   element<HTMLButtonElement>('practice-last').disabled = importing || !(lastReplay || (!game.practice && game.placements.length));
   element<HTMLButtonElement>('practice-import').disabled = importing;
   element<HTMLButtonElement>('practice-track').disabled = importing;
@@ -382,7 +386,7 @@ function refresh() {
     element('coach-title').textContent = game.fault.reason === 'target' ? 'Match the outlined target' : 'Try a shorter path';
     element('solution').textContent = `${game.fault.reason === 'target' ? 'That placement does not match the required target. ' : `${game.fault.actual} inputs used · ${game.fault.path.cost} needed. `}${path.join(' → ')}${game.fault.path.drop === 'soft' ? '. This target requires a tuck or spin after lowering the piece.' : ''}`;
   }
-  element('target-policy').textContent = game.practice && !game.practice.finished ? `Place the required piece in the outlined target to continue.${game.practice.set.allowHold ? ' Use Hold when the guide requests it.' : ' Hold is unavailable until then.'}` : !game.settings.training.allowDifferentTarget ? 'Place the current piece in the outlined target to continue. Hold is unavailable until then.' : 'The outline marks your last target. You can choose a different placement.';
+  element('target-policy').textContent = game.continuation?.enforced ? 'Match the selected continuation target. Use Hold when its guide requests it.' : game.practice && !game.practice.finished ? `Place the required piece in the outlined target to continue.${game.practice.set.allowHold ? ' Use Hold when the guide requests it.' : ' Hold is unavailable until then.'}` : !game.settings.training.allowDifferentTarget ? 'Place the current piece in the outlined target to continue. Hold is unavailable until then.' : 'The outline marks your last target. You can choose a different placement.';
   element('results').textContent = `Max combo: ${game.maxCombo} · Max B2B: ${game.maxB2B} · Target misses: ${game.targetMisses} · Unverified placements: ${game.unverified}${game.practice ? ` · Set restarts: ${game.practice.restarts}` : ''}. ${Object.entries(game.clears).map(([key, n]) => `${key}: ${n}`).join(' · ')}`;
   element('hold-panel').hidden = !game.rules.hold;
   element('next-panel').hidden = game.rules.nextCount === 0;

@@ -4,12 +4,22 @@ import profiles from './opener-followups.json';
 import { createEngine } from './engine';
 import { copyPiece, findFinesse, type Cell } from './finesse';
 import { clearedRows } from './board-effects';
-import { applyContinuationPath, continuationStateKey, searchContinuations, type ContinuationRequest, type ContinuationResult, type ContinuationRoute, type ContinuationStep } from './continuation-search';
+import { applyContinuationPath, continuationStateKey, searchContinuations, type ContinuationGoal, type ContinuationRequest, type ContinuationResult, type ContinuationRoute, type ContinuationStep } from './continuation-search';
 
-export type FollowupOpener = { id: string; name: string; source: string; sourceFumen?: string };
+export type FollowupOpener = { id: string; name: string; source: string; sourceFumen?: string; note?: string; finish?: { piece: string; lines: number } };
 type Stage = { id: string; name: string; rows: string[]; goal: string; spinLines: number };
 export type OpenerContinuationRequest = ContinuationRequest & { opener?: FollowupOpener; auto?: boolean };
 const key = (cells: Cell[]) => cells.map(cell => cell.join(',')).sort().join(';');
+
+export function automaticContinuationGoals(opener: FollowupOpener): ContinuationGoal[] {
+  if (/\bTSDs?\b|T[ -]?spin doubles?/i.test(`${opener.name} ${opener.note ?? ''}`) || publishedStages(opener).some(stage => stage.spinLines === 2)) return ['two-tsd', 'tsd', 'tspin', 'pc'];
+  return /mountain|perfect|\bpc\b/i.test(opener.name) ? ['pc', 'tspin'] : ['tspin', 'pc'];
+}
+
+const doubles = (route: ContinuationRoute) => route.steps.filter(step => step.piece === 't' && step.spin === 'normal' && step.lines === 2).length;
+export function rankDoubleContinuations(routes: ContinuationRoute[]) {
+  return [...routes].sort((a, b) => Math.min(2, doubles(b)) - Math.min(2, doubles(a)));
+}
 
 export function publishedStages(opener: FollowupOpener): Stage[] {
   const profile = profiles.find(profile => profile.id === opener.id || profile.name === opener.name);
@@ -39,10 +49,13 @@ export function searchOpenerContinuations(request: OpenerContinuationRequest): C
   const engine = createEngine(settings, 1, rules), initial = structuredClone(context.snapshot);
   let locked: Cell[] = []; engine.events.on('falling.lock.pre', () => { locked = engine.falling.absoluteBlocks; });
   const stages = publishedStages(request.opener), limit = Math.max(1, Math.min(6, request.limit ?? 4));
+  const goals = request.auto ? automaticContinuationGoals(request.opener) : [request.goal];
+  const preferDoubles = request.auto && goals[0] === 'two-tsd' && rules.advanced.spinBonuses !== 'none';
+  const publishedDeadline = preferDoubles ? started + budget * .5 : deadline;
   const routes = new Set<string>();
   let matched = false;
   for (const stage of stages) for (const mirror of [false, true]) {
-    if (performance.now() >= deadline || output.routes.length >= limit) break;
+    if (performance.now() >= publishedDeadline || output.routes.length >= limit) break;
     const full: Cell[] = [], gray: Cell[] = [], special: Cell[] = [];
     stage.rows.forEach((row, y) => [...row].forEach((tile, x) => {
       const cell: Cell = [mirror ? 9 - x : x, y];
@@ -57,7 +70,7 @@ export function searchOpenerContinuations(request: OpenerContinuationRequest): C
     if (stage.spinLines && rules.advanced.spinBonuses === 'none') continue;
     if (!request.auto && request.goal !== 'pc' && stage.goal === 'pc') continue;
     matched = true;
-    const stageDeadline = Math.min(deadline, performance.now() + 1700), failed = new Set<string>();
+    const stageDeadline = Math.min(publishedDeadline, performance.now() + 1700), failed = new Set<string>();
     const solve = (snapshot: EngineSnapshot, cells: Cell[], forced: Cell[], steps: ContinuationStep[], drawn: number): boolean => {
       if (performance.now() >= stageDeadline) { output.limited = true; return false; }
       if (!cells.length) {
@@ -107,11 +120,23 @@ export function searchOpenerContinuations(request: OpenerContinuationRequest): C
     };
     solve(initial, remaining, special.filter(cell => !occupied.has(cell.join(','))), [], 0);
   }
+  if (preferDoubles) {
+    for (const goal of ['two-tsd', 'tsd'] as const) {
+      const required = goal === 'two-tsd' ? 2 : 1;
+      if (output.routes.some(route => doubles(route) >= required)) break;
+      const remaining = deadline - performance.now(); if (remaining < 30) { output.limited = true; break; }
+      const result = searchContinuations({ ...request, goal, budgetMs: remaining * (goal === 'two-tsd' ? .65 : .6), limit: 2 });
+      output.routes.unshift(...result.routes.map(route => ({ ...route, id: `${goal}-${route.id}`, name: goal === 'two-tsd' ? 'Calculated two T-spin doubles' : 'Calculated T-spin double' })));
+      output.checked += result.checked; output.limited ||= result.limited;
+      if (result.routes.length) break;
+    }
+    output.routes = rankDoubleContinuations(output.routes).slice(0, limit);
+  }
   if (!output.routes.length && performance.now() < deadline) {
-    const goals = request.auto ? (/mountain|perfect|pc/i.test(request.opener.name) ? ['pc', 'tspin'] as const : ['tspin', 'pc'] as const) : [request.goal];
-    for (const goal of goals) {
+    const fallbackGoals = preferDoubles ? goals.filter(goal => !['two-tsd', 'tsd'].includes(goal)) : goals;
+    for (const goal of fallbackGoals) {
       const remaining = deadline - performance.now(); if (remaining < 30) break;
-      const fallback = searchContinuations({ ...request, goal, budgetMs: remaining / goals.length, limit: 2 });
+      const fallback = searchContinuations({ ...request, goal, budgetMs: remaining / fallbackGoals.length, limit: 2 });
       output.routes.push(...fallback.routes.map(route => ({ ...route, id: `${goal}-${route.id}`, name: goal === 'pc' ? 'Calculated perfect clear' : 'Calculated T-spin continuation' })));
       output.checked += fallback.checked; output.limited ||= fallback.limited;
     }

@@ -5,11 +5,24 @@ import { defaults } from '../src/settings.ts';
 import { modeDefinitions } from '../src/modes.ts';
 import { createEngine } from '../src/engine.ts';
 import { analysisContext } from '../src/analysis-context.ts';
-import { searchOpenerContinuations, publishedStages } from '../src/opener-followups.ts';
+import { searchOpenerContinuations, publishedStages, automaticContinuationGoals, rankDoubleContinuations } from '../src/opener-followups.ts';
 import { applyContinuationPath, type ContinuationRoute } from '../src/continuation-search.ts';
 import { sameCells } from '../src/practice.ts';
 import { buildDemoFrames } from '../src/demo-frames.ts';
 import { placementSteps } from '../src/guide.ts';
+
+test('explicit double support prioritizes two full TSDs, then one, ahead of other published possibilities', () => {
+  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'stickspin')!), ['two-tsd', 'tsd', 'tspin', 'pc']);
+  assert.deepEqual(automaticContinuationGoals({ id: 'local', name: 'Custom', source: '', note: 'Supports two T-spin doubles.' }), ['two-tsd', 'tsd', 'tspin', 'pc']);
+  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'db-377')!), ['pc', 'tspin']);
+  const routes = [
+    { id: 'pc', steps: [{ piece: 'o', spin: 'none', lines: 2 }] },
+    { id: 'one', steps: [{ piece: 't', spin: 'normal', lines: 2 }] },
+    { id: 'mini', steps: [{ piece: 't', spin: 'mini', lines: 2 }] },
+    { id: 'two', steps: [{ piece: 't', spin: 'normal', lines: 2 }, { piece: 't', spin: 'normal', lines: 2 }] }
+  ] as ContinuationRoute[];
+  assert.deepEqual(rankDoubleContinuations(routes).map(route => route.id), ['two', 'one', 'pc', 'mini']);
+});
 
 function setup(id: string, seed: number, mirror = false) {
   const opener = allOpeners.find(opener => opener.id === id)!;

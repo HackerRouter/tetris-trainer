@@ -51,3 +51,21 @@ test('automatic locks end exactly at the completed frame and replay without a ta
   assert.equal(playback.frames.flatMap(frame => frame.sounds).includes('harddrop'), false);
   assert.equal(playback.frames.flatMap(frame => frame.sounds).filter(sound => sound === 'finish').length, 1);
 });
+
+test('redo restores multiple undone placements and their original effective replay without duplicate inputs', async () => {
+  const configured = structuredClone(settings); configured.training.justThink = true;
+  const game = new TrainerGame(configured, 29); game.start();
+  tap(game, 'hardDrop'); tap(game, 'hardDrop'); tap(game, 'hardDrop');
+  const original = game.export(), board = tiles(game.engine.board.state), time = game.elapsedMs;
+  assert.ok(game.undo()); assert.ok(game.undo()); assert.equal(game.engine.stats.pieces, 1);
+  assert.ok(game.redo()); assert.equal(game.engine.stats.pieces, 2);
+  assert.ok(game.redo()); assert.equal(game.engine.stats.pieces, 3); assert.equal(game.canRedo, false);
+  assert.equal(game.elapsedMs, time); assert.deepEqual(tiles(game.engine.board.state), board); assert.equal(game.waitingForInput, true);
+  const replay = game.export(), playback = await buildPlayback(readReplay(replay, 'Redo')[0], configured);
+  assert.equal(replay.placements.length, 3); assert.equal(replay.timeline.frames, original.timeline.frames);
+  assert.deepEqual(replay.events.filter(event => event.type === 'keydown'), original.events.filter(event => event.type === 'keydown'));
+  assert.deepEqual(tiles(playback.engine.board.state), board); assert.equal(playback.duration, time / 1000);
+  assert.equal((await exportNative(replay)).replay.frames, replay.timeline.frames);
+  assert.ok(game.undo()); tap(game, 'moveRight'); assert.equal(game.canRedo, false); tap(game, 'hardDrop');
+  assert.deepEqual(tiles((await buildPlayback(readReplay(game.export(), 'New branch')[0], configured)).engine.board.state), tiles(game.engine.board.state));
+});
