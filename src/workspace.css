@@ -136,3 +136,144 @@
 @media(max-width:950px){.app>.app-header{flex-wrap:wrap;gap:12px;padding-block:16px}.app-header .page-nav{order:3;flex-basis:100%}.header-tools{margin-left:auto}.training-workspace{grid-template-columns:minmax(0,1fr) minmax(220px,.62fr);gap:16px}.game-toolbar{padding-top:16px}.game-switches{margin-left:0;width:100%;justify-content:flex-start;padding-block:8px;gap:20px}.play-area{grid-column:1;grid-row:2;position:static!important}.workspace-right{grid-column:2;grid-row:2;position:static;max-height:none}.workspace-left{grid-column:1/-1;grid-row:3;position:static;max-height:none}.tetrion{--cell-size:30px}.workspace-left:has(#opener-references:not([hidden])){display:grid;grid-template-columns:1fr 1fr;gap:20px}.workspace-left>details,.workspace-left>.workspace-links{grid-column:1/-1}.workspace-left #opener-reference-cards{max-height:270px}.opener-library-workspace,.replay-workspace{grid-template-columns:minmax(0,1fr) minmax(220px,.7fr)}.catalog-panel{grid-column:1/-1;grid-row:2}.opener-library-workspace .workspace-panel,.replay-workspace>.workspace-panel{position:static;max-height:none}.catalog-panel #opener-catalog{grid-template-columns:repeat(2,minmax(0,1fr));max-height:420px}.opener-preview{grid-column:1;grid-row:1;position:static;border:0;padding:0}.opener-instructions{grid-column:2;grid-row:1}.opener-preview #opener-board{width:240px;max-width:100%}.replay-library{grid-column:1/-1}.replay-board-area{grid-column:1;grid-row:2;position:static}.player-controls{grid-column:2;grid-row:2;position:static}.replay-library{display:flex;flex-wrap:wrap;gap:12px;align-items:center}.replay-library>h3{width:100%;margin:0}.replay-library>.wide{width:auto;margin:0}.replay-library>.select-row{margin:0}.replay-library>p{margin:0}.replay-library #player-title{width:100%}#player-empty{grid-column:1/-1}}
 @media(max-width:650px){.app{padding-inline:12px}.brand{font-size:17px}.app-header .page-nav{gap:0;justify-content:space-between}.page-nav a{font-size:11px;padding:8px 6px}.header-tools button{font-size:11px;padding:7px 9px}.game-toolbar{gap:6px}.game-toolbar .mode-picker{gap:5px}.game-toolbar .mode-picker img{display:none}.game-toolbar .mode-picker select{width:128px;font-size:12px}.game-toolbar>button{font-size:11px;padding:8px}.game-switches{justify-content:space-between;gap:10px 8px}.game-switches label{font-size:11px;gap:5px}.game-switches input,.game-switches #finesse-toggle{width:26px;height:16px}.game-switches input::after,.game-switches #finesse-toggle::after{width:12px;height:12px}.game-switches input:checked::after,.game-switches #finesse-toggle:checked::after{transform:translateX(10px)}.training-workspace{grid-template-columns:minmax(0,1fr);gap:16px}.play-area{grid-column:1;grid-row:2}.workspace-right{grid-column:1;grid-row:3}.workspace-left{grid-column:1;grid-row:4}.workspace-left:has(#opener-references:not([hidden])){display:block}.workspace-panel{padding:15px}.tetrion{max-width:460px}.tetrion .right-column{padding-left:5px}.board-stats strong{font-size:23px}#time,#player-clock{font-size:15px}.board-stats>div>span{font-size:9px}.board-stats small{font-size:8px}.native-frame h2{height:18px}.page-title{align-items:flex-start;gap:15px}.page-title button{font-size:12px;max-width:50%}.page-title>p{font-size:11px;max-width:50%}.opener-library-workspace,.replay-workspace{grid-template-columns:minmax(0,1fr)}.opener-preview{grid-column:1;grid-row:1}.opener-instructions{grid-column:1;grid-row:2}.catalog-panel{grid-column:1;grid-row:3}.replay-board-area{grid-column:1;grid-row:2}.player-controls{grid-column:1;grid-row:3}.catalog-panel #opener-catalog{grid-template-columns:repeat(2,minmax(0,1fr));max-height:360px}.catalog-panel .opener-card{grid-template-columns:1fr}.catalog-panel .opener-card canvas{grid-row:auto;max-width:110px;justify-self:center}.opener-preview #opener-board{width:210px}.summary-cards strong{font-size:22px}.page-content .summary-cards{gap:8px}.page-content .summary-cards>div{padding:10px}.page-content .table-scroll{max-width:100%}.page-content .chip-options{gap:5px}.page-content .chip-options label{padding:6px}.player-controls{padding-top:16px}#player-empty{padding:25px}}
 @media(prefers-reduced-motion:reduce){.game-switches input::after{transition:none}}
+@media(max-width:950px){.training-workspace>.play-area{position:relative!important;top:0}.replay-board-area{position:relative;top:0}}
+@media(min-width:1800px){
+  :root{font-size:20px}
+  .app{max-width:2480px;padding:0 40px 36px}
+  .app>.app-header{min-height:108px;gap:40px;padding:20px 0}
+  .brand{font-size:32px;letter-spacing:2px}
+  .page-nav a{font-size:21px;padding:15px 20px}
+  .app-header .page-nav{gap:8px}
+  .header-tools{gap:12px}
+  .header-tools button{font-size:19px;padding:13px 22px}
+  .training-workspace{--left-rail:380px;--right-rail:440px;gap:32px}
+  .game-toolbar{min-height:98px;gap:12px;padding:22px 0 8px}
+  .game-toolbar>button{font-size:19px;padding:13px 22px}
+  .game-toolbar .mode-picker{gap:14px}
+  .game-toolbar .mode-picker img{width:32px;height:32px}
+  .game-toolbar .mode-picker select{font-size:20px;width:215px;padding:12px}
+  .game-switches{gap:26px}
+  .game-switches label{font-size:19px;gap:12px}
+  .game-switches input,.game-switches #finesse-toggle{width:42px;height:25px}
+  .game-switches input::after,.game-switches #finesse-toggle::after{width:19px;height:19px;left:3px;top:3px}
+  .game-switches input:checked::after,.game-switches #finesse-toggle:checked::after{transform:translateX(17px)}
+  .workspace-panel{padding:26px;border-radius:10px}
+  .workspace-left,.workspace-right{top:24px;max-height:calc(100dvh - 300px)}
+  .workspace-panel>h3,.workspace-panel>section>h3{font-size:25px;margin:10px 0 20px}
+  .workspace-panel .eyebrow,.eyebrow{font-size:15px;letter-spacing:2px}
+  .muted,.fine-print,.workspace-panel .muted{font-size:18px;line-height:1.65}
+  .workspace-panel summary{font-size:19px;line-height:1.6}
+  .workspace-panel details{margin-top:24px;padding-top:20px}
+  .workspace-panel details[open]>summary{margin-bottom:16px}
+  .workspace-panel .select-row,.workspace-panel .check-row{font-size:18px;gap:12px;margin:20px 0}
+  .workspace-panel select,.workspace-panel input:not([type=checkbox]){font-size:18px;padding:12px}
+  .workspace-panel input[type=checkbox]{width:20px;height:20px;accent-color:#a9dcd0}
+  .workspace-panel button,.workspace-panel .wide{font-size:18px;padding:12px 18px;margin-top:14px}
+  .workspace-panel .stats{font-size:17px;gap:24px 16px}
+  .workspace-panel .stats strong{font-size:36px;margin-top:10px}
+  .workspace-panel a,.workspace-links a{font-size:18px}
+  .workspace-links{gap:14px;margin-top:26px;padding-top:22px}
+  .session-overview .progress-heading{font-size:18px;gap:12px;line-height:1.6;margin-top:16px}
+  .session-overview progress{height:7px;margin:20px 0 28px}
+  .workspace-left:has(#opener-references:not([hidden])) .session-overview{padding-top:26px;margin-top:28px}
+  #custom-tools{gap:12px;margin-top:18px}
+  #custom-tools button{font-size:17px;padding:13px 16px}
+  .play-area{top:20px}
+  .tetrion{--cell-size:clamp(30px,calc((100dvh - 380px) / var(--board-rows,23)),52px)}
+  .tetrion .right-column{padding-left:14px}
+  .board-stats{padding-right:13px}
+  .board-stats>div{margin-top:26px}
+  .board-stats>div>span{font-size:16px;letter-spacing:1.5px;margin-bottom:9px}
+  .board-stats strong{font-size:44px}
+  .board-stats small{font-size:16px;margin-left:4px}
+  #time,#player-clock{font-size:29px;letter-spacing:-.5px}
+  .native-frame h2{height:35px}
+  .native-frame>canvas:not(.preview-frame){width:calc(100% - 16px);margin:0 8px 12px}
+  .play-area #message{font-size:18px;max-width:780px;margin-top:14px}
+  #controls-summary{font-size:16px;max-width:940px;margin:8px auto}
+  #retry-status{font-size:18px;margin:8px auto}
+  #overlay-label{font-size:17px;letter-spacing:4px}
+  #overlay-value{font-size:44px;margin-top:16px}
+  #board-overlay{padding:32px 8px}
+  .counting #overlay-value{font-size:110px}
+  #opener-reference-title{font-size:25px}
+  #opener-reference-status,#continuation-status,#continuation-step{font-size:18px;line-height:1.65}
+  #opener-reference-cards{max-height:510px}
+  #opener-reference-cards,#continuation-routes{gap:14px;margin:18px 0}
+  .workspace-panel .opener-card{grid-template-columns:104px minmax(0,1fr);gap:6px 14px;padding:16px;min-height:118px;margin:0}
+  .workspace-panel .opener-card strong{font-size:18px;line-height:1.5;padding-right:12px}
+  .workspace-panel .opener-card small{font-size:15px;line-height:1.5;margin-top:3px}
+  .workspace-panel .shortlist-star{font-size:25px;padding:3px 6px;top:5px;right:5px;margin:0}
+  #opener-continuations{padding-top:22px;margin-top:26px}
+  #opener-continuations h3{font-size:24px;margin-bottom:20px}
+  #continuation-scope{font-size:16px}
+  #continuation-route-name,#practice-guide-title{font-size:22px;line-height:1.5}
+  #continuation-board,#practice-guide-board{width:210px;max-width:210px;margin:22px auto}
+  #continuation-inputs,#practice-guide-steps,#opener-guide{font-size:19px;line-height:1.7;padding-left:28px}
+  #continuation-inputs li,#practice-guide-steps li,#opener-guide li{margin:14px 0}
+  #continuation-plan{font-size:18px;line-height:1.7;padding-left:28px}
+  #continuation-guide .page-toolbar{gap:10px;margin:18px 0}
+  #continuation-guide .page-toolbar button{font-size:17px;padding:10px 13px}
+  #current-guidance .coach{font-size:19px;padding:18px;margin:22px 0}
+  #current-guidance .coach small{font-size:17px}
+  #current-guidance .demo-popup{margin-top:20px}
+  #current-guidance .demo-popup header{font-size:21px;gap:18px;padding-bottom:16px;line-height:1.5}
+  #current-guidance .demo-popup header button{font-size:22px;padding:5px 13px}
+  #current-guidance .demo-popup canvas{width:200px;max-height:460px;margin:18px auto}
+  #current-guidance .demo-popup #demo-step{font-size:20px;line-height:1.5;margin:18px 0 10px}
+  #current-guidance .demo-popup small{font-size:16px}
+  #current-guidance .demo-instructions{padding-top:20px;margin-top:20px}
+  #current-guidance .demo-instructions h3{font-size:20px}
+  #current-guidance .demo-instructions p{font-size:17px;line-height:1.6}
+  #current-guidance .demo-instructions ol{font-size:19px;line-height:1.6;padding-left:26px}
+  #current-guidance .demo-instructions li{padding:10px 8px}
+  .page-content{padding-top:32px}
+  .page-title{margin-bottom:32px;gap:32px}
+  .page-title h2{font-size:39px;margin-top:8px}
+  .page-title>p{max-width:630px;font-size:18px}
+  .page-title>button{font-size:20px;padding:16px 26px}
+  .opener-library-workspace,.replay-workspace{grid-template-columns:380px minmax(0,1fr) 440px;gap:32px}
+  .opener-library-workspace .workspace-panel,.replay-workspace>.workspace-panel{top:24px;max-height:calc(100dvh - 280px)}
+  .catalog-panel #opener-search{font-size:20px;padding:14px}
+  .catalog-panel #opener-count{font-size:16px;margin:14px 0}
+  .catalog-panel #opener-catalog{max-height:calc(100dvh - 630px);gap:12px;margin:20px 0}
+  .catalog-panel .page-toolbar{gap:10px;margin-top:16px}
+  .catalog-panel .page-toolbar button{font-size:16px;padding:10px 12px}
+  .opener-preview>h3{font-size:30px;margin-bottom:28px}
+  .opener-preview #opener-board{width:min(100%,calc((100dvh - 560px) * .435));max-width:420px}
+  .opener-preview #opener-step{font-size:21px}
+  .opener-preview .page-toolbar{gap:14px;margin:20px 0}
+  .opener-preview button{font-size:21px;padding:14px 26px}
+  .opener-preview #opener-status{font-size:19px;max-width:720px;margin:20px auto}
+  .opener-route li button{font-size:18px}
+  #opener-import{gap:18px}
+  #opener-import textarea{font-size:18px;padding:14px}
+  .playback-transport{max-width:800px;margin:24px auto}
+  .replay-board-area .tetrion{--cell-size:clamp(30px,calc((100dvh - 490px) / var(--board-rows,23)),52px)}
+  .playback-transport .page-toolbar{gap:12px;margin-bottom:18px}
+  .playback-transport button{font-size:19px;padding:12px 18px}
+  .playback-transport label,.playback-transport select{font-size:19px}
+  .playback-transport select{padding:10px}
+  #player-time{font-size:20px}
+  #player-info,#player-title{font-size:18px;line-height:1.7}
+  .player-controls .stats{margin:30px 0}
+  .page-content h3{font-size:25px}
+  .page-toolbar button,.page-toolbar label,.select-row,.check-row{font-size:19px}
+  .summary-cards strong{font-size:36px}
+  .page-content table{font-size:19px}
+  .page-content th,.page-content td{padding:18px}
+  dialog{width:min(1160px,calc(100vw - 80px));padding:36px;max-height:calc(100dvh - 80px)}
+  dialog h2{font-size:34px}dialog h3{font-size:25px;margin:28px 0 20px}
+  dialog button,dialog input,dialog select{font-size:19px}
+  dialog .muted,dialog label small,dialog output{font-size:17px;line-height:1.5}
+  dialog .number-row{grid-template-columns:1fr 100px 90px;font-size:19px;gap:16px;margin:22px 0}
+  dialog .number-row input{width:100px}
+  dialog .range-row{grid-template-columns:150px minmax(80px,1fr) 55px;font-size:18px;margin:20px 0}
+  dialog .select-row,dialog .check-row,dialog .binding-row,dialog .custom-number{font-size:19px;margin:20px 0}
+  dialog .key-button{min-width:150px;max-width:220px;font-size:18px}
+  dialog .settings-columns{gap:60px}
+  dialog .settings-tools button,dialog .small,dialog summary,dialog #settings-status{font-size:18px}
+  #tools-dialog{width:860px}
+  #tools-dialog>section{padding-bottom:24px}
+  #tools-dialog .config-hint,#export-status,#conversion-status{font-size:18px}
+}

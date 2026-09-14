@@ -68,6 +68,7 @@ export class OpeningTraining {
   private async prepare(opener?: Opener) {
     const session = this.session; if (!session) return;
     const token = ++this.token; this.busy = true; this.built = false;
+    this.callbacks.game().demonstration = null;
     this.callbacks.pause(); location.hash = 'play';
     el('opener-references').hidden = false; el('opener-session-options').hidden = false; el<HTMLInputElement>('opener-keep-board').checked = openingOptions().continueAfter;
     el('opener-reference-status').textContent = opener ? 'Finding a new seed and construction variant…' : 'Dealing the next seed and checking candidates…';

@@ -4,6 +4,7 @@ import type { TrainerGame } from './game';
 import type { Demonstration } from './practice';
 import { drawBoard } from './renderer';
 import { placementSteps } from './guide';
+import { bindingLabel } from './settings';
 
 import { buildDemoFrames, type DemoFrame } from './demo-frames';
 
@@ -31,7 +32,7 @@ export class DemoPanel {
       this.completed = game.practice?.completed ?? 0;
       this.popup.hidden = !this.source;
       if (this.source) {
-        document.getElementById('demo-title')!.textContent = `${game.practice ? 'Scene' : 'Piece'} ${this.source.sceneNumber} · Correct placement`;
+        document.getElementById('demo-title')!.textContent = this.source.kind === 'guide' ? `Step ${this.source.sceneNumber} · Placement guide` : `${game.practice ? 'Scene' : 'Piece'} ${this.source.sceneNumber} · Correct placement`;
         this.engine = createEngine(game.settings, 1, game.rules);
         this.canvas.width = this.engine.board.width * 18;
         this.canvas.height = (this.engine.board.height + 3) * 18;
@@ -40,6 +41,7 @@ export class DemoPanel {
         document.getElementById('demo-steps')!.replaceChildren(...this.steps);
         document.getElementById('demo-summary')!.textContent = `${this.source.path.cost} finesse input${this.source.path.cost === 1 ? '' : 's'} · ${steps.length} step${steps.length === 1 ? '' : 's'}. Drop inputs are not counted.`;
         document.getElementById('demo-note')!.textContent = this.source.path.drop === 'lock' ? 'Start from the shown position. Follow the steps, soft drop and wait for automatic locking.' : this.source.path.drop === 'soft' ? 'Start from the shown position. Lower the piece only where indicated, then finish with hard drop.' : 'Start from the shown position. Follow the steps in order, then finish with hard drop.';
+        if (this.source.holdFirst) document.getElementById('demo-note')!.prepend(`Use Hold (${bindingLabel(game.settings, 'hold')}) first if you have not swapped yet. `);
         try { this.frames = buildDemoFrames(this.source, this.engine, steps); }
         catch (error) { this.frames = [{ piece: this.source.snapshot.falling, label: (error as Error).message, duration: 10000, step: -1 }]; }
         this.index = 0; this.since = now;

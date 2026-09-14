@@ -14,7 +14,7 @@ test('the shared workspace keeps controls above the board and file tools pause a
   await page.locator('#tools-open').click();
   await expect(page.locator('#tools-dialog')).toBeVisible(); await expect(page.locator('#overlay-value')).toHaveText('Paused');
   await expect(page.locator('#download-native')).toBeVisible(); await expect(page.locator('#config-open')).toBeVisible();
-  await page.keyboard.press('r'); await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('0');
+  await page.keyboard.press('r'); await expect(page.locator('#pieces')).toHaveText('0');
   await page.keyboard.press('Escape'); await expect(page.locator('#tools-dialog')).toBeHidden(); await expect(page.locator('#board-overlay')).toBeHidden();
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');
   await page.locator('#pause').click(); await page.locator('#tools-open').click(); await page.locator('#tools-close').click();

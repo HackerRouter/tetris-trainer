@@ -41,9 +41,10 @@ let lastReplay: unknown = null;
 try { lastReplay = JSON.parse(localStorage.getItem('tetrio-trainer-last-replay') || 'null'); } catch {}
 const toolsDialog = element<HTMLDialogElement>('tools-dialog');
 let resumeAfterTools: TrainerGame | null = null;
+let statusBeforeTools: TrainerGame['status'] | null = null;
 
 function finishTools() {
-  const previous = resumeAfterTools; resumeAfterTools = null;
+  const previous = resumeAfterTools; resumeAfterTools = null; statusBeforeTools = null;
   if (previous === game && pages.page === 'play' && !panel.open && !customPanel.open) game.resume();
   accumulator = 0; last = performance.now();
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
@@ -51,6 +52,7 @@ function finishTools() {
 function closeTools() { toolsDialog.close(); finishTools(); }
 element('tools-open').addEventListener('click', () => {
   resumeAfterTools = game.active ? game : null;
+  statusBeforeTools = game.status;
   game.pause(); pressed.clear(); toolsDialog.showModal();
 });
 element('tools-close').addEventListener('click', closeTools);
@@ -217,13 +219,18 @@ canvas.addEventListener('click', event => {
   if (event.button === 0 && game.status === 'paused' && !panel.open && !customPanel.open && !importing) pause();
 });
 element('sprint').addEventListener('click', () => { pages.opening.clear(); selectMode('sprint'); start(); });
-element('download').addEventListener('click', () => { if (game.startedAt) downloadJson(game.export(), `${game.rules.id}-training-${Date.now()}.json`); element('download').blur(); });
+function currentRecording() {
+  const recording = game.export();
+  if (resumeAfterTools === game && statusBeforeTools && recording.status === 'paused') recording.status = statusBeforeTools;
+  return recording;
+}
+element('download').addEventListener('click', () => { if (game.startedAt) downloadJson(currentRecording(), `${game.rules.id}-training-${Date.now()}.json`); element('download').blur(); });
 let exporting = false;
 element('download-native').addEventListener('click', async () => {
   if (exporting) return;
   exporting = true; const button = element<HTMLButtonElement>('download-native'); button.disabled = true;
   element('export-status').textContent = 'Verifying the effective recording...';
-  try { const replay = await exportNative(structuredClone(game.export())); downloadJson(replay, `trainer-${Date.now()}.ttr`); element('export-status').textContent = message.textContent = 'TETR.IO replay exported and verified locally. Retried and undone attempts were removed; JSON keeps the full training history.'; }
+  try { const replay = await exportNative(structuredClone(currentRecording())); downloadJson(replay, `trainer-${Date.now()}.ttr`); element('export-status').textContent = message.textContent = 'TETR.IO replay exported and verified locally. Retried and undone attempts were removed; JSON keeps the full training history.'; }
   catch (error) { element('export-status').textContent = message.textContent = (error as Error).message; }
   finally { exporting = false; button.disabled = false; button.blur(); }
 });
@@ -269,6 +276,7 @@ element('practice-track').addEventListener('click', () => { const track = tracks
 element('replay-file').addEventListener('change', async () => {
   const input = element<HTMLInputElement>('replay-file'), file = input.files?.[0];
   if (!file) return;
+  element<HTMLDetailsElement>('fault-practice-tools').open = true;
   try {
     if (file.size > 20_000_000) throw new Error('Replay files must be smaller than 20 MB.');
     tracks = readReplay(JSON.parse(await file.text()), file.name);

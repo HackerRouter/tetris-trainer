@@ -31,30 +31,41 @@ const overlays = new WeakMap<HTMLCanvasElement, HTMLCanvasElement>();
 export function drawActionText(board: HTMLCanvasElement, engine: Engine, items: TimedActionText[]) {
   const holder = board.closest<HTMLElement>('.tetrion');
   if (!holder) return;
+  const stage = holder.closest<HTMLElement>('.play-area,.replay-board-area') ?? holder;
   let canvas = overlays.get(board);
   if (!canvas) {
     canvas = document.createElement('canvas'); canvas.className = 'action-text-layer'; canvas.setAttribute('role', 'img');
-    holder.append(canvas); overlays.set(board, canvas);
+    stage.append(canvas); overlays.set(board, canvas);
   }
-  const w = holder.clientWidth, h = holder.clientHeight, pixelRatio = Math.min(2, window.devicePixelRatio || 1);
+  const stageBounds = stage.getBoundingClientRect();
+  const w = stage.clientWidth, h = stage.clientHeight, pixelRatio = Math.min(2, window.devicePixelRatio || 1);
   if (canvas.width !== Math.round(w * pixelRatio) || canvas.height !== Math.round(h * pixelRatio)) { canvas.width = Math.round(w * pixelRatio); canvas.height = Math.round(h * pixelRatio); }
   const ctx = canvas.getContext('2d')!; ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0); ctx.clearRect(0, 0, w, h);
-  const bounds = board.getBoundingClientRect(), parent = holder.getBoundingClientRect(), size = bounds.width / engine.board.width;
-  const left = bounds.left - parent.left, top = bounds.top - parent.top + size * 3, height = size * engine.board.height;
+  const bounds = board.getBoundingClientRect(), size = bounds.width / engine.board.width;
+  const left = bounds.left - stageBounds.left, top = bounds.top - stageBounds.top + size * 3, height = size * engine.board.height;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches, labels = actionLabels(items);
   const pc = [...items].reverse().find(item => item.action.pc && item.age >= 0 && item.age < 2500);
   canvas.setAttribute('aria-label', [...labels.map(line => line.text), ...(pc ? ['ALL CLEAR'] : [])].join(' · ') || '');
-  const text = (value: string, x: number, y: number, fontSize: number, color: string, maxWidth: number) => {
-    ctx.font = `700 ${fontSize}px Config, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
-    ctx.lineWidth = Math.max(2, fontSize / 10); ctx.strokeStyle = '#0b101bdd'; ctx.strokeText(value, x, y, maxWidth); ctx.fillStyle = color; ctx.fillText(value, x, y, maxWidth);
+  const text = (value: string, x: number, y: number, fontSize: number, color: string, align: CanvasTextAlign = 'center') => {
+    ctx.font = `700 ${fontSize}px Config, sans-serif`; ctx.textAlign = align; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(2, fontSize / 10); ctx.strokeStyle = '#0b101bdd'; ctx.strokeText(value, x, y); ctx.fillStyle = color; ctx.fillText(value, x, y);
   };
-  const scale = Math.min(1, size / 30), area = Math.max(1, left - 8);
+  const scale = Math.min(1.7, size / 30), area = Math.max(1, left - 24);
+  let labelY = top + height * .25;
   for (const label of labels) {
     const t = label.age / 1800, entrance = Math.min(1, label.age / 130), exit = Math.min(1, (1800 - label.age) / 450);
+    const fontSize = label.size * scale, lines: string[] = []; let line = '';
+    ctx.font = `700 ${fontSize}px Config, sans-serif`;
+    for (const word of label.text.match(/[^\s-]+-?\s*/g) ?? [label.text]) {
+      if (line && ctx.measureText((line + word).trim()).width > area - 20) { lines.push(line.trim()); line = ''; }
+      line += word;
+    }
+    if (line) lines.push(line.trim());
     ctx.save(); ctx.globalAlpha = reduced ? 1 : entrance * exit;
-    ctx.translate(area / 2 + (reduced ? 0 : (1 - entrance) * -12 * scale), top + height * .25 + label.y * scale);
+    ctx.translate(area + (reduced ? 0 : (1 - entrance) * -12 * scale), labelY);
     const pulse = reduced ? 1 : 1 + Math.sin(Math.min(1, t * 6) * Math.PI) * .08; ctx.scale(pulse, pulse);
-    text(label.text, 0, 0, label.size * scale, label.color, area * .94); ctx.restore();
+    lines.forEach((value, i) => text(value, 0, i * fontSize * 1.15, fontSize, label.color, 'right')); ctx.restore();
+    labelY += Math.max(1, lines.length) * fontSize * 1.15 + 6 * scale;
   }
   if (!pc) return;
   const t = pc.age / 2500, entrance = Math.min(1, t / .1), exit = Math.min(1, (1 - t) / .2);
@@ -64,8 +75,8 @@ export function drawActionText(board: HTMLCanvasElement, engine: Engine, items: 
   const fontSize = Math.min(60 * scale, bounds.width * .24), color = t < .1 ? '#ffffff' : t < .15 ? '#ffb3a0' : t < .8 ? '#ffe5a5' : '#ffffff';
   if (!reduced) {
     ctx.save(); const echo = 1 + t * 1.5; ctx.scale(echo, echo); ctx.globalAlpha = Math.max(0, .22 * (1 - t)) * entrance;
-    text('ALL', 0, -fontSize * .43, fontSize, '#b49b66', bounds.width * .78); text('CLEAR', 0, fontSize * .43, fontSize, '#b49b66', bounds.width * .78); ctx.restore();
+    text('ALL', 0, -fontSize * .43, fontSize, '#b49b66'); text('CLEAR', 0, fontSize * .43, fontSize, '#b49b66'); ctx.restore();
   }
   ctx.globalAlpha = reduced ? 1 : entrance * exit * .95;
-  text('ALL', 0, -fontSize * .43, fontSize, color, bounds.width * .78); text('CLEAR', 0, fontSize * .43, fontSize, color, bounds.width * .78); ctx.restore();
+  text('ALL', 0, -fontSize * .43, fontSize, color); text('CLEAR', 0, fontSize * .43, fontSize, color); ctx.restore();
 }

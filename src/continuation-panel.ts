@@ -42,7 +42,7 @@ export class ContinuationPanel {
     el('continuation-animate').addEventListener('click', () => {
       if (!this.selected || !this.game) return;
       const scene = this.selected.steps[this.preview].scene;
-      this.game.demonstration = { ...scene, snapshot: scene.guideSnapshot ?? scene.snapshot, serial: Date.now(), sceneNumber: this.preview + 1 };
+      this.game.demonstration = { ...scene, kind: 'guide', snapshot: scene.guideSnapshot ?? scene.snapshot, serial: Date.now(), sceneNumber: this.preview + 1 };
       el('continuation-animate').blur();
     });
   }
@@ -54,7 +54,7 @@ export class ContinuationPanel {
   private cancel() { this.worker?.terminate(); this.worker = null; this.token++; }
   private reset() {
     this.cancel(); this.key = ''; this.optionsKey = ''; this.selected = null; this.routes = [];
-    if (this.game) { this.game.hintTarget = null; this.baseline = this.count(this.game); }
+    if (this.game) { this.game.hintTarget = null; this.baseline = this.count(this.game); if (this.game.demonstration?.kind === 'guide') this.game.demonstration = null; }
     el('continuation-guide').hidden = true; el('continuation-clear').hidden = true; el('continuation-routes').replaceChildren();
   }
   clear() { this.reset(); this.game = null; this.available = false; el('opener-continuations').hidden = true; }
@@ -155,5 +155,6 @@ export class ContinuationPanel {
     if (scene.holdFirst) steps.unshift(`Use Hold (${bindingLabel(this.game.settings, 'hold')}) first if you have not swapped yet.`);
     el('continuation-inputs').replaceChildren(...steps.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
     el('continuation-plan').replaceChildren(...route.steps.map((step, index) => { const li = document.createElement('li'); li.textContent = `${step.scene.holdFirst ? 'Hold → ' : ''}${step.piece.toUpperCase()}: ${step.lines} lines${step.spin !== 'none' ? `, ${step.spin} ${step.piece.toUpperCase()}-spin` : ''}${step.pc ? ', perfect clear' : ''}`; if (index === this.step) li.setAttribute('aria-current', 'step'); return li; }));
+    if (this.step < route.steps.length) this.game.demonstration = { ...scene, kind: 'guide', snapshot, serial: Date.now(), sceneNumber: this.preview + 1 };
   }
 }

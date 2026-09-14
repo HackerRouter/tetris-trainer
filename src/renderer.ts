@@ -94,8 +94,9 @@ export type PlacementEffect = { rows: number[]; cells: Cell[]; piece: string; ha
 type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null; actions?: TimedActionText[] };
 
 export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, engine: Engine, rules: ModeRules, display: Settings['display'], scene: Scene, age: number) {
-  if (canvas.width !== engine.board.width * 30 || canvas.height !== (engine.board.height + 3) * 30) {
-    canvas.width = engine.board.width * 30; canvas.height = (engine.board.height + 3) * 30;
+  const resolution = Math.max(30, Math.ceil(canvas.getBoundingClientRect().width / engine.board.width * Math.min(2, window.devicePixelRatio || 1)));
+  if (canvas.width !== engine.board.width * resolution || canvas.height !== (engine.board.height + 3) * resolution) {
+    canvas.width = engine.board.width * resolution; canvas.height = (engine.board.height + 3) * resolution;
   }
   drawBoard(canvas, engine, scene.board, scene.piece, scene.target, { ...display, ghost: display.ghost && rules.advanced.shadow });
   drawPreviews(hold, engine, [scene.hold], display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
@@ -107,7 +108,7 @@ export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, ne
 function drawPlacementEffect(canvas: HTMLCanvasElement, engine: Engine, placement: PlacementEffect | null, age: number) {
   const reduced = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (placement && age >= 0 && age < 240 && !reduced) {
-    const ctx = canvas.getContext('2d')!, strength = Math.max(0, 1 - age / 240) * .5, size = canvas.width / engine.board.width;
+    const ctx = canvas.getContext('2d')!, strength = Math.max(0, 1 - age / 240) * .25, size = canvas.width / engine.board.width;
     ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = strength * .5;
     for (const [x, y] of placement.cells) {
       const px = x * size, py = (engine.board.height + 2 - y) * size;

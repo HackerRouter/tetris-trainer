@@ -13,7 +13,7 @@ export class PracticeGuide {
   constructor() {
     el('practice-guide-animate').addEventListener('click', () => {
       if (!this.game || !this.scene) return;
-      this.game.demonstration = { ...this.scene, snapshot: this.scene.guideSnapshot ?? this.scene.snapshot, serial: Date.now(), sceneNumber: this.index + 1 };
+      this.animate();
       el('practice-guide-animate').blur();
     });
   }
@@ -30,5 +30,9 @@ export class PracticeGuide {
     const steps = placementSteps(scene.path, game.settings).map(step => step.text);
     if (scene.holdFirst) steps.unshift(`Use Hold (${bindingLabel(game.settings, 'hold')}) first if you have not swapped yet.`);
     el('practice-guide-steps').replaceChildren(...steps.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
+    if (practice.set.kind === 'opener') this.animate();
+  }
+  private animate() {
+    if (this.game && this.scene) this.game.demonstration = { ...this.scene, kind: 'guide', snapshot: this.scene.guideSnapshot ?? this.scene.snapshot, serial: Date.now(), sceneNumber: this.index + 1 };
   }
 }

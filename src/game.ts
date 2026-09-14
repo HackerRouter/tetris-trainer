@@ -227,9 +227,9 @@ export class TrainerGame {
       if (reason === 'finesse') this.faults++; else this.targetMisses++;
       if (path) this.fault = { target, path, actual, reason };
       this.rollback = locking.checkpoint;
-      if (reason === 'finesse' && finesse) {
-        this.demonstration = { id: `fault-${this.faults}`, serial: this.faults, sceneNumber: this.practice ? this.practice.index + 1 : this.engine.stats.pieces, snapshot: structuredClone(snapshot), target: locking.target, path: finesse };
-        if (this.practice && !this.practice.finished && this.settings.training.strictPractice) {
+      if (path && (reason === 'finesse' || this.practice?.set.kind === 'opener')) {
+        this.demonstration = { id: `fault-${this.placements.length}`, kind: 'retry', serial: this.placements.length, sceneNumber: this.practice ? this.practice.index + 1 : this.engine.stats.pieces, snapshot: structuredClone(snapshot), target, path };
+        if (reason === 'finesse' && this.practice && this.practice.set.kind !== 'opener' && !this.practice.finished && this.settings.training.strictPractice) {
           this.practice.restarts++; this.practice.completed = 0;
           this.rollback = { ...locking.checkpoint, timerFrames: 0, perfects: 0, holds: 0, clears: {}, maxCombo: 0, maxB2B: 0 };
           this.nextScene = 0;
@@ -240,6 +240,7 @@ export class TrainerGame {
       this.undoStack.push(locking.checkpoint);
       if (enabled) { if (finesse) this.perfects++; else this.unverified++; }
       this.fault = null;
+      this.demonstration = null;
       const name = result.spin !== 'none' ? `${result.spin === 'mini' ? 'mini-' : ''}${result.mino}spin-${result.lines}` : ['none', 'single', 'double', 'triple', 'quad'][result.lines] || `clear-${result.lines}`;
       this.clears[name] = (this.clears[name] || 0) + 1;
       if (this.engine.board.perfectClear && result.lines) this.clears.pc = (this.clears.pc || 0) + 1;
@@ -261,7 +262,7 @@ export class TrainerGame {
     if (!this.canUndo) return false;
     this.restore(this.undoStack.pop()!);
     this.waitingForInput = true;
-    this.rollback = null; this.fault = null;
+    this.rollback = null; this.fault = null; this.demonstration = null;
     if (this.status !== 'paused') this.status = 'playing';
     this.events.push({ frame: this.engine.frame, type: 'undo', data: { snapshot: this.checkpoint.snapshot, room: this.checkpoint.room, timeMs: this.elapsedMs, eventCount: this.checkpoint.eventCount, placementCount: this.checkpoint.placementCount, waitingForInput: true } });
     return true;
@@ -300,7 +301,7 @@ export class TrainerGame {
     this.restore({ ...this.capture(), snapshot, room: { ...this.room.state, delay: 0, wake: false } });
     this.room.refill();
     this.checkpoint = this.capture();
-    this.fault = null; this.rollback = null; this.boardResets++;
+    this.fault = null; this.rollback = null; this.demonstration = null; this.boardResets++;
     this.events.push({ frame: this.engine.frame, type: 'clear-field', data: { manual, snapshot: this.checkpoint.snapshot, room: this.checkpoint.room, timeMs: this.elapsedMs } });
     return true;
   }

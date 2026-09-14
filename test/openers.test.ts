@@ -9,11 +9,37 @@ import { createEngine } from '../src/engine.ts';
 import { analysisContext } from '../src/analysis-context.ts';
 import { buildPlayback } from '../src/playback.ts';
 import { readReplay } from '../src/replay.ts';
+import { sameCells } from '../src/practice.ts';
+import { buildDemoFrames } from '../src/demo-frames.ts';
+import { placementSteps } from '../src/guide.ts';
+import { copyPiece } from '../src/finesse.ts';
 
 const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
 const options = { mirror: false, loop: false, study: true, finesse: true };
 const tap = (game: TrainerGame, key: GameAction, frames = 1) => { game.input.press(key); for (let i = 0; i < frames; i++) game.step(); game.input.release(key); game.step(); };
 const tiles = (board: any[][]) => board.map(row => row.map(tile => tile?.mino ?? null));
+
+test('opener faults retry only the current piece and demonstrate its required target even with strict fault practice enabled', () => {
+  const fumen = encoder.encode([{ field: Field.create(), operation: { type: 'O', x: 4, y: 0, rotation: 'spawn' } }, { operation: { type: 'O', x: 4, y: 2, rotation: 'spawn' } }]);
+  const strict = structuredClone(settings); strict.training.strictPractice = true; strict.training.justThink = true;
+  const route = compileOpener({ id: 'retry', name: 'Local opener retry', fumen, source: '', note: '' }, strict, modeDefinitions.sprint.rules(strict), { ...options, continueAfter: true });
+  for (const inefficient of [false, true]) {
+    const game = new TrainerGame(strict, 17, route.set); game.start(); tap(game, 'hardDrop');
+    assert.equal(game.practice!.index, 1);
+    const before = structuredClone(game.engine.board.state), time = game.elapsedMs, target = game.practice!.set.scenes[1].target;
+    if (inefficient) { tap(game, 'moveLeft'); tap(game, 'moveRight'); }
+    tap(game, 'moveLeft'); tap(game, 'hardDrop');
+    assert.equal(game.placements.at(-1)!.reason, inefficient ? 'finesse' : 'target');
+    assert.equal(game.practice!.index, 1); assert.equal(game.practice!.completed, 1); assert.equal(game.practice!.restarts, 0);
+    assert.deepEqual(game.engine.board.state, before); assert.equal(game.elapsedMs, time); assert.ok(game.waitingForInput);
+    assert.ok(sameCells(game.target!, target)); assert.ok(sameCells(game.demonstration!.target, target));
+    assert.ok(!sameCells(game.demonstration!.target, game.placements.at(-1)!.cells));
+    const demo = game.demonstration!, frames = buildDemoFrames(demo, game.engine, placementSteps(demo.path, game.settings));
+    assert.ok(sameCells(copyPiece(game.engine, frames.at(-1)!.piece).absoluteBlocks, target));
+    tap(game, 'hardDrop'); assert.equal(game.practice!.finished, true); assert.equal(game.demonstration, null); assert.equal(game.engine.board.state.flat().filter(Boolean).length, 8);
+    assert.equal(game.faults, inefficient ? 1 : 0);
+  }
+});
 
 test('the catalog provides hundreds of searchable source-linked constructions and curated routes work on both sides', () => {
   assert.ok(allOpeners.length >= 479); assert.ok(allOpeners.filter(opener => verifiedOpeners.has(opener.id)).length > 400);

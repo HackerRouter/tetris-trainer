@@ -97,12 +97,12 @@ test('all-clear text animates in live play and replay without extending the reco
   const time = await page.locator('#time').textContent(); await page.waitForTimeout(400); expect(await page.locator('#time').textContent()).toBe(time);
   await page.getByRole('link', { name: 'Replays', exact: true }).click(); await page.locator('#player-current').click();
   await expect(page.locator('#player-status')).toHaveText('Ready.'); await page.locator('#player-play').click();
-  await expect(page.locator('#player-tetrion .action-text-layer')).toHaveAttribute('aria-label', /ALL CLEAR/);
+  await expect(page.locator('.replay-board-area .action-text-layer')).toHaveAttribute('aria-label', /ALL CLEAR/);
   const end = await page.locator('#player-time').textContent(); await page.waitForTimeout(450); expect(await page.locator('#player-time').textContent()).toBe(end);
   await page.screenshot({ path: 'TEMP/replay-all-clear.png', fullPage: true });
   await page.waitForTimeout(2200);
-  await expect(page.locator('#player-tetrion .action-text-layer')).not.toHaveAttribute('aria-label', /ALL CLEAR/);
+  await expect(page.locator('.replay-board-area .action-text-layer')).not.toHaveAttribute('aria-label', /ALL CLEAR/);
   expect(await page.locator('#player-time').textContent()).toBe(end);
   await page.locator('#player-seek').fill('0'); await page.locator('#player-seek').dispatchEvent('input');
-  await expect(page.locator('#player-tetrion .action-text-layer')).toHaveAttribute('aria-label', '');
+  await expect(page.locator('.replay-board-area .action-text-layer')).toHaveAttribute('aria-label', '');
 });
