@@ -1,12 +1,86 @@
 import { test, expect, chromium, type Page } from '@playwright/test';
 import { defaults } from '../../src/settings';
 import { reviveCatalog } from '../../src/revive-tasks';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 async function prepare(page: Page) {
   await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game;' }); });
   await page.addInitScript(settings => { if (!localStorage.getItem('tetrio-trainer-settings-v1')) localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)); }, { ...defaults, training: { ...defaults.training, countdownSeconds: 0, finesseEnabled: true, undoEnabled: true } });
   await page.goto('/#quickplay');
 }
+
+for (const [name, fixture, output] of [
+  ['Duo survives its live upper-Quad pressure failure while the Worker replans', 'qp-duo-quad-pressure', 'Q1-duo-quad-pressure-recovery'],
+  ['Duo constructs an I-Spin on existing terrain with live pressure and its real Worker', 'qp-duo-ispi-terrain', 'Q1-duo-ispi-terrain-recovery'],
+  ['Duo constructs an I-Spin on raised terrain with its real Worker', 'qp-duo-ispi-high', 'Q1-duo-ispi-high-recovery'],
+  ['Duo constructs an I-Spin Double with its real Worker', 'qp-duo-ispi-double', 'Q1-duo-ispi-double-recovery'],
+  ['Duo completes a Quad at 2-plus Combo and the following no-Hold Combo with its real Worker', 'qp-duo-quad-combo', 'Q1-duo-quad-combo-recovery'],
+  ['Duo survives and lowers its stack after the top-three-row timed task', 'qp-duo-top-three', 'Q1-duo-top-three-recovery'],
+  ['Duo immediately completes an available TSD with its current piece', 'qp-duo-tsd-current', 'Q1-duo-tsd-current-recovery'],
+  ['Duo immediately completes an available TSD with legal Hold', 'qp-duo-tsd-hold', 'Q1-duo-tsd-hold-recovery'],
+  ['Duo immediately completes an available TST with legal rotations', 'qp-duo-tst-current', 'Q1-duo-tst-current-recovery'],
+  ['Duo immediately clears real garbage using an S/Z Spin', 'qp-duo-sz-garbage', 'Q1-duo-sz-garbage-recovery'],
+  ['Duo immediately clears real garbage using an L/J Spin', 'qp-duo-lj-garbage', 'Q1-duo-lj-garbage-recovery'],
+  ['Duo completes consecutive S/Z Singles on used terrain with its real Worker', 'qp-duo-sz-singles', 'Q1-duo-sz-singles-recovery'],
+  ['Duo preserves an existing S/Z Single and immediately finishes the pair', 'qp-duo-sz-singles-progress', 'Q1-duo-sz-singles-progress-recovery'],
+  ['Duo constructs a TST from an empty board with its real Worker', 'qp-duo-tst-empty', 'Q1-duo-tst-empty-recovery'],
+  ['Duo constructs a TST on used terrain and pressure with its real Worker', 'qp-duo-tst-terrain', 'Q1-duo-tst-terrain-recovery'],
+  ['Duo keeps space through twelve CCW-only placements, twenty rotations and a TSD', 'qp-duo-ccw-rotate-tsd', 'Q1-duo-ccw-rotate-tsd-recovery'],
+  ['Duo constructs an S/Z Spin from an empty board with its real Worker', 'qp-duo-sz-spin-empty', 'Q1-duo-sz-spin-empty-recovery'],
+  ['Duo constructs an S/Z Spin on raised terrain with its real Worker', 'qp-duo-sz-spin-high', 'Q1-duo-sz-spin-high-recovery'],
+  ['Duo accepts pressure and constructs an S/Z garbage Spin on used terrain', 'qp-duo-sz-garbage-terrain', 'Q1-duo-sz-garbage-terrain-recovery'],
+  ['Duo accepts pressure and constructs an L/J garbage Spin on used terrain', 'qp-duo-lj-garbage-terrain', 'Q1-duo-lj-garbage-terrain-recovery'],
+  ['Duo completes both S/Z/L/J Spins from raised terrain with its real Worker', 'qp-duo-szlj-spin-high', 'Q1-duo-szlj-spin-high-recovery'],
+  ['Duo completes both S/Z Doubles and the following fourteen no-clear placements from its v5 failure', 'qp-duo-sz-double-chain', 'Q1-duo-sz-double-chain-recovery']
+]) test(name, async ({ page }) => {
+  test.setTimeout(60000);
+  const source = JSON.parse(readFileSync(`test/fixtures/${fixture}.json`, 'utf8').replace(/^\uFEFF/, ''));
+  await page.route('**/src/main.ts', async route => {
+    const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game; window.__qpScene = scene => start(undefined, undefined, scene.settings, scene);' });
+  });
+  await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), source.settings);
+  await page.setViewportSize({ width: 2560, height: 1600 }); await page.goto('/#quickplay');
+  await page.evaluate(scene => { (window as any).__qpScene(scene); (window as any).__recoveryFrames = []; let last = performance.now(); const sample = (now: number) => { (window as any).__recoveryFrames.push(now - last); last = now; if (!(window as any).__qpGame().qp.over) requestAnimationFrame(sample); }; requestAnimationFrame(sample); }, source);
+  let revivedAt: number | null = null;
+  const recoveryFrames = ['qp-duo-top-three', 'qp-duo-quad-pressure'].includes(fixture) ? 900 : fixture === 'qp-duo-sz-double-chain' ? 180 : 0;
+  for (let sample = 0; sample < 90; sample++) {
+    const state = await page.evaluate(() => { const qp = (window as any).__qpGame().qp; return { over: qp.over, frame: qp.frame, revives: qp.sides[1].revives }; });
+    if (revivedAt === null && state.revives > source.sides[1].state.revives) revivedAt = state.frame;
+    const done = state.over || revivedAt !== null && state.frame >= revivedAt + recoveryFrames;
+    if (done) break; await page.waitForTimeout(500);
+  }
+  const result = await page.evaluate(() => {
+    const qp = (window as any).__qpGame().qp, frames = (window as any).__recoveryFrames.slice(5).sort((a: number, b: number) => a - b);
+    return { frame: qp.frame, revives: qp.sides[1].revives, life: qp.sides[1].life, height: qp.sides[1].engine.board.state.reduce((peak: number, row: unknown[], y: number) => row.some(Boolean) ? y + 1 : peak, 0), recoveries: qp.events.filter((event: any) => event.type === 'bot-recovery'), errors: qp.events.filter((event: any) => event.type === 'bot-error'), p95: frames[Math.floor(frames.length * .95)] };
+  });
+  console.log(JSON.stringify(result)); writeFileSync(`TEMP/${output}-checkpoint.json`, JSON.stringify(await page.evaluate(() => (window as any).__qpGame().qp.checkpoint(true))));
+  await page.screenshot({ path: `TEMP/${output}.png`, fullPage: true });
+  expect(result.life).toBe('alive'); expect(result.revives).toBe(source.sides[1].state.revives + 1); expect(result.errors).toEqual([]); expect(result.p95).toBeLessThan(100);
+  if (fixture.startsWith('qp-duo-ispi')) expect(await page.evaluate(() => (window as any).__qpGame().qp.events.some((event: any) => event.type === 'lock' && event.side === 1 && event.data.piece === 'i' && event.data.lines > 0 && event.data.spin !== 'none'))).toBe(true);
+  if (recoveryFrames) { expect(revivedAt).not.toBeNull(); expect(result.frame).toBeGreaterThanOrEqual(revivedAt! + recoveryFrames); expect(result.height).toBeLessThan(13); }
+  if (['qp-duo-tst-empty', 'qp-duo-tst-terrain', 'qp-duo-ccw-rotate-tsd'].includes(fixture)) {
+    expect(result.height).toBeLessThan(13);
+    const completed = await page.evaluate(() => (window as any).__qpGame().qp.completed.at(-1).tasks);
+    expect(completed.resets).toBe(0); expect(completed.prompts.every((prompt: any) => prompt.complete)).toBe(true);
+  }
+  if (/(tsd-(current|hold)|tst-current|[szlj]{2}-garbage|sz-singles(-progress)?)$/.test(fixture)) {
+    const task = await page.evaluate(() => { const qp = (window as any).__qpGame().qp; return { completed: qp.completed.at(-1).tasks, locks: qp.events.filter((event: any) => event.side === 1 && event.type === 'lock') }; });
+    expect(task.completed.resets).toBe(source.sides[1].state.task.resets);
+    if (!fixture.endsWith('sz-singles')) {
+      const first = task.locks.find((event: any) => event.frame >= source.frame);
+      expect(first.frame - source.frame).toBeLessThanOrEqual(30);
+      if (fixture.endsWith('garbage')) expect(first.data.lines).toBeGreaterThan(0);
+      else expect(first.data.lines).toBe(fixture.startsWith('qp-duo-tsd-') ? 2 : fixture === 'qp-duo-tst-current' ? 3 : 1);
+      if (!fixture.endsWith('progress')) expect(first.data.spin).not.toBe('none');
+    }
+  }
+  if (/sz-spin-|szlj-spin-|garbage-terrain|sz-double-chain/.test(fixture)) {
+    expect(result.height).toBeLessThan(13);
+    const state = await page.evaluate(() => { const qp = (window as any).__qpGame().qp; return { completed: qp.completed.at(-1).tasks, inserted: qp.sides[1].garbage.inserted }; });
+    expect(state.completed.prompts.every((prompt: any) => prompt.complete)).toBe(true); expect(state.completed.resets).toBe(0);
+    if (fixture.includes('garbage-terrain')) expect(state.inserted).toBeGreaterThan(source.sides[1].state.garbage.inserted);
+  }
+});
 
 test('All-Spin, Invisible and Freefall use their rules while player data stays below Hold', async ({ page }) => {
   await page.setViewportSize({ width: 2048, height: 1280 }); await prepare(page);
@@ -170,7 +244,7 @@ test('QP random pool, straight-up six PPS rescue preparation and Stop work throu
   for (const id of ['f-rotate-20', 'e-spin-1']) await page.locator(`#qp-task-pool input[value="${id}"]`).check();
   await page.fill('#qp-task-count', '1'); await page.click('#qp-form button[type="submit"]'); await page.click('#qp-down-bot');
   await expect(page.locator('#qp-life')).toContainText('stacking straight up');
-  await expect(page.locator('#qp-bot-state')).toContainText('6 PPS');
+  await expect(page.locator('#qp-bot-state')).toContainText('6 target');
   await expect.poll(() => page.evaluate(() => (window as any).__qpGame().qp.sides[1].life), { timeout: 5000 }).toBe('down');
   const evidence = await page.evaluate(() => {
     const qp = (window as any).__qpGame().qp, begin = qp.events.find((event: any) => event.type === 'practice-topout').frame;
@@ -181,4 +255,52 @@ test('QP random pool, straight-up six PPS rescue preparation and Stop work throu
   await page.click('#qp-stop'); await expect(page.locator('#overlay-value')).toHaveText('Run stopped');
   const frame = await page.evaluate(() => (window as any).__qpGame().qp.frame); await page.waitForTimeout(250); expect(await page.evaluate(() => (window as any).__qpGame().qp.frame)).toBe(frame);
   await page.reload(); await expect(page.locator('#qp-task-mode')).toHaveValue('random'); await expect(page.locator('#qp-task-pool input:checked')).toHaveCount(2);
+});
+
+
+test('Ordinary Duo bot at 10 PPS locks near ten pieces per second with its real Worker and legal inputs', async ({ page }) => {
+  const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
+  settings.quickplay.profile = { mods: ['duo'], allyMods: ['duo'] }; settings.quickplay.pressure.mode = 'none'; settings.quickplay.trigger = 'none'; settings.quickplay.bot.pps = 10;
+  await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game;' }); });
+  await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), settings);
+  await page.goto('/#quickplay'); await page.click('#qp-form button[type="submit"]');
+  await expect.poll(() => page.evaluate(() => (window as any).__qpGame().qp.sides[1].engine.stats.pieces), { timeout: 8000 }).toBeGreaterThan(25);
+  const before = await page.evaluate(() => { const qp = (window as any).__qpGame().qp; return { frame: qp.frame, pieces: qp.sides[1].engine.stats.pieces }; });
+  await page.waitForTimeout(3000);
+  const after = await page.evaluate(() => { const qp = (window as any).__qpGame().qp; return { frame: qp.frame, pieces: qp.sides[1].engine.stats.pieces, life: qp.sides[1].life, inputs: qp.events.filter((event: any) => event.side === 1 && event.type === 'inputs').length, locks: qp.sides[1].lockFrames }; });
+  const rate = (after.pieces - before.pieces) * 60 / (after.frame - before.frame);
+  console.log(JSON.stringify({ actualPps: rate, before, after }));
+  expect(after.life).toBe('alive'); expect(after.inputs).toBeGreaterThan(30); expect(rate).toBeGreaterThanOrEqual(9); expect(rate).toBeLessThanOrEqual(10.5);
+  await expect(page.locator('#qp-bot-state')).toContainText('PPS actual'); await expect(page.locator('#qp-bot-state')).toContainText('10 target');
+});
+
+for (const { task, seed } of [...['f-combo-3', 'e-combo-5', 'a-combo-7', 'd-combonohold-3'].map(task => ({ task, seed: 1234 })), { task: 'f-combo-3', seed: 17 }, { task: 'a-combo-7', seed: 42 }]) test(`Duo Worker keeps placing pieces and completes ${task}, seed ${seed}, instead of waiting for topout`, async ({ page }) => {
+  test.setTimeout(60000);
+  const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
+  settings.quickplay.profile = { mods: ['duo'], allyMods: ['duo'] }; settings.quickplay.pressure.mode = 'none'; settings.quickplay.trigger = 'none'; settings.quickplay.tasks = [task];
+  await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game;' }); });
+  await page.addInitScript(({ settings, seed }) => {
+    localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings));
+    const nativeRandom = crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues = (array: any) => array instanceof Uint32Array && array.length === 1 ? (array[0] = seed - 1, array) : nativeRandom(array);
+  }, { settings, seed });
+  await page.setViewportSize({ width: 2560, height: 1600 }); await page.goto('/#quickplay'); await page.click('#qp-form button[type="submit"]'); await page.click('#qp-down-player');
+  writeFileSync(`TEMP/Q1-combo-${task}-${seed}-browser-start.json`, JSON.stringify(await page.evaluate(() => (window as any).__qpGame().qp.checkpoint())));
+  let completed = false, longestGap = 0;
+  for (let i = 0; i < 100; i++) {
+    const state = await page.evaluate(() => {
+      const qp = (window as any).__qpGame().qp, side = qp.sides[1], locks = qp.events.filter((event: any) => event.side === 1 && event.type === 'lock').map((event: any) => event.frame);
+      return { frame: qp.frame, seed: qp.seed, pieces: side.engine.stats.pieces, life: side.life, revives: side.revives, gap: qp.frame - (locks.at(-1) ?? side.task?.prompts[0].activatedAt ?? 0), progress: side.task?.prompts[0].count, reason: side.plan?.reason, errors: qp.events.filter((event: any) => event.type === 'bot-error'), worker: typeof qp.botPlanner === 'function' };
+    });
+    if (!state.worker || state.life !== 'alive' || state.gap >= 180) {
+      console.log(JSON.stringify({ task, longestGap, ...state }));
+      writeFileSync(`TEMP/Q1-combo-${task}-${seed}-browser-failure.json`, JSON.stringify(await page.evaluate(() => (window as any).__qpGame().qp.checkpoint(true))));
+      await page.screenshot({ path: `TEMP/Q1-combo-${task}-${seed}-browser-failure.png`, fullPage: true });
+    }
+    longestGap = Math.max(longestGap, state.gap); expect(state.seed).toBe(seed); expect(state.worker).toBe(true); expect(state.errors).toEqual([]); expect(state.life).toBe('alive');
+    if (state.revives) { completed = true; console.log(JSON.stringify({ task, longestGap, ...state })); break; }
+    expect(state.gap, JSON.stringify(state)).toBeLessThan(180);
+    await page.waitForTimeout(500);
+  }
+  expect(completed).toBe(true);
 });

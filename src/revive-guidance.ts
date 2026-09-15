@@ -2,7 +2,7 @@ import { QuickPlayRuntime, type QpCheckpoint } from './qp-runtime';
 import { qpOperations, trialQpOperation, type QpOperation } from './qp-search';
 import { sameCells } from './practice';
 
-export const reviveSearchDepth = 8;
+export const reviveSearchDepth = 60;
 export function reviveGuidanceIdentity(runtime: QuickPlayRuntime) {
   const side = runtime.sides[0], engine = side.engine, task = side.task;
   return JSON.stringify([engine.board.state, engine.falling.symbol, engine.stats.pieces, engine.held, engine.holdLocked, task?.active, task?.prompts.map(prompt => prompt.task), task?.resets, side.life, runtime.over, side.garbage.pending, side.garbage.entering, engine.misc.movement.lockTime, runtime.settings.quickplay.reviveNoGravity]);
@@ -36,9 +36,10 @@ export class ReviveContinuation {
     return !!this.operation?.actions.some(action => action.key === 'hold' && action.down) && live.stats.pieces === original.stats.pieces && live.hold === original.falling.symbol && live.falling.symbol === (original.hold ?? original.queue.value[0]) && boardKey(this.source) === boardKey(checkpoint);
   }
 }
-export function validateReviveGuidance(checkpoint: QpCheckpoint, source: QpCheckpoint, operation: QpOperation, milliseconds = 180) {
+export type ReviveValidation = { status: 'Reachable' | 'BudgetExhausted' | 'Unavailable' | 'Unsupported'; operation: QpOperation | null };
+export function validateReviveGuidanceResult(checkpoint: QpCheckpoint, source: QpCheckpoint, operation: QpOperation, milliseconds = 180): ReviveValidation {
   const reference = trialQpOperation(source, 0, operation);
-  if (!reference) return null;
+  if (!reference) return { status: 'Unsupported', operation: null };
   const runtime = QuickPlayRuntime.fromCheckpoint(checkpoint), side = runtime.sides[0], target = reference.target[0];
   const work = { nodes: 0, frames: 0, limit: 6000, deadline: performance.now() + milliseconds, expired() { return this.nodes >= this.limit || performance.now() >= this.deadline; } };
   const matches = (candidate: QpOperation) => {
@@ -46,10 +47,13 @@ export function validateReviveGuidance(checkpoint: QpCheckpoint, source: QpCheck
     if (!trial || trial.progress < reference.progress || trial.target.length !== reference.target.length || target && !sameCells(target, trial.target[0])) return null;
     return { ...candidate, target: trial.target[0] };
   };
-  const unchanged = matches(operation);
-  if (unchanged && target) return unchanged;
+  const unchanged = side.engine.holdLocked && operation.actions.some(action => action.key === 'hold' && action.down) ? null : matches(operation);
+  if (unchanged && target) return { status: 'Reachable', operation: unchanged };
   const candidates = qpOperations(side, work).filter(candidate => target ? candidate.target && sameCells(candidate.target, target) : !candidate.target);
   candidates.sort((a, b) => a.actions.filter(action => action.down).length - b.actions.filter(action => action.down).length || a.duration - b.duration);
-  for (const candidate of candidates) { if (work.expired()) break; const valid = matches(candidate); if (valid) return valid; }
-  return unchanged;
+  for (const candidate of candidates) { if (work.expired()) break; const valid = matches(candidate); if (valid) return { status: 'Reachable', operation: valid }; }
+  return { status: unchanged ? 'Reachable' : work.expired() ? 'BudgetExhausted' : 'Unavailable', operation: unchanged };
+}
+export function validateReviveGuidance(checkpoint: QpCheckpoint, source: QpCheckpoint, operation: QpOperation, milliseconds = 180) {
+  return validateReviveGuidanceResult(checkpoint, source, operation, milliseconds).operation;
 }

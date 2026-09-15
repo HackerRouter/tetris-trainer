@@ -2,16 +2,29 @@ import type { Engine, EngineSnapshot, LockRes } from '@haelp/teto/engine';
 import type { Game } from '@haelp/teto/types';
 import type { GameAction } from './settings';
 import type { Move } from './finesse';
-import type { RevivePlacement } from './revive-tasks';
+import type { RevivePlacement, ReviveState } from './revive-tasks';
 
 export type BotAction = { at: number; key: GameAction; down: boolean };
-export type BotPlan = { actions: BotAction[]; cursor: number; age: number; target: [number, number][] | null; knownPieces: number; nodes: number; reason: string; duration?: number; taskActive?: number };
-export function inputPlan(moves: Move[], engine: Engine, hold = false): BotAction[] {
+export type BotStep = { actions: BotAction[]; duration: number; target: [number, number][] | null; taskActive?: number; expected: string; label: string; progress?: number };
+export type BotPlan = { actions: BotAction[]; cursor: number; age: number; target: [number, number][] | null; knownPieces: number; nodes: number; reason: string; duration?: number; taskActive?: number; followups?: BotStep[]; progress?: number };
+export function botStateKey(engine: EngineSnapshot, task: ReviveState | null) {
+  return JSON.stringify([engine.board.map(row => row.map(tile => tile?.mino ?? null)), engine.falling.symbol, engine.hold, engine.holdLocked, engine.stats.pieces, engine.stats.combo, engine.stats.b2b, engine.queue, task?.active, task?.prompts.map(prompt => [prompt.task, prompt.count]), task?.resets, task?.quadColumns, task?.spinPieces]);
+}
+export function pacedBotOperation<T extends { actions: BotAction[]; duration: number }>(operation: T, frame: number, nextLock: number): T {
+  const lockAt = operation.actions.find(action => action.key === 'hardDrop' && action.down)?.at;
+  const delay = lockAt === undefined ? 0 : Math.max(0, Math.ceil(nextLock - frame - lockAt));
+  return delay ? { ...operation, actions: operation.actions.map(action => ({ ...action, at: action.at + delay })), duration: operation.duration + delay } : operation;
+}
+export function inputPlan(moves: Move[], engine: Engine, hold = false, fast = false): BotAction[] {
   const actions: BotAction[] = []; let at = 0;
-  const press = (key: GameAction, duration = 1) => { actions.push({ at, key, down: true }, { at: at + duration, key, down: false }); at += duration + 1; };
+  const press = (key: GameAction, duration = fast ? 0 : 1) => { actions.push({ at, key, down: true }, { at: at + duration, key, down: false }); at += duration + Number(!fast); };
   if (hold) press('hold');
   for (const move of moves) {
-    if (move === 'dasLeft' || move === 'dasRight') press(move === 'dasLeft' ? 'moveLeft' : 'moveRight', Math.ceil(engine.handling.das + engine.handling.arr * engine.board.width) + 2);
+    if (move === 'dasLeft' || move === 'dasRight') {
+      const key = move === 'dasLeft' ? 'moveLeft' : 'moveRight';
+      if (fast) for (let i = 0; i < engine.board.width; i++) press(key);
+      else press(key, Math.ceil(engine.handling.das + engine.handling.arr * engine.board.width) + 2);
+    }
     else if (move === 'softDrop' || move === 'down') press('softDrop', engine.handling.sdf === 41 ? 1 : Math.ceil(engine.board.height / Math.max(.02, engine.dynamic.gravity.get() * engine.handling.sdf)));
     else press(move as GameAction);
   }

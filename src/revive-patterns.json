@@ -1,0 +1,279 @@
+{
+  "szljspin": [
+    { "id": "ttt-30-2-j-minimal", "piece": "j", "rows": ["___X......", "_.X......."], "fillRows": [], "lift": true }
+  ],
+  "szspin": [
+    { "id": "s-single-0", "piece": "s", "rows": ["XXXX_XXXXX", "...__.....", "..._X.....", "...__X...."], "fillRows": [0], "lift": true },
+    { "id": "s-single-1", "piece": "s", "rows": ["...._.....", "XXX__XXXXX", "..._X.....", "...__X...."], "fillRows": [1], "lift": true },
+    { "id": "s-single-2", "piece": "s", "rows": ["...._.....", "...__.....", "XXX_XXXXXX", "...__X...."], "fillRows": [2], "lift": true }
+  ],
+  "tspinminiclear": [
+    {
+      "id": "ttt-8-2-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "_XXXXXXXXX"
+      ]
+    },
+    {
+      "id": "ttt-8-3-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXXXXX_"
+      ]
+    }
+  ],
+  "tspintriple": [
+    {
+      "id": "ttt-9-1-t-minimal",
+      "variant": 0,
+      "piece": "t",
+      "lift": true,
+      "rows": ["XX_XXXXXXX", "XX__XXXXXX", "XX_XXXXXXX", "..____....", "..X___...."]
+    },
+    {
+      "id": "ttt-9-1-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XX_XXXXXXX",
+        "XX__XXXXXX",
+        "XX_XXXXXXX",
+        "_X________",
+        "_XX_______"
+      ]
+    },
+    {
+      "id": "ttt-9-2-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXX_XXX",
+        "XXXXX__XXX",
+        "XXXXXX_XXX",
+        "_______X__",
+        "______XX__"
+      ]
+    }
+  ],
+  "tspindoubleup": [
+    {
+      "id": "ttt-16-7-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXXX_XX",
+        "XXXXXX__XX",
+        "________XX",
+        "________XX",
+        "______XXXX"
+      ]
+    },
+    {
+      "id": "ttt-16-9-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXX_XXX",
+        "XXXXX__XXX",
+        "_______XXX",
+        "_______X_X",
+        "_____XXX__"
+      ]
+    }
+  ],
+  "tspindtcolumn": [],
+  "ispindouble": [
+    {
+      "id": "i-mini-2-minimal",
+      "variant": 0,
+      "piece": "i",
+      "fillRows": [0, 1],
+      "lift": true,
+      "rows": ["X_XXXXXXXX", "X_XXXXXXXX", ".__.......", "._.____...", ".X.____..."]
+    },
+    {
+      "id": "i-mini-2",
+      "variant": 0,
+      "piece": "i",
+      "rows": [
+        "X_XXXXXXXX",
+        "X_XXXXXXXX",
+        "X______XXX",
+        "X_X____XXX",
+        "XXX____XXX",
+        "XXX____XXX",
+        "XXX____XXX",
+        "XXX____XXX",
+        "XXX____XXX"
+      ]
+    }
+  ],
+  "szspintriple": [
+    {
+      "id": "ttt-15-9-z-minimal",
+      "variant": 0,
+      "piece": "z",
+      "rows": ["XX_XXXXXXX", "XX__XXXXXX", "XXX_XXXXXX", ".X____...."]
+    },
+    {
+      "id": "ttt-15-10-z",
+      "variant": 0,
+      "piece": "z",
+      "rows": [
+        "XXXXXXX_XX",
+        "XXXXXXX__X",
+        "XXXXXXXX_X",
+        "_X_______X",
+        "_XX______X",
+        "________XX"
+      ]
+    },
+    {
+      "id": "ttt-15-9-z",
+      "variant": 0,
+      "piece": "z",
+      "rows": [
+        "XX_XXXXXXX",
+        "XX__XXXXXX",
+        "XXX_XXXXXX",
+        "XX____XXXX",
+        "X_________",
+        "X_________"
+      ]
+    }
+  ],
+  "ljspintriple": [
+    {
+      "id": "ttt-14-9-l-minimal",
+      "variant": 0,
+      "piece": "l",
+      "rows": ["XXXXXXX__X", "XXXXXXX_XX", "XXXXXXX_XX", ".......___", ".......X._"]
+    },
+    {
+      "id": "ttt-14-9-l",
+      "variant": 0,
+      "piece": "l",
+      "rows": [
+        "XXXXXXX__X",
+        "XXXXXXX_XX",
+        "XXXXXXX_XX",
+        "___X__X___",
+        "__XX__XX__"
+      ]
+    },
+    {
+      "id": "ttt-14-10-l",
+      "variant": 1,
+      "piece": "l",
+      "rows": [
+        "XXXXXXX__X",
+        "XXXXXXX_XX",
+        "XXXXXXX_XX",
+        "____XX____",
+        "___XXX____",
+        "_____XX___"
+      ]
+    }
+  ],
+  "szspinconsecutive": [
+    {
+      "id": "ttt-15-1-s",
+      "variant": 0,
+      "piece": "s",
+      "rows": [
+        "XXXX__XXXX",
+        "XXXXX__XXX"
+      ]
+    },
+    {
+      "id": "ttt-15-2-z",
+      "variant": 0,
+      "piece": "z",
+      "rows": [
+        "XXX__XXXXX",
+        "XX__XXXXXX"
+      ]
+    }
+  ],
+  "ljspinconsecutive": [
+    {
+      "id": "ttt-17-9-l",
+      "variant": 0,
+      "piece": "l",
+      "rows": [
+        "XX_XXXXXXX",
+        "XX___XXXXX",
+        "XXX__X____"
+      ]
+    },
+    {
+      "id": "ttt-14-5-l",
+      "variant": 0,
+      "piece": "l",
+      "rows": [
+        "XXXXXX_XXX",
+        "XXXXXX___X",
+        "XX______XX"
+      ]
+    }
+  ],
+  "spinclear": [
+    {
+      "id": "ttt-8-2-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "_XXXXXXXXX"
+      ]
+    },
+    {
+      "id": "ttt-8-3-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXXXXX_"
+      ]
+    }
+  ],
+  "noclearspin": [
+    {
+      "id": "ttt-30-2-j",
+      "variant": 0,
+      "piece": "j",
+      "rows": [
+        "___XXX____",
+        "__XX_X____"
+      ]
+    },
+    {
+      "id": "ttt-15-6-s",
+      "variant": 3,
+      "piece": "s",
+      "rows": [
+        "X__XXXX__X",
+        "XX__XX__XX"
+      ]
+    }
+  ],
+  "combospin": [
+    {
+      "id": "ttt-8-2-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "_XXXXXXXXX"
+      ]
+    },
+    {
+      "id": "ttt-8-3-t",
+      "variant": 0,
+      "piece": "t",
+      "rows": [
+        "XXXXXXXXX_"
+      ]
+    }
+  ]
+}

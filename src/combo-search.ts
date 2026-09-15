@@ -47,21 +47,43 @@ export function verifyComboRoute(request: AnalysisRequest, route: ContinuationRo
   }
   return true;
 }
-export function searchCombo(request: AnalysisRequest, progress?: (result: AnalysisResult) => void): AnalysisResult {
+export type ComboSearchTarget = { combo: number; noHold: boolean; progress: number; preserve: boolean; terminalLines?: number; clear?: { pieces: string; lines: number } };
+export function searchCombo(request: AnalysisRequest, progress?: (result: AnalysisResult) => void, target?: ComboSearchTarget): AnalysisResult {
   const start = performance.now(), deadline = start + request.budget.milliseconds, reasons = pcCapabilities(request).map(reason => reason.replaceAll('PC Lab','Combo Lab'));
   const objective = request.goal.objective ?? 'clears';
   const result: AnalysisResult = { sessionId:request.sessionId,revision:request.revision,fingerprint:request.fingerprint,solver:request.solver,status:reasons.length?'Unsupported':'Incomplete',routes:[],complete:false,reasons,checked:0,elapsedMs:0,verification:'engine-rules',timing:'frozen',queue:request.position.currentKnown?[request.position.falling.symbol,...request.position.next]:[],information:request.information,depth:request.depth,lines:0,combo:{objective,best:0,proven:false,board:comboBoardKind(request),immediateChoices:0,immediateComplete:false} };
   if (reasons.length) return result;
   const engine = analysisEngine(request), initial = engine.snapshot({isUndoRedo:true}), memo = new Map<string, ContinuationStep[]>(), moveCache = new Map<string, ReturnType<typeof reachablePlacements>>(), counts = new Map<string,number>();
   const setupLimit = request.goal.cleanup ?? Math.max(0, request.depth - 1);
-  const longOpening = request.depth>20 && result.queue.length>20 && setupLimit>2 && request.rules.board.width===10 && request.position.stats.combo<0;
+  const carry = !!target?.preserve && (target.clear ? target.progress > 0 : initial.stats.combo >= 0);
+  const longOpening = (request.depth>20 || !!target) && setupLimit>2 && request.rules.board.width===10 && !carry && (!!target?.clear || request.position.stats.combo<0);
   const initialCells=initial.board.reduce((sum,row)=>sum+row.filter(Boolean).length,0);
   let limited = false, pruned = false, lastProgress = start, locked: [number,number][] = [];
   engine.events.on('falling.lock.pre', () => { locked = engine.falling.absoluteBlocks; });
   const stop = () => performance.now() >= deadline || result.checked >= request.budget.nodes;
   const keyFor = (snapshot: EngineSnapshot, drawn: number, depth: number, started: boolean, cleanup: number) => `${boardMask(snapshot.board)}|${snapshot.falling.symbol}|${snapshot.falling.location}|${snapshot.falling.rotation}|${snapshot.hold}|${snapshot.holdLocked}|${drawn}|${depth}|${started}|${cleanup}|${stableKey(snapshot.stats)}|${stableKey(snapshot.lastSpin)}`;
   const quality = (steps: ContinuationStep[], before: EngineSnapshot) => objective === 'attack' ? (steps.at(-1)?.after.stats.garbage.attack ?? before.stats.garbage.attack) - before.stats.garbage.attack : steps.filter(step => step.lines > 0).length;
-  const compareSteps = (a: ContinuationStep[], b: ContinuationStep[], before: EngineSnapshot) => quality(b,before)-quality(a,before) || b.filter(s=>s.lines).length-a.filter(s=>s.lines).length || a.filter(s=>!s.lines).length-b.filter(s=>!s.lines).length;
+  const targetProgress = (steps: ContinuationStep[]) => {
+    if (!target) return -Infinity;
+    if (target.clear) {
+      let count = target.progress;
+      for (const step of steps) count = step.lines === target.clear.lines && target.clear.pieces.includes(step.piece) ? count + 1 : 0;
+      return count;
+    }
+    if (!target.noHold) return steps.at(-1)?.after.stats.combo ?? initial.stats.combo;
+    let count = target.progress;
+    for (const step of steps) { if (step.scene.holdFirst || !step.lines) count = 0; if (step.lines && step.after.stats.combo > 0) count++; }
+    return count;
+  };
+  const reached = (steps: ContinuationStep[]) => !!target && !!steps.length && targetProgress(steps) >= target.combo && (!target.terminalLines || steps.at(-1)!.lines === target.terminalLines);
+  const enoughCells = (steps: ContinuationStep[]) => {
+    if (!target || !steps.at(-1)?.lines || reached(steps)) return true;
+    const remaining = Math.max(target.terminalLines ? 1 : 0, target.combo - targetProgress(steps));
+    const required = remaining * Math.max(0, request.rules.board.width * (target.clear?.lines ?? 1) - 4) + (target.terminalLines ? (target.terminalLines - 1) * request.rules.board.width : 0);
+    return steps.at(-1)!.after.board.reduce((sum, row) => sum + row.filter(Boolean).length, 0) >= required;
+  };
+  const effort = (steps: ContinuationStep[]) => steps.reduce((sum, step) => sum + step.scene.path.cost + 1 + Number(step.scene.holdFirst), 0);
+  const compareSteps = (a: ContinuationStep[], b: ContinuationStep[], before: EngineSnapshot) => Number(reached(b))-Number(reached(a)) || (reached(a) ? effort(a)-effort(b) || a.length-b.length : 0) || quality(b,before)-quality(a,before) || b.filter(s=>s.lines).length-a.filter(s=>s.lines).length || a.filter(s=>!s.lines).length-b.filter(s=>!s.lines).length;
   const better = (a: ContinuationStep[], b: ContinuationStep[], before: EngineSnapshot) => compareSteps(a,b,before)<0;
   const annotate = (steps: ContinuationStep[]): ContinuationRoute => {
     let drawn = 0, started = false, cleanup = setupLimit;
@@ -93,6 +115,7 @@ export function searchCombo(request: AnalysisRequest, progress?: (result: Analys
     const key=keyFor(snapshot,drawn,depth,started,cleanup);
     const branches: Branch[]=[]; let complete=true;
     for(const holdFirst of [false,true]) {
+      if (holdFirst && started && target?.noHold) continue;
       if(drawn===result.queue.length&&!holdFirst) continue;
       engine.fromSnapshot(snapshot); const emptyHold=!snapshot.hold;
       if(holdFirst&&(!request.rules.hold||snapshot.holdLocked||(emptyHold&&drawn+1>=result.queue.length)||!engine.press('hold'))) continue;
@@ -103,7 +126,7 @@ export function searchCombo(request: AnalysisRequest, progress?: (result: Analys
         if(stop()) {limited=true;complete=false;break;}
         result.checked++; engine.fromSnapshot(before); const outcome=applyContinuationPath(engine,p.path), after=engine.snapshot({isUndoRedo:true});
         if(!sameCells(locked,p.target)) {limited=true;complete=false;continue;}
-        if(engine.toppedOut || (started&&!outcome.lines) || (!started&&!outcome.lines&&!cleanup)) continue;
+        if(engine.toppedOut || (started&&!outcome.lines) || (!started&&!outcome.lines&&!cleanup) || target?.clear && outcome.lines > 0 && (outcome.lines !== target.clear.lines || !target.clear.pieces.includes(outcome.mino))) continue;
         const step:ContinuationStep={scene:{id:`combo-${result.checked}`,snapshot,guideSnapshot:holdFirst?before:undefined,holdFirst,target:p.target,path:p.path},after,lines:outcome.lines,spin:outcome.spin,piece:outcome.mino,pc:!!outcome.lines&&!after.board.some(row=>row.some(Boolean)),unknownCurrent:drawn===result.queue.length};
         const rows=boardMask(after.board),order=pcBoardOrder(rows,request.rules.board.width);
         branches.push({step,drawn:drawn+1+Number(holdFirst&&emptyHold),order,channel:longOpening?channelOrder(rows,request.rules.board.width):order});
@@ -116,12 +139,13 @@ export function searchCombo(request: AnalysisRequest, progress?: (result: Analys
     return candidates;
   };
   const visit = (snapshot:EngineSnapshot,drawn:number,depth:number,started:boolean,cleanup:number,prefix:ContinuationStep[],expanded?:Branch[]):ContinuationStep[] => {
+    if (reached(prefix)) return [];
     if (stop()) { limited=true; return []; }
     const key=keyFor(snapshot,drawn,depth,started,cleanup), cached=memo.get(key); if(cached) { consider([...prefix,...cached]); return cached; }
     const candidates=expanded??expand(snapshot,drawn,depth,started,cleanup);
     let best:ContinuationStep[]=[];
     for(const branch of candidates) {
-      const next=[...prefix,branch.step]; consider(next);
+      const next=[...prefix,branch.step]; if (!enoughCells(next)) continue; consider(next);
       const rest=visit(branch.step.after,branch.drawn,depth-1,started||!!branch.step.lines,cleanup-Number(!branch.step.lines),next), path=[branch.step,...rest];
       if(path.some(s=>s.lines)&&(!best.length||better(path,best,snapshot))) best=path;
       if(stop()) {limited=true;break;}
@@ -129,23 +153,25 @@ export function searchCombo(request: AnalysisRequest, progress?: (result: Analys
     if(!limited&&memo.size<5000) memo.set(key,best);
     return best;
   };
-  const root = expand(initial,0,request.depth,false,setupLimit);
-  if (setupLimit <= 2 || (!longOpening&&root.some(branch=>branch.step.lines))) visit(initial,0,request.depth,false,setupLimit,[],root);
+  const root = expand(initial,0,request.depth,carry,setupLimit);
+  if (setupLimit <= 2 || (!longOpening&&root.some(branch=>branch.step.lines))) visit(initial,0,request.depth,carry,setupLimit,[],root);
   else {
     type Node = {snapshot:EngineSnapshot;drawn:number;started:boolean;cleanup:number;steps:ContinuationStep[];order:number;potential:number};
-    const passes=longOpening?[{width:8,channel:false},{width:8,channel:true},{width:32,channel:true},{width:32,channel:false},{width:128,channel:true},{width:128,channel:false},{width:512,channel:true}]:[8,32,128,512].map(width=>({width,channel:false}));
+    const passes=longOpening?target?[{width:8,channel:target.combo>=6},{width:8,channel:target.combo<6},{width:32,channel:true},{width:32,channel:false},{width:128,channel:true},{width:128,channel:false}]:[{width:8,channel:false},{width:8,channel:true},{width:32,channel:true},{width:32,channel:false},{width:128,channel:true},{width:128,channel:false},{width:512,channel:true}]:[8,32,128,512].map(width=>({width,channel:false}));
     for (const {width,channel} of passes) {
-      let beam:Node[]=[{snapshot:initial,drawn:0,started:false,cleanup:setupLimit,steps:[],order:0,potential:0}], passPruned=false;
+      let beam:Node[]=[{snapshot:initial,drawn:0,started:carry,cleanup:setupLimit,steps:[],order:0,potential:0}], passPruned=false;
       for(let ply=0;ply<request.depth&&beam.length&&!stop();ply++) {
         const next=new Map<string,Node>();
         for(const node of beam) {
           const branches=ply===0?root:expand(node.snapshot,node.drawn,request.depth-ply,node.started,node.cleanup);
           for(const branch of branches) {
             const steps=[...node.steps,branch.step],remaining=Math.max(0,Math.min(request.depth-steps.length,result.queue.length-branch.drawn+Number(request.rules.hold&&!!branch.step.after.hold)));
+            if (!enoughCells(steps)) continue;
             const cells=initialCells+4*steps.length-request.rules.board.width*(branch.step.after.stats.lines-initial.stats.lines);
             const potential=steps.filter(step=>step.lines).length+Math.min(remaining,request.rules.board.width>4?Math.floor(cells/(request.rules.board.width-4)):remaining);
             const child:Node={snapshot:branch.step.after,drawn:branch.drawn,started:node.started||!!branch.step.lines,cleanup:node.cleanup-Number(!branch.step.lines),steps,order:channel?branch.channel:branch.order,potential};
             if(child.started) consider(child.steps);
+            if(reached(child.steps)) continue;
             const key=keyFor(child.snapshot,child.drawn,request.depth-ply-1,child.started,child.cleanup), previous=next.get(key);
             if(!previous||better(child.steps,previous.steps,initial)) next.set(key,child);
           }

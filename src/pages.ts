@@ -8,7 +8,7 @@ import { drawScene } from './renderer';
 import { drawNativePreview } from './ui-assets';
 import type { CustomRules, ModeRules } from './modes';
 import { readReplay, type ReplayTrack } from './replay';
-import { downloadJson, type Settings } from './settings';
+import { downloadJson, storageKey, type Settings } from './settings';
 import { formatTime } from './time';
 import type { PracticeSet } from './practice';
 import { PcLab } from './pc-lab';
@@ -50,7 +50,11 @@ export class Pages {
     this.drills(); this.statistics(); this.replays();
     this.qpReplay = new QpReplayView();
     this.quickplay = new QuickPlayPage({ game: callbacks.game, settings: callbacks.settings, enter: callbacks.quickplay, start: callbacks.startQuickplay });
-    this.revive = new RevivePage({ game: callbacks.game, start: callbacks.startRevive });
+    this.revive = new RevivePage({ game: callbacks.game, start: callbacks.startRevive, coachingGravity: enabled => {
+      if (location.hash !== '#quickplay') return;
+      const settings = callbacks.settings(); settings.quickplay.reviveNoGravity = enabled; this.quickplay.coachingGravity(enabled);
+      localStorage.setItem(storageKey, JSON.stringify(settings));
+    } });
     this.opening = new OpeningTraining(callbacks);
     this.lab = new PcLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
     this.spin = new SpinLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });

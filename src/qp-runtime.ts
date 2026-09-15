@@ -8,8 +8,9 @@ import { awardClimb, initialClimb, tickClimb, type QpMod } from './qp-rules';
 import { acceptPressure, cancelGarbage, initialGarbage, initialPressure, pressurePackets, randomStep, ruleRandom, updateGarbage, type GarbageState, type PressureState } from './qp-pressure';
 import { qpGarbageHole, qpMessiness } from './qp-garbage-pattern';
 import { drawReviveTasks, drawSelectedReviveTasks, initialRevive, reviveAttack, reviveClock, reviveHold, reviveInput, revivePlacement, reviveRotate, type ReviveState } from './revive-tasks';
-import { placementEvidence, type BotPlan } from './qp-bot';
-import { planQpBot } from './qp-search';
+import { placementEvidence, botStateKey, pacedBotOperation, type BotStep, type BotPlan } from './qp-bot';
+import { planQpBot, trialQpOperation } from './qp-search';
+import { sameCells } from './practice';
 import { qpAttack } from './qp-attack';
 import { garbageSize, garbageWarning, packetCues } from './qp-feedback';
 import { placementSounds } from './sound-events';
@@ -22,7 +23,7 @@ export type QpSide = {
   revives: number; deaths: number; contribution: number; plan: BotPlan | null; nextPlan: number; heldPiece: boolean;
   moves: string[]; gravityBonus: number; lockedGravityUntil: number; locking: { falling: EngineSnapshot['falling']; cells: [number, number][]; held: boolean; moved: boolean; moves: string[]; hold: Mino | null } | null;
   clear: { lines: number; garbageCleared: number; stats: EngineSnapshot['stats']; perfectClear: boolean } | null; report: LockRes | null;
-  modState: QpModState; practiceTopout: boolean;
+  modState: QpModState; practiceTopout: boolean; lockFrames: number[]; nextSteps: BotStep[];
   feedback: { alert: boolean; siren: number; windupAt: number; windupPortions: number };
 };
 export type QpEvent = { frame: number; side: number; type: string; data: unknown };
@@ -87,7 +88,7 @@ export class QuickPlayRuntime {
   }
   private makeSide(engine: Engine, settings: Settings, seed: number): QpSide {
     return { engine, settings, rules: modeDefinitions.zenith.rules(settings), mods: settings.quickplay.profile.mods, garbage: initialGarbage(seed), pressure: initialPressure(seed ^ 0x751afe),
-      life: 'alive', downAt: null, reviveAt: null, task: null, revives: 0, deaths: 0, contribution: 0, plan: null, nextPlan: 0, heldPiece: false, moves: [], gravityBonus: 0, lockedGravityUntil: 240, locking: null, clear: null, report: null, modState: initialQpModState(engine.board.state), practiceTopout: false, feedback: { alert: false, siren: 0, windupAt: -1000, windupPortions: 0 } };
+      life: 'alive', downAt: null, reviveAt: null, task: null, revives: 0, deaths: 0, contribution: 0, plan: null, nextPlan: 0, heldPiece: false, moves: [], gravityBonus: 0, lockedGravityUntil: 240, locking: null, clear: null, report: null, modState: initialQpModState(engine.board.state), practiceTopout: false, lockFrames: [], nextSteps: [], feedback: { alert: false, siren: 0, windupAt: -1000, windupPortions: 0 } };
   }
   private attach(side: QpSide, index: number) {
     const engine = side.engine;
@@ -187,7 +188,9 @@ export class QuickPlayRuntime {
     if (cancelled) this.events.push({ frame: this.frame, side: index, type: 'cancel', data: { amount: cancelled } });
     if (result.lines && !side.mods.includes('expert')) this.award(side, Math.min(2, result.lines), false);
     if (!result.lines) this.stageGarbage(side);
-    side.nextPlan = Math.max(side.nextPlan, this.frame + Math.round(60 / (side.practiceTopout ? 6 : this.settings.quickplay.bot.pps)));
+    side.nextPlan = this.frame + 60 / (side.practiceTopout ? 6 : this.settings.quickplay.bot.pps);
+    side.lockFrames = [...side.lockFrames.filter(frame => frame > this.frame - 180), this.frame];
+    if (index === 1 && side.plan && !side.plan.actions.some(action => action.at === side.plan!.age && action.key === 'hardDrop' && action.down)) side.plan = null;
     this.events.push({ frame: this.frame, side: index, type: 'lock', data: { piece: result.mino, cells: locking.cells, lines: result.lines, spin: result.spin, attack, sent, cancelled } });
   }
   private award(side: QpSide, amount: number, sent: boolean) {
@@ -252,7 +255,7 @@ export class QuickPlayRuntime {
   requestRescue(index: number) {
     if (this.over || this.sides.length !== 2 || this.sides.some(side => side.life !== 'alive' || side.practiceTopout)) return false;
     if (index === 0) return this.down(0);
-    const side = this.sides[1]; this.release(side); side.practiceTopout = true; side.nextPlan = this.frame;
+    const side = this.sides[1]; this.release(side); side.nextSteps = []; side.practiceTopout = true; side.nextPlan = this.frame;
     this.events.push({ frame: this.frame, side: 1, type: 'practice-topout', data: null });
     return true;
   }
@@ -306,9 +309,14 @@ export class QuickPlayRuntime {
     const ally = this.sides[1];
     if (ally) {
       if (ally.plan && ally.plan.taskActive !== ally.task?.active) { ally.plan = null; ally.nextPlan = this.frame; }
-      if (recordedBot === undefined && ally.life === 'alive' && !ally.plan && this.frame >= ally.nextPlan) {
-        ally.plan = ally.practiceTopout ? { actions: [{ at: 0, key: 'hardDrop', down: true }, { at: 1, key: 'hardDrop', down: false }], duration: 2, age: 0, cursor: 0, target: null, nodes: 0, knownPieces: 0, reason: 'Stack straight up for rescue practice.' } : this.botPlanner ? this.botPlanner(this) : planQpBot(this);
-        if (ally.plan && !ally.plan.duration) { ally.plan = null; ally.nextPlan = this.frame + 30; }
+      if (recordedBot === undefined && ally.life === 'alive' && !ally.plan && (!ally.practiceTopout || this.frame >= ally.nextPlan)) {
+        ally.plan = ally.practiceTopout ? { actions: [{ at: 0, key: 'hardDrop', down: true }, { at: 1, key: 'hardDrop', down: false }], duration: 2, age: 0, cursor: 0, target: null, nodes: 0, knownPieces: 0, reason: 'Stack straight up for rescue practice.' } : this.cachedBotPlan() ?? (this.botPlanner ? this.botPlanner(this) : planQpBot(this));
+        if (ally.plan?.followups) ally.nextSteps = ally.plan.followups;
+        if (ally.plan && !ally.plan.duration) { ally.plan.duration = 30; ally.nextPlan = this.frame + 30; }
+        if (ally.plan?.target) {
+          const lockAt = ally.plan.actions.find(action => action.down && action.key === 'hardDrop')?.at ?? 0;
+          ally.plan.age = Math.min(0, this.frame - Math.ceil(ally.nextPlan - lockAt));
+        }
       }
       const plan = ally.plan, actions = ally.life === 'alive' && plan ? plan.actions.filter(action => action.at === plan.age) : [];
       const inputs = recordedBot ?? actions.map(action => ({ frame: ally.engine.frame, type: action.down ? 'keydown' : 'keyup', data: { key: action.key, subframe: 0 } })) as Game.Replay.Frame[];
@@ -384,6 +392,14 @@ export class QuickPlayRuntime {
       if (side.engine.toppedOut) this.down(index, 'blockout');
     }
     return result;
+  }
+  private cachedBotPlan(): BotPlan | null {
+    const side = this.sides[1], next = side.nextSteps.shift(); if (!next) return null;
+    if (next.expected === botStateKey(side.engine.snapshot(), side.task)) {
+      const trial = trialQpOperation(this.checkpoint(), 1, pacedBotOperation({ ...next, target: next.target ?? undefined }, this.frame, side.nextPlan));
+      if (trial && trial.progress >= (next.progress ?? -Infinity) && (!next.target || trial.target[0] && sameCells(next.target, trial.target[0]))) return { ...next, cursor: 0, age: 0, knownPieces: 0, nodes: 0, reason: `Continue calculated route. ${next.label}` };
+    }
+    side.nextSteps = []; return null;
   }
   private tickEngine(side: QpSide, index: number, frames: Game.Replay.Frame[]) {
     if (index !== 0 || !this.settings.quickplay.reviveNoGravity || !side.task && !this.sides[1]?.practiceTopout) return side.engine.tick(frames);

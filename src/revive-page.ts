@@ -15,7 +15,7 @@ import { bindingLabel } from './settings';
 import { loadRevivePreferences, readReviveRecords, revivePreferencesKey, reviveRecordsKey, RevivePracticeTracker, type ReviveAttempt } from './revive-practice';
 
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
-type Callbacks = { game: () => TrainerGame; start: (config: QpSettings, scene?: QpCheckpoint) => TrainerGame };
+type Callbacks = { game: () => TrainerGame; start: (config: QpSettings, scene?: QpCheckpoint) => TrainerGame; coachingGravity?: (enabled: boolean) => void };
 type Scene = { id: string; name: string; checkpoint: QpCheckpoint };
 const scenesKey = 'tetrio-trainer-revive-scenes-v1';
 const taskLabel = (id: string) => reviveCatalog.find(task => task.id === id)?.label ?? id;
@@ -76,7 +76,8 @@ export class RevivePage {
     el<HTMLInputElement>('revive-no-gravity').checked = this.config.reviveNoGravity;
     el('revive-no-gravity').addEventListener('change', () => {
       const enabled = el<HTMLInputElement>('revive-no-gravity').checked, game = this.callbacks.game();
-      this.config.reviveNoGravity = enabled; this.persist();
+      if (this.active) { this.config.reviveNoGravity = enabled; this.persist(); }
+      this.callbacks.coachingGravity?.(enabled);
       if (game.qp) { game.qp.settings.quickplay.reviveNoGravity = enabled; game.qp.events.push({ frame: game.qp.frame, side: 0, type: 'coaching-gravity', data: { disabled: enabled } }); }
     });
     this.tasks(); this.sequence(); this.saved(); this.statistics();
@@ -141,7 +142,7 @@ export class RevivePage {
   private render() {
     const result = this.result!, names: Record<ReviveSearch['status'], string> = { Found: 'Completion route found', BudgetExhausted: 'Budget exhausted', UnknownFuture: 'Unknown future queue', Unsupported: 'Rule or state unsupported', NoTask: 'No active task' };
     el('revive-search-status').textContent = `${names[result.status]} · ${result.nodes.toLocaleString()} nodes · ${result.depth} operations deep`;
-    el('revive-scope').textContent = [`Snapshot at ${(this.source!.frame / 60).toFixed(2)} s.`, ...result.limits, 'Routes are checked with gravity, lock timing and queued garbage. An unfinished search does not prove no solution.', 'Full generated queue; maximum depth of eight operations. The selected completion has the fewest inputs, then placements, among routes found in this budget.'].join(' ');
+    el('revive-scope').textContent = [`Snapshot at ${(this.source!.frame / 60).toFixed(2)} s.`, ...result.limits, 'Routes are checked with gravity, lock timing and queued garbage. An unfinished search does not prove no solution.', 'Full generated queue; maximum depth of twenty operations. The selected completion has the fewest inputs, then placements, among routes found in this budget.'].join(' ');
     const source = QuickPlayRuntime.fromCheckpoint(this.source!), side = source.sides[0];
     result.routes.forEach((route, index) => {
       const button = document.createElement('button'); button.className = 'secondary revive-route'; button.type = 'button';
@@ -172,7 +173,7 @@ export class RevivePage {
     this.observed = this.identity(); this.coachSteps();
     el('revive-routes').replaceChildren();
     Array.from(el('revive-steps').children).forEach((element, index) => { (element as HTMLElement).hidden = index < continuation.index; });
-    el('revive-route-title').textContent = `Route ${this.routeNumber} ? Step ${continuation.index + 1} of ${continuation.operations.length}`;
+    el('revive-route-title').textContent = `Route ${this.routeNumber} / Step ${continuation.index + 1} of ${continuation.operations.length}`;
     if (continuation.operation) { this.demonstrate(); el('revive-search-status').textContent = 'Following the calculated route.'; }
     else { this.demo = null; this.callbacks.game().hintTarget = null; if (qp.sides[0].task?.finishedAt === null) this.search(); }
     return true;
@@ -267,7 +268,10 @@ export class RevivePage {
         worker.onmessage = event => {
           worker.terminate(); if (this.validating !== worker) return; this.validating = null;
           if (this.identity() !== this.observed || !this.selected) return;
-          if (!event.data.operation) { this.search(); return; }
+          if (!event.data.operation) {
+            if (event.data.status === 'BudgetExhausted') { this.pose = ''; el('revive-search-status').textContent = 'Target validation reached its budget. Retrying the retained route.'; return; }
+            this.search(); return;
+          }
           this.liveOperation = event.data.operation; this.coachSource = checkpoint; this.coachSteps();
         };
         worker.onerror = () => { worker.terminate(); if (this.validating === worker) this.validating = null; };
@@ -282,7 +286,7 @@ export class RevivePage {
       demo.due += Math.max(0, now - demo.last) * .012; demo.last = now;
       for (let count = 0; demo.due >= 1 && count < 60 && !demo.view.completed; count++, demo.due--) demo.view.advance();
       const view = demo.view, side = view.runtime.sides[0], frame = view.frame;
-      drawBoard(canvas, side.engine, frame.board, frame.piece, frame.target ?? null, side.settings.display, 3, frame.visual);
+      drawBoard(canvas, side.engine, frame.board, frame.piece, frame.target ?? null, { ...side.settings.display, ghost: !!frame.target && side.settings.display.ghost }, 3, frame.visual);
       el('revive-demo-step').textContent = view.completed ? view.operation.target ? 'This step is complete. The placed piece stays visible.' : 'Input step complete. No placement is required.' : view.operation.label;
       if (view.completed) { demo.ended ??= now; if (now - demo.ended > 1000) this.demonstrate(); }
     }
