@@ -4,6 +4,48 @@ import { readFile } from 'node:fs/promises';
 import { defaults } from '../../src/settings';
 
 const instantSettings = { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } };
+
+test('opacity sliders use whole percentages and displayed numeric values support direct editing', async ({ page }) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.setViewportSize({ width: 2560, height: 1600 });
+  await page.addInitScript(settings => {
+    if (sessionStorage.getItem('opacity-fixture')) return;
+    localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)); sessionStorage.setItem('opacity-fixture', '1');
+  }, { ...instantSettings, display: { ...defaults.display, ghostOpacity: .652802893309223 } });
+  await page.goto('/'); await page.click('#settings-open');
+  await expect(page.locator('#opacity-unit')).toHaveText('65%');
+  for (const [id, output] of [['ghostOpacity', 'opacity-unit'], ['gridOpacity', 'gridOpacity-unit'], ['boardOpacity', 'boardOpacity-unit']]) {
+    const slider = page.locator(`#${id}`);
+    await slider.scrollIntoViewIfNeeded(); const rect = (await slider.boundingBox())!;
+    await page.mouse.move(rect.x + rect.width * .24, rect.y + rect.height / 2); await page.mouse.down();
+    await page.mouse.move(rect.x + rect.width * .6528, rect.y + rect.height / 2, { steps: 7 }); await page.mouse.up();
+    const value = Number(await slider.inputValue()); expect(Number.isInteger(value)).toBe(true);
+    await expect(page.locator(`#${output}`)).toHaveText(`${value}%`);
+    await slider.press('ArrowRight'); await expect(slider).toHaveValue(String(value + 1));
+    await page.click(`#${output}`); const editor = page.locator('.setting-value-editor');
+    await editor.fill('37.4'); await editor.press('Enter');
+    await expect(slider).toHaveValue('37'); await expect(page.locator(`#${output}`)).toHaveText('37%');
+    await expect(page.locator('#settings-dialog')).toBeVisible();
+  }
+  await page.click('#audio-volume-unit'); await page.locator('.setting-value-editor').fill('48');
+  await page.locator('.setting-value-editor').press('Tab'); await expect(page.locator('#audio-volume-unit')).toHaveText('48%');
+  await page.click('#bind-moveLeft'); await page.click('#das-unit'); await page.locator('.setting-value-editor').fill('125'); await page.locator('.setting-value-editor').press('Enter');
+  await expect(page.locator('#das')).toHaveValue('7.5'); await expect(page.locator('#das-unit')).toHaveText('125.0 ms');
+  await expect(page.locator('#bind-moveLeft')).toHaveText('Left');
+  await page.click('#arr-unit'); await page.locator('.setting-value-editor').fill('25'); await page.locator('.setting-value-editor').press('Escape');
+  await expect(page.locator('#arr')).toHaveValue('0'); await expect(page.locator('#settings-dialog')).toBeVisible();
+  await page.click('#opacity-unit'); await page.locator('.setting-value-editor').fill('101'); await page.locator('.setting-value-editor').press('Enter');
+  await expect(page.locator('.setting-value-editor')).toHaveAttribute('aria-invalid', 'true');
+  await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await expect(page.locator('#settings-dialog')).toBeVisible();
+  await page.locator('.setting-value-editor').fill(''); await page.locator('.setting-value-editor').press('Enter');
+  await expect(page.locator('.setting-value-editor')).toBeVisible(); await page.locator('.setting-value-editor').press('Escape');
+  await page.screenshot({ path: 'TEMP/settings-integer-values.png' });
+  await page.getByRole('button', { name: 'Save settings', exact: true }).click();
+  await page.reload(); await page.click('#settings-open');
+  await expect(page.locator('#opacity-unit')).toHaveText('37%'); await expect(page.locator('#gridOpacity-unit')).toHaveText('37%');
+  await expect(page.locator('#boardOpacity-unit')).toHaveText('37%'); await expect(page.locator('#audio-volume-unit')).toHaveText('48%');
+  await expect(page.locator('#das')).toHaveValue('7.5'); expect(errors).toEqual([]);
+});
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(settings => { if (!localStorage.getItem('tetrio-trainer-settings-v1')) localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)); }, instantSettings);
 });

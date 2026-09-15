@@ -72,15 +72,23 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
   }
 }
 
-function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string | null)[], dim = false) {
+function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string | null)[], size: number, dim = false) {
+  const width = canvas.getBoundingClientRect().width, height = Math.max(1, pieces.length) * size * 3;
+  if (!width || !size) return;
+  canvas.style.height = `${height}px`;
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  if (canvas.width !== Math.round(width * ratio)) canvas.width = Math.round(width * ratio);
+  if (canvas.height !== Math.round(height * ratio)) canvas.height = Math.round(height * ratio);
   const ctx = canvas.getContext('2d')!;
+  ctx.resetTransform();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
   ctx.globalAlpha = dim ? 0.4 : 1;
-  const size = 30, slot = canvas.height / pieces.length;
+  const slot = size * 3;
   pieces.forEach((piece, index) => {
     if (!piece) return;
     const data = engine.getPreview(piece as typeof engine.falling.symbol);
-    const left = (canvas.width - data.w * size) / 2, top = index * slot + (slot - data.h * size) / 2;
+    const left = (width - data.w * size) / 2, top = index * slot + (slot - data.h * size) / 2;
     for (const [x, y] of data.data) {
       if (!drawMino(ctx, piece.toLowerCase(), left + x * size, top + y * size, size)) { ctx.fillStyle = colors[piece.toLowerCase()]; ctx.fillRect(left + x * size + 1, top + y * size + 1, size - 2, size - 2); }
     }
@@ -99,8 +107,9 @@ export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, ne
     canvas.width = engine.board.width * resolution; canvas.height = (engine.board.height + 3) * resolution;
   }
   drawBoard(canvas, engine, scene.board, scene.piece, scene.target, { ...display, ghost: display.ghost && rules.advanced.shadow });
-  drawPreviews(hold, engine, [scene.hold], display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
-  drawPreviews(next, engine, scene.next);
+  const cellSize = canvas.getBoundingClientRect().width / engine.board.width;
+  drawPreviews(hold, engine, [scene.hold], cellSize, display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
+  drawPreviews(next, engine, scene.next, cellSize);
   drawPlacementEffect(canvas, engine, scene.effect, age);
   drawActionText(canvas, engine, scene.actions ?? []);
 }

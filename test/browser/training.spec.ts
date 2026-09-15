@@ -12,6 +12,34 @@ function twoFaults() {
   return game.export();
 }
 
+for (const [target, mode] of [['#board', 'sprint'], ['#start', 'sprint'], ['#board', 'custom'], ['#start', 'custom']]) test(`initial ${mode} ${target} starts the existing seed and queue with the default countdown`, async ({ page }) => {
+  await page.route('**/src/main.ts', async route => {
+    const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__currentGame = () => game;' });
+  });
+  await page.goto('/');
+  if (mode === 'custom') await page.selectOption('#mode-select', 'custom');
+  const initial = await page.evaluate(() => { const game = (window as any).__currentGame(); (window as any).initialGame = game; return { seed: game.seed, queue: game.engine.queue.slice(0, 14), current: game.engine.falling.symbol }; });
+  await page.click(target); await expect(page.locator('#overlay-value')).toHaveText('3');
+  await page.click('#board'); await page.waitForTimeout(80);
+  const started = await page.evaluate(() => { const game = (window as any).__currentGame(); return { same: game === (window as any).initialGame, seed: game.seed, queue: game.engine.queue.slice(0, 14), current: game.engine.falling.symbol, events: game.events.filter((event: any) => event.type === 'start').length }; });
+  expect(started).toEqual({ ...initial, same: true, events: 1 });
+  await expect(page.locator('#time')).toHaveText('0:00.000');
+  await expect(page.locator('#board-overlay')).toBeHidden({ timeout: 4000 });
+});
+
+test('saving settings before the first start preserves the seed and applies the countdown', async ({ page }) => {
+  await page.route('**/src/main.ts', async route => {
+    const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__currentGame = () => game;' });
+  });
+  await page.goto('/');
+  const initial = await page.evaluate(() => { const game = (window as any).__currentGame(); return { seed: game.seed, queue: game.engine.queue.slice(0, 14) }; });
+  await page.click('#settings-open'); await page.fill('#countdownSeconds', '0.5'); await page.fill('#das', '8.5');
+  await page.getByRole('button', { name: 'Save settings', exact: true }).click(); await page.click('#board');
+  await expect(page.locator('#overlay-value')).toHaveText('1');
+  expect(await page.evaluate(() => { const game = (window as any).__currentGame(); return { seed: game.seed, queue: game.engine.queue.slice(0, 14), das: game.settings.handling.das }; })).toEqual({ ...initial, das: 8.5 });
+  await expect(page.locator('#board-overlay')).toBeHidden();
+});
+
 test('TETR.IO module positions, default countdown, pause and timer formatting', async ({ page }) => {
   await page.goto('/');
   const board = await page.locator('#board').boundingBox(), hold = await page.locator('#hold-panel').boundingBox(), next = await page.locator('#next-panel').boundingBox();

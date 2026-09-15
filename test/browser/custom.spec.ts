@@ -29,7 +29,7 @@ test('custom rules start a seeded challenge, control previews, complete goals an
   await page.locator('#custom-start').click();
   await expect(page.locator('#mode-label')).toHaveText('CUSTOM PRACTICE');
   await expect(page.locator('#hold-panel')).not.toBeVisible();
-  await expect(page.locator('#next-preview')).toHaveAttribute('height', '270');
+  expect(await page.locator('#next-preview').evaluate(el => el.getBoundingClientRect().height / document.querySelector('#board')!.getBoundingClientRect().width)).toBeCloseTo(9 / 10, 1);
   await expect(page.locator('#mode-rules')).toContainText('Seed: 1234');
   await page.keyboard.press('c'); await expect(page.locator('#holds')).toHaveText('0');
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('1');

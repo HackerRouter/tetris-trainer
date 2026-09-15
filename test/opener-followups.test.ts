@@ -14,7 +14,8 @@ import { placementSteps } from '../src/guide.ts';
 test('explicit double support prioritizes two full TSDs, then one, ahead of other published possibilities', () => {
   assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'stickspin')!), ['two-tsd', 'tsd', 'tspin', 'pc']);
   assert.deepEqual(automaticContinuationGoals({ id: 'local', name: 'Custom', source: '', note: 'Supports two T-spin doubles.' }), ['two-tsd', 'tsd', 'tspin', 'pc']);
-  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'db-377')!), ['pc', 'tspin']);
+  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'db-377')!), ['two-tsd', 'tsd', 'tspin', 'pc']);
+  assert.deepEqual(automaticContinuationGoals({ id: 'local-pc', name: 'Perfect Clear', source: '' }), ['pc', 'tspin']);
   const routes = [
     { id: 'pc', steps: [{ piece: 'o', spin: 'none', lines: 2 }] },
     { id: 'one', steps: [{ piece: 't', spin: 'normal', lines: 2 }] },

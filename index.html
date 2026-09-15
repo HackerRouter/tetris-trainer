@@ -4,13 +4,13 @@
 <body>
   <div class="app">
     <header class="app-header"><a class="brand" href="#play" aria-label="Tetris Trainer home">TETRIS <span>TRAINER</span></a>
-    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#drills">Finesse drills</a><a href="#openers">Openers</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
+    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#pc">PC</a><a href="#combo">Combo</a><a href="#drills">Finesse</a><a href="#openers">Openers</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
       <div class="header-tools"><button id="tools-open" class="secondary" aria-haspopup="dialog">Tools</button><button id="settings-open" class="secondary" aria-haspopup="dialog">Settings</button></div>
     </header>
     <main id="play-page" class="training-workspace">
       <div class="game-toolbar" aria-label="Game controls">
         <div class="mode-picker"><img id="mode-icon" src="/tetrio/ui/sprint.svg" width="24" height="24" alt=""><label for="mode-select" class="visually-hidden">Game mode</label><select id="mode-select"><option value="sprint">40L Sprint</option><option value="custom">Custom / Zen</option></select></div>
-        <button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button><button id="undo" class="secondary" disabled title="Undo placement · Ctrl + Z">Undo</button><button id="redo" class="secondary" disabled title="Redo placement ? Ctrl + Y">Redo</button>
+        <button id="start">Start game</button><button id="pause" class="secondary" disabled>Pause</button><button id="undo" class="secondary" disabled title="Undo placement · Ctrl + Z">Undo</button><button id="redo" class="secondary" disabled title="Redo placement · Ctrl + Y">Redo</button>
         <div class="game-switches">
           <label title="Automatically retry finesse faults and restore the timer.">Perfect finesse<input id="finesse-toggle" type="checkbox" role="switch" aria-describedby="finesse-help finesse-scope"></label>
           <label title="Freeze the board and timer while thinking.">Just think<input id="think-toggle" type="checkbox" role="switch" aria-describedby="think-help"></label>
@@ -77,9 +77,9 @@
           <label class="select-row" for="irs">Initial rotation<select id="irs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
           <label class="select-row" for="ihs">Initial hold<select id="ihs"><option value="off">Off</option><option value="tap">Tap</option><option value="hold">Hold</option></select></label>
           <h3>Display</h3><label class="check-row"><input id="grid" type="checkbox"> Grid</label><label class="check-row"><input id="ghost" type="checkbox"> Ghost piece</label>
-          <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="0" max="100" step="any"><output id="opacity-unit"></output></label>
-          <label class="range-row" for="gridOpacity">Grid opacity<input id="gridOpacity" type="range" min="0" max="100" step="any"><output id="gridOpacity-unit"></output></label>
-          <label class="range-row" for="boardOpacity">Board opacity<input id="boardOpacity" type="range" min="0" max="100" step="any"><output id="boardOpacity-unit"></output></label>
+          <label class="range-row" for="ghostOpacity">Ghost opacity<input id="ghostOpacity" type="range" min="0" max="100" step="1"><output id="opacity-unit"></output></label>
+          <label class="range-row" for="gridOpacity">Grid opacity<input id="gridOpacity" type="range" min="0" max="100" step="1"><output id="gridOpacity-unit"></output></label>
+          <label class="range-row" for="boardOpacity">Board opacity<input id="boardOpacity" type="range" min="0" max="100" step="1"><output id="boardOpacity-unit"></output></label>
           <label class="check-row"><input id="coloredGhost" type="checkbox"> Colored ghost piece</label>
           <label class="check-row"><input id="dimLockedHold" type="checkbox"> Dim locked Hold piece</label>
           <h3>Audio</h3>
@@ -104,6 +104,6 @@
       <footer><div class="settings-tools"><button id="reset-settings" type="button" class="secondary">Restore defaults</button><button id="import-settings" type="button" class="secondary">Import JSON / TTC</button><button id="export-settings" type="button" class="secondary">Export</button><input id="settings-file" type="file" accept=".ttc,.json,application/json" hidden></div><button type="submit">Save settings</button></footer>
     </form>
   </dialog>
-  <div id="demo-popup" class="demo-popup" hidden><header><strong id="demo-title">Correct placement</strong><button id="demo-close" class="secondary small" aria-label="Close demonstration">×</button></header><button id="demo-replay" aria-label="Replay placement demonstration"><canvas id="demo-board" width="180" height="414" aria-label="Animated placement guide"></canvas><span id="demo-step"></span><small>Click to replay</small></button><section class="demo-instructions" aria-label="Complete placement steps"><h3>Complete steps</h3><p id="demo-summary"></p><p id="demo-note"></p><ol id="demo-steps"></ol></section></div>
+  <div id="demo-popup" class="demo-popup" hidden><header><strong id="demo-title">Correct placement</strong><button id="pc-static" class="secondary small" hidden>Static view</button><button id="demo-close" class="secondary small" aria-label="Close demonstration">×</button></header><button id="demo-replay" aria-label="Replay placement demonstration"><canvas id="demo-board" width="180" height="414" aria-label="Animated placement guide"></canvas><span id="demo-step"></span><small>Click to replay</small></button><section class="demo-instructions" aria-label="Complete placement steps"><h3>Complete steps</h3><p id="demo-summary"></p><p id="demo-note"></p><ol id="demo-steps"></ol></section></div>
   <script type="module" src="/src/main.ts"></script>
 </body></html>

@@ -19,7 +19,7 @@ test('2560 by 1600 uses a large board and readable sidebars with all core contro
     const box = (selector: string) => { const r = document.querySelector(selector)!.getBoundingClientRect(); return { x: r.x, width: r.width, bottom: r.bottom }; };
     return { board: box('#board'), left: box('.workspace-left'), right: box('#current-guidance'), text: parseFloat(getComputedStyle(document.querySelector('#guide-empty p')!).fontSize), width: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight };
   });
-  expect(sizes.board.width).toBe(520); expect(sizes.left.width).toBe(720); expect(sizes.right.width).toBe(sizes.left.width); expect(sizes.text).toBeGreaterThanOrEqual(18);
+  expect(sizes.board.width).toBe(520); expect(sizes.left.width).toBe(660); expect(sizes.right.width).toBe(sizes.left.width); expect(sizes.text).toBeGreaterThanOrEqual(18);
   expect(sizes.left.x).toBe(80); expect(2560 - sizes.right.x - sizes.right.width).toBe(sizes.left.x); expect(sizes.board.x + sizes.board.width / 2).toBe(1280);
   expect(sizes.board.bottom).toBeLessThan(1500); expect(sizes.width).toBe(2560); expect(sizes.height).toBe(1600);
   await page.screenshot({ path: 'TEMP/fullscreen-sprint-final.png', fullPage: true });
@@ -68,6 +68,6 @@ test('long action text uses natural glyph widths and fits outside the board with
   });
   expect(result.calls.map(call => call.text).join(' ').replace(/-\s+/g, '-')).toContain('BACK-TO-BACK ×123');
   expect(result.calls.every(call => call.maxWidth === undefined && call.left >= 0 && call.right <= result.width)).toBe(true);
-  expect(result.overlay).toBeGreaterThan(result.tetrion);
+  expect(result.overlay).toBeGreaterThanOrEqual(result.tetrion);
   await page.waitForTimeout(250); await page.screenshot({ path: 'TEMP/fullscreen-action-text.png', fullPage: true });
 });

@@ -23,7 +23,7 @@ test('all archived room presets populate the editor and Classic enforces its vis
   await page.locator('#custom-preset').selectOption('room:classic'); await page.locator('#custom-start').click();
   await expect(page.locator('#mode-label')).toHaveText('CLASSIC · SOLO');
   await expect(page.locator('#hold-panel')).not.toBeVisible();
-  await expect(page.locator('#next-preview')).toHaveAttribute('height', '90');
+  expect(await page.locator('#next-preview').evaluate(el => el.getBoundingClientRect().height / document.querySelector('#board')!.getBoundingClientRect().width)).toBeCloseTo(3 / 10, 1);
   await expect(page.locator('#mode-rules')).toContainText('ARR 5, DAS 16, SDF 6');
   await expect(page.locator('#controls-summary')).toContainText('automatic lock');
   await page.keyboard.press('Space'); await page.keyboard.press('c');
@@ -36,7 +36,7 @@ test('4-WIDE renders at the right aspect ratio with a complete replayable finess
   await page.goto('/'); await page.locator('#mode-select').selectOption('custom'); await page.locator('#custom-open').click();
   await page.locator('#custom-preset').selectOption('room:4wide'); await page.locator('#custom-seed').fill('1'); await page.locator('#custom-start').click();
   await page.locator('#finesse-toggle').check();
-  await expect(page.locator('#board')).toHaveAttribute('width', '120'); await expect(page.locator('#board')).toHaveAttribute('height', '870');
+  await expect(page.locator('#board')).toBeVisible();
   const board = await page.locator('#board').boundingBox(), hold = await page.locator('#hold-panel').boundingBox();
   expect(Math.abs(board!.height / board!.width - 29 / 4)).toBeLessThan(.01);
   expect(Math.abs(hold!.y - (board!.y + board!.width * 3 / 4))).toBeLessThan(3);
@@ -49,7 +49,7 @@ test('4-WIDE renders at the right aspect ratio with a complete replayable finess
   await page.locator('#demo-replay').click(); await expect(page.locator('#demo-step')).toHaveText('Start here');
   await page.locator('#pause').click(); await page.screenshot({ path: 'test-results/room-4wide-finesse.png', fullPage: true });
   await openSection(page, '#fault-practice-tools'); await page.locator('#practice-last').click(); await expect(page.locator('#practice-status')).toContainText('1 fault scenes loaded');
-  await expect(page.locator('#board')).toHaveAttribute('width', '120');
+  await expect.poll(() => page.locator('#board').evaluate(el => el.getBoundingClientRect().height / el.getBoundingClientRect().width)).toBeCloseTo(29 / 4, 1);
   await page.keyboard.press('Space'); await expect(page.locator('#overlay-value')).toHaveText('Practice complete');
 });
 
@@ -81,7 +81,7 @@ test('authored maps and queues round-trip through preset files, validate before 
   await page.locator('#custom-map').fill('*###');
   expect(await page.locator('#custom-dialog').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/room-preset-mobile.png', fullPage: true });
-  await page.locator('#custom-start').click(); await expect(page.locator('#board')).toHaveAttribute('width', '120');
+  await page.locator('#custom-start').click(); await expect.poll(() => page.locator('#board').evaluate(el => el.getBoundingClientRect().height / el.getBoundingClientRect().width)).toBeCloseTo(29 / 4, 1);
   await expect(page.locator('#mode-rules')).toContainText('Authored queue (repeating)');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

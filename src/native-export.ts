@@ -10,7 +10,8 @@ const gameKeys = ['moveLeft', 'moveRight', 'softDrop', 'hardDrop', 'rotateCW', '
 export async function exportNative(replay: TrainerReplay) {
   if (!replay.startedAt || !replay.placements.length) throw new Error('Place at least one piece before exporting a TETR.IO replay.');
   const rules = replay.modeRules, a = rules.advanced, tape = replayTimeline(replay);
-  if (replay.mode === 'fault-practice' || a.garbageRefill || a.garbageInterval || a.sequence || replay.events.some(event => event.type === 'clear-field')) throw new Error('This session uses scene changes, garbage refill, timed solo packets, an authored queue or board clearing. Export trainer JSON to preserve it; native export currently supports ordinary Sprint and Custom sessions with retries and undo.');
+  if (replay.analysisScene) throw new Error('This session uses scene changes. Export trainer JSON to preserve the PC board.');
+  if (replay.mode === 'fault-practice' || a.garbageRefill || a.garbageInterval || a.sequence || replay.events.some(event => ['clear-field', 'practice-scene'].includes(event.type))) throw new Error('This session uses scene changes, garbage refill, timed solo packets, an authored queue or board clearing. Export trainer JSON to preserve it; native export currently supports ordinary Sprint and Custom sessions with retries and undo.');
   const engine = createEngine(replay.settings, replay.seed, rules);
   applyModeSetup(engine, rules, replay.seed);
   if (engine.board.state.some(row => row.some(tile => tile?.mino === 'bomb'))) throw new Error('Native export cannot preserve an initial bomb map yet. Export trainer JSON for this session.');

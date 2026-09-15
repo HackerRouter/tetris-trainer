@@ -14,9 +14,11 @@ Though I do not think anyone is reading this, haha!
 
 1. Finesse practice mode;
 2. Openers practice;
-3. Finesse auto detection and rollback mechanism;
-4. Supports tetrio recording import, export and replay.
-5. Everyone loves statistics!
+3. PC Guidance and Calculator;
+4. Combo Guidance and Calculator;
+5. Finesse auto detection and rollback mechanism;
+6. Supports tetrio recording import, export and replay.
+7. Everyone loves statistics!
 
 ------
 

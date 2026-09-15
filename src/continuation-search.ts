@@ -5,8 +5,8 @@ import type { AnalysisContext } from './analysis-context';
 import type { PracticeScene } from './practice';
 
 export type ContinuationGoal = 'pc' | 'tspin' | 'tsd' | 'two-tspins' | 'two-tsd';
-export type ContinuationStep = { scene: PracticeScene; after: EngineSnapshot; lines: number; spin: string; piece: string; pc: boolean };
-export type ContinuationRoute = { id: string; name?: string; source?: string; stageId?: string; steps: ContinuationStep[]; spins: number; lines: number; pc: boolean };
+export type ContinuationStep = { scene: PracticeScene; after: EngineSnapshot; lines: number; spin: string; piece: string; pc: boolean; unknownCurrent?: boolean };
+export type ContinuationRoute = { id: string; name?: string; source?: string; stageId?: string; steps: ContinuationStep[]; spins: number; lines: number; pc: boolean; combo?: { clears: number; setup: number; attack: number; endCombo: number; choices: number[]; boundary: string } };
 export type ContinuationRequest = { context: AnalysisContext; goal: ContinuationGoal; depth: number; seeded: boolean; budgetMs?: number; limit?: number };
 export type ContinuationResult = { routes: ContinuationRoute[]; checked: number; elapsedMs: number; depth: number; queue: string[]; seeded: boolean; limited: boolean; message: string };
 type Node = { snapshot: EngineSnapshot; steps: ContinuationStep[]; drawn: number; spins: number; lines: number; score: number };

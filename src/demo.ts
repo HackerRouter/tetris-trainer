@@ -27,8 +27,9 @@ export class DemoPanel {
   }
 
   update(now: number, game: TrainerGame) {
-    if (game.demonstration !== this.source) {
-      this.source = game.demonstration;
+    const demonstration = game.hideAnalysisTarget ? null : game.demonstration;
+    if (demonstration !== this.source) {
+      this.source = demonstration;
       this.completed = game.practice?.completed ?? 0;
       this.popup.hidden = !this.source;
       if (this.source) {

@@ -11,6 +11,7 @@
 .training-workspace{--left-rail:230px;--right-rail:280px;display:grid;grid-template-columns:var(--left-rail) minmax(0,1fr) var(--right-rail);gap:18px;margin-top:0;align-items:start}
 .game-toolbar{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-height:72px;flex-wrap:wrap;padding:12px 0 4px}
 .game-toolbar>button{font-size:12px;padding:9px 12px}
+.game-toolbar #undo{margin-bottom:0}
 .game-toolbar .mode-picker{display:flex;margin:0;gap:8px;min-width:0}
 .game-toolbar .mode-picker select{width:145px;font-size:13px;padding:8px}
 .game-switches{display:flex;gap:16px;align-items:center;margin-left:auto;flex-wrap:wrap}
@@ -46,7 +47,7 @@
 .workspace-links a,.workspace-panel a{font-size:12px;color:#a9dcd0;text-underline-offset:3px}
 #custom-tools{flex-wrap:wrap}
 .tetrion{--cell-size:clamp(16px,calc((100dvh - 300px) / var(--board-rows,23)),30px);width:min(100%,calc(var(--tetrion-columns,16) * var(--cell-size)));margin-inline:auto;text-align:left}
-.tetrion .left-column,.tetrion .right-column{padding-top:100%}
+.tetrion .left-column,.tetrion .right-column{padding-top:60%}
 .tetrion .right-column{padding-left:8px}
 .board-stats{padding-right:7px}
 .board-stats>div{margin-top:16px}
@@ -91,7 +92,8 @@
 #current-guidance .coach details{margin-top:8px;padding-top:8px}
 #current-guidance .demo-popup{display:block;padding:0;border:0;box-shadow:none;background:transparent;max-height:none;overflow:visible;margin:12px 0 0}
 #current-guidance .demo-popup header{padding-bottom:8px;border-bottom:1px solid #263345}
-#current-guidance .demo-popup canvas{width:110px;max-height:240px;margin:10px auto}
+#current-guidance{--guide-preview-width:110px;--guide-preview-height:240px;--guide-preview-margin:10px}
+#current-guidance :is(#demo-board,#pc-preview){width:var(--guide-preview-width);max-width:100%;height:auto;max-height:var(--guide-preview-height);object-fit:contain;margin:var(--guide-preview-margin) auto}
 #current-guidance .demo-instructions{padding-top:12px;border-top:1px solid #263345;margin-top:12px}
 #current-guidance .demo-instructions h3{font-size:13px}
 #current-guidance .demo-instructions ol{padding-left:20px;margin-bottom:0}
@@ -219,7 +221,7 @@
   #current-guidance .demo-popup{margin-top:20px}
   #current-guidance .demo-popup header{font-size:21px;gap:18px;padding-bottom:16px;line-height:1.5}
   #current-guidance .demo-popup header button{font-size:22px;padding:5px 13px}
-  #current-guidance .demo-popup canvas{width:200px;max-height:460px;margin:18px auto}
+  #current-guidance{--guide-preview-width:200px;--guide-preview-height:460px;--guide-preview-margin:18px}
   #current-guidance .demo-popup #demo-step{font-size:20px;line-height:1.5;margin:18px 0 10px}
   #current-guidance .demo-popup small{font-size:16px}
   #current-guidance .demo-instructions{padding-top:20px;margin-top:20px}
@@ -278,9 +280,36 @@
   #tools-dialog .config-hint,#export-status,#conversion-status{font-size:18px}
 }
 
-@media(min-width:1800px){
-  .app{--wide-rail:28.125vw;max-width:none;padding-inline:3.125vw}
+@media(min-width:951px){
+  .app{--desktop-overhead:250px;--desktop-cell:clamp(16px,calc((100dvh - var(--desktop-overhead)) / 23),52px);--wide-rail:min(28.125vw,calc((93.75vw - var(--desktop-cell) * 20 - 40px) / 2));max-width:none;padding-inline:3.125vw}
+  .tetrion{--cell-size:clamp(16px,calc((100dvh - var(--desktop-overhead)) / var(--board-rows,23)),52px)}
+  .board-stats strong{font-size:clamp(36px,calc(var(--desktop-cell) * 1.08),56px)}
+  .board-stats>div>span{font-size:clamp(14px,calc(var(--desktop-cell) * .39),20px)}
+  .board-stats small{font-size:clamp(13px,calc(var(--desktop-cell) * .39),20px)}
+  #time,#player-clock{font-size:clamp(26px,calc(var(--desktop-cell) * .77),40px)}
+  .native-frame h2{height:clamp(22px,calc(var(--desktop-cell) * .67),35px)}
   .training-workspace{--left-rail:var(--wide-rail);--right-rail:var(--wide-rail);column-gap:20px}
   .opener-library-workspace,.replay-workspace{grid-template-columns:var(--wide-rail) minmax(0,1fr) var(--wide-rail);column-gap:20px}
-  .workspace-panel .opener-card{grid-template-columns:140px minmax(0,1fr)}
+  .workspace-panel .opener-card{grid-template-columns:min(30%,140px) minmax(0,1fr)}
 }
+@media(min-width:1800px){.app{--desktop-overhead:380px}}
+
+.pc-active .workspace-left>:not(#pc-lab){display:none}
+#pc-lab textarea{width:100%;resize:vertical}
+#pc-lab .select-row{align-items:center}
+#pc-lab .select-row input{min-width:0;width:50%}
+#pc-status{color:#a9dcd0;line-height:1.6}
+#pc-routes{grid-template-columns:minmax(0,1fr);gap:10px}
+#pc-guide-title{font-size:22px;line-height:1.5}
+#pc-plan{padding-left:24px;font-size:18px;line-height:1.7}
+#pc-plan li{margin-block:14px}
+#current-guidance:has(#pc-guide:not([hidden])) #guide-empty{display:none}
+#current-guidance:has(#demo-popup:not([hidden])) #pc-preview{display:none}
+#pc-lab .pc-learning{border-top:1px solid #263345;margin-top:18px}
+@media(min-width:1800px){#pc-lab button{font-size:18px}#pc-lab .small{padding:10px 14px}#pc-lab>h3{font-size:28px}#pc-guide .page-toolbar button{font-size:18px}#pc-scope,#pc-candidate-note{font-size:16px}}
+.range-row output[role="button"], .number-row output[role="button"] { cursor: text; border-radius: 4px; }
+.range-row output[role="button"]:hover, .number-row output[role="button"]:hover { color: #8de0ce; }
+.range-row output[role="button"]:focus-visible, .number-row output[role="button"]:focus-visible { outline: 2px solid #8de0ce; outline-offset: 3px; }
+#settings-dialog input.setting-value-editor { width: 100%; min-width: 0; padding: 4px 2px; text-align: right; font: inherit; appearance: textfield; }
+#settings-dialog input.setting-value-editor::-webkit-inner-spin-button, #settings-dialog input.setting-value-editor::-webkit-outer-spin-button { appearance: none; margin: 0; }
+#settings-dialog input.setting-value-editor[aria-invalid="true"] { outline: 2px solid #ff7e86; }

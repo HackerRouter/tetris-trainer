@@ -7,10 +7,41 @@ export class SettingsPanel {
   private status = document.querySelector<HTMLElement>('#settings-status')!;
   private draft = structuredClone(defaults);
   private capturing: Action | null = null;
+  private valueEdit: { input: HTMLInputElement; output: HTMLOutputElement; field: HTMLInputElement; milliseconds: boolean } | null = null;
 
   constructor(private save: (settings: Settings) => void, private close: () => void) {
     const sdf = this.field<HTMLSelectElement>('sdf');
     sdf.replaceChildren(...Array.from({ length: 41 }, (_, i) => new Option(i === 40 ? 'Instant' : `${i + 1}×`, String(i + 1))));
+    for (const [id, outputId, name, milliseconds] of [
+      ['ghostOpacity', 'opacity-unit', 'Ghost opacity', false],
+      ['gridOpacity', 'gridOpacity-unit', 'Grid opacity', false],
+      ['boardOpacity', 'boardOpacity-unit', 'Board opacity', false],
+      ['audio-volume', 'audio-volume-unit', 'Volume', false],
+      ['arr', 'arr-unit', 'ARR', true], ['das', 'das-unit', 'DAS', true], ['dcd', 'dcd-unit', 'DCD', true],
+    ] as const) {
+      const output = this.field<HTMLOutputElement>(outputId);
+      const label = `Edit ${name} in ${milliseconds ? 'milliseconds' : 'percent'}`;
+      output.tabIndex = 0; output.setAttribute('role', 'button'); output.setAttribute('aria-label', label); output.title = label;
+      const edit = () => {
+        if (!this.finishValueEdit(true)) return;
+        this.capturing = null; this.drawBindings();
+        const field = this.field(id), input = document.createElement('input');
+        input.type = 'number'; input.className = 'setting-value-editor'; input.setAttribute('aria-label', label);
+        input.min = '0'; input.max = milliseconds ? String(Number(field.max) * 1000 / 60) : '100'; input.step = milliseconds ? 'any' : '1';
+        input.value = milliseconds ? (Number(field.value) * 1000 / 60).toFixed(1) : field.value;
+        output.hidden = true; output.after(input); this.valueEdit = { input, output, field, milliseconds };
+        input.addEventListener('input', event => event.stopPropagation());
+        input.addEventListener('keydown', event => {
+          if (event.key !== 'Enter' && event.key !== 'Escape') return;
+          event.preventDefault(); event.stopPropagation();
+          if (this.finishValueEdit(event.key === 'Enter')) output.focus();
+        });
+        input.addEventListener('blur', () => this.finishValueEdit(true));
+        input.focus(); input.select();
+      };
+      output.addEventListener('click', event => { event.preventDefault(); edit(); });
+      output.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); edit(); } });
+    }
     const bindings = document.querySelector('#bindings')!;
     for (const action of Object.keys(actions) as Action[]) {
       const row = document.createElement('div'); row.className = 'binding-row';
@@ -69,7 +100,20 @@ export class SettingsPanel {
     } catch (error) { if (this.dialog.open) this.setStatus(`Import failed: ${(error as Error).message}`, true); }
   }
   importError(message: string) { this.setStatus(`Import failed: ${message}`, true); }
-  private finish() { this.capturing = null; this.dialog.close(); this.close(); if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); }
+  private finish() { this.finishValueEdit(false); this.capturing = null; this.dialog.close(); this.close(); if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); }
+  private finishValueEdit(commit: boolean) {
+    const edit = this.valueEdit; if (!edit) return true;
+    if (commit) {
+      const value = edit.input.valueAsNumber;
+      if (!Number.isFinite(value) || value < 0 || value > Number(edit.input.max)) {
+        this.setStatus(`Enter a value from 0 to ${Number(edit.input.max).toFixed(edit.milliseconds ? 1 : 0)}.`, true);
+        edit.input.setAttribute('aria-invalid', 'true'); return false;
+      }
+      edit.field.value = String(edit.milliseconds ? Math.round(value * 60 / 1000 * 10) / 10 : Math.round(value));
+      this.setStatus('Unsaved changes. Save to apply to the next game.');
+    } else this.setStatus('Value edit cancelled.');
+    this.valueEdit = null; edit.input.remove(); edit.output.hidden = false; this.updateUnits(); return true;
+  }
   private setStatus(text: string, error = false) { this.status.textContent = text; this.status.className = error ? 'error' : ''; }
   private field<T extends HTMLInputElement | HTMLSelectElement | HTMLButtonElement | HTMLOutputElement = HTMLInputElement>(id: string) { return this.form.querySelector<T>(`#${id}`)!; }
 
@@ -92,11 +136,12 @@ export class SettingsPanel {
   }
 
   private fill(settings: Settings) {
+    this.finishValueEdit(false);
     this.draft = structuredClone(settings); this.capturing = null;
     for (const key of ['arr', 'das', 'dcd', 'sdf', 'irs', 'ihs'] as const) this.field(key).value = String(settings.handling[key]);
     for (const key of ['cancel', 'safelock', 'may20g'] as const) this.field<HTMLInputElement>(key).checked = settings.handling[key];
     for (const key of ['grid', 'ghost', 'coloredGhost', 'dimLockedHold'] as const) this.field<HTMLInputElement>(key).checked = settings.display[key];
-    for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) this.field(key).value = String(settings.display[key] * 100);
+    for (const key of ['ghostOpacity', 'gridOpacity', 'boardOpacity'] as const) this.field(key).value = String(Math.round(settings.display[key] * 100));
     this.field('countdownSeconds').value = String(settings.training.countdownSeconds);
     this.field('think-style').value = settings.training.thinkStyle;
     this.field('audio-volume').value = String(settings.audio.volume * 100);
@@ -128,6 +173,7 @@ export class SettingsPanel {
   }
 
   private read(): Settings {
+    if (!this.finishValueEdit(true)) throw new Error('Correct the highlighted value before saving.');
     const result = structuredClone(this.draft);
     result.audio = { enabled: this.field<HTMLInputElement>('audio-enabled').checked, volume: Number(this.field('audio-volume').value) / 100, ui: this.field<HTMLInputElement>('audio-ui').checked };
     for (const key of ['arr', 'das', 'dcd', 'sdf'] as const) {

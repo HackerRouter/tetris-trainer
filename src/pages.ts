@@ -11,13 +11,18 @@ import { readReplay, type ReplayTrack } from './replay';
 import { downloadJson, type Settings } from './settings';
 import { formatTime } from './time';
 import type { PracticeSet } from './practice';
+import { PcLab } from './pc-lab';
+import { analysisContext, type AnalysisContext } from './analysis-context';
+import { createEngine } from './engine';
+import type { Mino } from '@haelp/teto/engine';
 
-type Callbacks = { game: () => TrainerGame; freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
+type Callbacks = { game: () => TrainerGame; analysis: (context: AnalysisContext) => TrainerGame; freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const cell = (text: string | number) => { const td = document.createElement('td'); td.textContent = String(text); return td; };
 
 export class Pages {
   readonly opening: OpeningTraining;
+  readonly lab: PcLab;
   private openersPage: OpenersPage;
   private sessions: SessionRecord[] = [];
   private groups: FaultGroup[] = [];
@@ -31,6 +36,8 @@ export class Pages {
   constructor(private history: HistoryStore, private callbacks: Callbacks) {
     this.drills(); this.statistics(); this.replays();
     this.opening = new OpeningTraining(callbacks);
+    this.lab = new PcLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
+    const pcStatistics = document.createElement('section'); pcStatistics.id = 'pc-statistics'; el('statistics-page').append(pcStatistics);
     this.openersPage = new OpenersPage({ settings: callbacks.settings, rules: callbacks.rules, random: () => this.opening.startRandom(), single: opener => this.opening.startSingle(opener) });
     window.addEventListener('hashchange', () => this.route());
     document.addEventListener('drop', event => {
@@ -47,12 +54,14 @@ export class Pages {
     const hint = document.querySelector('.config-hint');
     if (hint) hint.textContent = this.page === 'replays' ? 'Drop a trainer JSON or TETR.IO replay here. TTC files still open the config importer.' : 'Drop a TETR.IO .ttc config anywhere on this page to import your settings.';
     for (const name of ['play', 'drills', 'openers', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
+    if (['#analysis', '#pc', '#combo'].includes(location.hash)) this.lab.setPage(location.hash === '#combo' ? 'combo' : 'pc');
+    this.lab.setVisible(['#analysis', '#pc', '#combo'].includes(location.hash));
     document.querySelectorAll<HTMLAnchorElement>('.page-nav a').forEach(link => {
-      if (link.hash === `#${this.page}`) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+      if (link.hash === (this.lab.active ? location.hash === '#combo' ? '#combo' : '#pc' : `#${this.page}`)) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
     if (this.page !== 'play') { this.opening.suspend(); this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
     if (this.page === 'openers') this.openersPage.refresh();
-    if (this.page === 'statistics') void this.refreshHistory();
+    if (this.page === 'statistics') { void this.refreshHistory(); this.lab.renderStatistics(el('pc-statistics')); }
     if (this.page !== 'replays') this.playing = false;
   }
   private notice(message: string) { el('statistics-status').textContent = message; }
@@ -75,7 +84,7 @@ export class Pages {
       } catch (error) { el('drill-status').textContent = (error as Error).message; }
     });
   }
-  private beginPractice(set: PracticeSet) { this.opening.clear(); el('opener-references').hidden = true; location.hash = 'play'; this.callbacks.practice(set); }
+  private beginPractice(set: PracticeSet) { this.lab.clear(); this.opening.clear(); el('opener-references').hidden = true; location.hash = 'play'; this.callbacks.practice(set); }
   private statistics() {
     el('statistics-page').innerHTML = `<h2 id="statistics-title">Finesse statistics</h2><p class="muted">History is stored only in this browser. Sessions include unfinished games; use the filters to compare like sessions. Every inefficient attempt counts, including retries and mistakes recorded with checking off.</p><div class="page-toolbar"><label>Mode<select id="stats-mode"><option value="">All modes</option><option value="40l-finesse">40L Sprint</option><option value="custom">Custom</option><option value="fault-practice">Drills / fault practice</option></select></label><label>Status<select id="stats-state"><option value="">All sessions</option><option value="complete">Completed</option><option value="topout">Top outs</option></select></label><button id="stats-refresh" class="secondary">Refresh</button><button id="history-export" class="secondary">Export history backup</button><button id="history-import" class="secondary">Import history backup</button><input id="history-file" type="file" accept=".json" hidden></div><p id="statistics-status" role="status"></p><div id="history-summary" class="summary-cards"></div><h3>Most frequent faults</h3><p class="muted">Grouped by piece, target column / shape and rotation system. Repeated retries remain separate attempts. Empty-board drills train placement habits; enable original boards for stack-dependent tucks and spins.</p><div class="page-toolbar"><button id="fault-top" class="secondary">Select top 5</button><button id="fault-none" class="secondary">Clear selection</button><label class="check-row"><input id="fault-original" type="checkbox">Use original boards</label><button id="train-faults" disabled>Practice selected faults</button><span id="fault-selection" role="status">0 selected</span></div><div class="table-scroll"><table><thead><tr><th>Select</th><th>Rank</th><th>Placement</th><th>Faults</th><th>Extra inputs</th><th>Frequency</th></tr></thead><tbody id="fault-rows"></tbody></table></div><h3>Sessions</h3><div class="table-scroll"><table><thead><tr><th>Date / mode</th><th>Status</th><th>Attempts</th><th>Faults</th><th>Perfect %</th><th>Time</th><th>Actions</th></tr></thead><tbody id="session-rows"></tbody></table></div><p class="muted">Perfect % uses verified attempts. Unknown paths and target-only mistakes are excluded. Backups contain full recordings; keep one before clearing browser data.</p>`;
     el('stats-refresh').addEventListener('click', () => void this.refreshHistory());
@@ -136,6 +145,23 @@ export class Pages {
     tetrion.querySelectorAll<HTMLElement>('[id]').forEach(node => { node.id = node.id === 'time' ? 'player-clock' : `player-${node.id}`; });
     tetrion.querySelector('#player-board-overlay')!.remove();
     el('player-tetrion').append(tetrion);
+    const analyze = document.createElement('button'); analyze.id = 'player-analyze'; analyze.className = 'secondary wide'; analyze.textContent = 'Analyze this frame for PC';
+    el('player-info').parentElement!.before(analyze);
+    analyze.addEventListener('click', () => {
+      const playback = this.playback; if (!playback) return;
+      try {
+        this.playing = false;
+        let index = 0;
+        while (index + 1 < playback.frames.length && playback.frames[index + 1].time <= this.position) index++;
+        const frame = playback.frames[index];
+        if (!frame.piece || frame.analysis.unavailable) throw new Error('Choose a frame with a controllable active piece.');
+        const engine = createEngine(playback.settings, 1, playback.rules), snapshot = engine.snapshot({ isUndoRedo: true });
+        Object.assign(snapshot, { board: structuredClone(frame.board), falling: structuredClone(frame.piece), hold: frame.hold as Mino | null, holdLocked: frame.holdLocked, stats: structuredClone(frame.analysis.stats), lastSpin: frame.analysis.lastSpin, lastWasClear: frame.analysis.lastWasClear });
+        snapshot.queue.value = [...frame.next] as Mino[]; snapshot._queue.value = [...snapshot.queue.value];
+        if (frame.analysis.pendingGarbage) throw new Error('This replay frame has pending garbage. Stable boards only.');
+        this.lab.importScene({ id: crypto.randomUUID(), name: `${playback.name} · frame ${Math.round(frame.time * 60)}`, source: `Replay frame ${Math.round(frame.time * 60)} (${frame.time.toFixed(3)} s); visible Next; bag remainder unknown`, context: analysisContext(playback.rules, playback.settings, snapshot), future: false, finiteQueue: true });
+      } catch (error) { this.replayStatus((error as Error).message); }
+    });
     el('player-import').addEventListener('click', () => el<HTMLInputElement>('player-file').click());
     el('player-file').addEventListener('change', () => { const file = el<HTMLInputElement>('player-file').files?.[0]; if (file) void this.loadFile(file); el<HTMLInputElement>('player-file').value = ''; });
     el('player-current').addEventListener('click', () => {
@@ -166,8 +192,8 @@ export class Pages {
       el('player-faults').textContent = String(playback.trainingFaults);
       el('player-faults').parentElement!.title = 'All original training faults remain in Statistics. Removed attempts are not replayed.';
       const tetrion = el('player-tetrion').firstElementChild as HTMLElement;
-      tetrion.style.gridTemplateColumns = `minmax(0,3fr) minmax(0,${playback.engine.board.width}fr) minmax(0,3fr)`;
-      tetrion.style.setProperty('--tetrion-columns', String(playback.engine.board.width + 6)); tetrion.style.setProperty('--board-rows', String(playback.engine.board.height + 3));
+      tetrion.style.gridTemplateColumns = `minmax(0,5fr) minmax(0,${playback.engine.board.width}fr) minmax(0,5fr)`;
+      tetrion.style.setProperty('--tetrion-columns', String(playback.engine.board.width + 10)); tetrion.style.setProperty('--board-rows', String(playback.engine.board.height + 3));
       el('player-content').hidden = false; el('player-empty').hidden = true; el('player-title').textContent = track.name;
       el<HTMLInputElement>('player-seek').max = String(playback.duration);
       const canvas = el<HTMLCanvasElement>('player-board'); canvas.width = playback.engine.board.width * 30; canvas.height = (playback.engine.board.height + 3) * 30;
@@ -175,7 +201,7 @@ export class Pages {
     } catch (error) { if (token === this.loading) this.replayStatus((error as Error).message); }
   }
   update(now: number) {
-    if (this.page === 'play') this.opening.update(this.callbacks.game());
+    if (this.page === 'play') { if (this.lab.active) this.lab.update(); else this.opening.update(this.callbacks.game()); }
     if (this.page !== 'replays' || !this.playback) return;
     const before = this.position;
     if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) { this.playing = false; this.effectTail = now; } }

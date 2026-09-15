@@ -14,7 +14,7 @@ import { placementSounds } from './sound-events';
 import type { Cell } from './finesse';
 import type { PlacementEffect } from './renderer';
 
-export type PlaybackFrame = { actionEffects: ActionText[]; time: number; board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; hold: string | null; holdLocked: boolean; next: string[]; pieces: number; lines: number; inputs: number; holds: number; perfects: number; target: Cell[] | null; effect: PlacementEffect | null; effectTime: number; label: string; sounds: string[] };
+export type PlaybackFrame = { analysis: Pick<EngineSnapshot, 'stats' | 'lastSpin' | 'lastWasClear'> & { pendingGarbage: boolean; unavailable: boolean }; actionEffects: ActionText[]; time: number; board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; hold: string | null; holdLocked: boolean; next: string[]; pieces: number; lines: number; inputs: number; holds: number; perfects: number; target: Cell[] | null; effect: PlacementEffect | null; effectTime: number; label: string; sounds: string[] };
 export type Playback = { name: string; engine: Engine; frames: PlaybackFrame[]; duration: number; rules: ModeRules; settings: Settings; trainingFaults: number; modeName: string };
 
 export async function buildPlayback(track: ReplayTrack, settings: Settings, progress?: (text: string) => void): Promise<Playback> {
@@ -48,7 +48,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
       if (piece.y < previous.y && engine.input.keys.softDrop) sounds.push('softdrop');
     }
     previous = { x: piece.x, y: piece.y, rotation: piece.rotation };
-    const state: PlaybackFrame = { actionEffects, time: engine.frame / 60, board, piece: engine.toppedOut || room?.waiting ? null : piece.snapshot(), hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, rules.nextCount), pieces: track.kind === 'trainer' && track.data.practice ? completed : engine.stats.pieces, lines: engine.stats.lines, inputs, holds, perfects, target, effect, effectTime, label, sounds };
+    const state: PlaybackFrame = { analysis: { stats: structuredClone(engine.stats), lastSpin: engine.lastSpin, lastWasClear: engine.lastWasClear, pendingGarbage: engine.garbageQueue.size > 0, unavailable: engine.glock > 0 || !!room?.waiting }, actionEffects, time: engine.frame / 60, board, piece: engine.toppedOut || room?.waiting ? null : piece.snapshot(), hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, rules.nextCount), pieces: track.kind === 'trainer' && track.data.practice ? completed : engine.stats.pieces, lines: engine.stats.lines, inputs, holds, perfects, target, effect, effectTime, label, sounds };
     if (frames.at(-1)?.time === state.time) { state.sounds = [...frames.at(-1)!.sounds, ...sounds]; frames[frames.length - 1] = state; }
     else frames.push(state);
     sounds = [];
@@ -58,7 +58,7 @@ export async function buildPlayback(track: ReplayTrack, settings: Settings, prog
     const keys = track.data.events.filter((event: any) => event.type === 'keydown');
     let keyIndex = 0;
     await nativeScenes(track, settings, progress, (engine, mode, runtime, count) => {
-      rules = mode; room = runtime; perfects = count;
+      rules = mode; room = runtime; perfects = count; displaySettings = { ...settings, handling: { ...engine.handling } };
       while (keyIndex < keys.length && keys[keyIndex].frame < engine.frame) { inputs++; keyIndex++; }
       lastFrame = engine.frame; collect(engine);
     });
