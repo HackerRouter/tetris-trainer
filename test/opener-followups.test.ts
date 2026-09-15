@@ -11,10 +11,12 @@ import { sameCells } from '../src/practice.ts';
 import { buildDemoFrames } from '../src/demo-frames.ts';
 import { placementSteps } from '../src/guide.ts';
 
-test('explicit double support prioritizes two full TSDs, then one, ahead of other published possibilities', () => {
-  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'stickspin')!), ['two-tsd', 'tsd', 'tspin', 'pc']);
+test('a TSD means one two-line T-spin and only explicit counts request two TSDs', () => {
+  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'stickspin')!), ['tsd', 'tspin', 'pc']);
   assert.deepEqual(automaticContinuationGoals({ id: 'local', name: 'Custom', source: '', note: 'Supports two T-spin doubles.' }), ['two-tsd', 'tsd', 'tspin', 'pc']);
-  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'db-377')!), ['two-tsd', 'tsd', 'tspin', 'pc']);
+  assert.deepEqual(automaticContinuationGoals(allOpeners.find(opener => opener.id === 'db-377')!), ['pc', 'tsd', 'tspin']);
+  for (const note of ['Supports TSD.', 'Follow with a T-spin double.', 'Choose from these TSDs.']) assert.deepEqual(automaticContinuationGoals({ id: 'local', name: 'Custom', source: '', note }), ['tsd', 'tspin', 'pc']);
+  assert.deepEqual(automaticContinuationGoals({ id: 'local', name: 'Custom', source: '', note: 'Supports two T-spins.' }), ['two-tspins', 'tspin', 'pc']);
   assert.deepEqual(automaticContinuationGoals({ id: 'local-pc', name: 'Perfect Clear', source: '' }), ['pc', 'tspin']);
   const routes = [
     { id: 'pc', steps: [{ piece: 'o', spin: 'none', lines: 2 }] },
@@ -22,7 +24,8 @@ test('explicit double support prioritizes two full TSDs, then one, ahead of othe
     { id: 'mini', steps: [{ piece: 't', spin: 'mini', lines: 2 }] },
     { id: 'two', steps: [{ piece: 't', spin: 'normal', lines: 2 }, { piece: 't', spin: 'normal', lines: 2 }] }
   ] as ContinuationRoute[];
-  assert.deepEqual(rankDoubleContinuations(routes).map(route => route.id), ['two', 'one', 'pc', 'mini']);
+  assert.deepEqual(rankDoubleContinuations(routes).map(route => route.id), ['one', 'two', 'pc', 'mini']);
+  assert.deepEqual(rankDoubleContinuations(routes, 2).map(route => route.id), ['two', 'one', 'pc', 'mini']);
 });
 
 function setup(id: string, seed: number, mirror = false) {

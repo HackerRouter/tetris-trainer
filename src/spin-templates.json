@@ -1,0 +1,7900 @@
+[
+  {
+    "id": "i-mini-2",
+    "name": "Mini I-spin Double",
+    "piece": "i",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X______XXX",
+          "X_X____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X______XXX",
+          "X_X____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "i-mini-3",
+    "name": "Mini I-spin Triple",
+    "piece": "i",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X______XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXX_____XX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "i",
+    "name": "Mini I-spin Single",
+    "piece": "i",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXX_XXXX",
+          "XX____XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XX____XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX____XXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXX__XXX",
+          "XXX____XXX",
+          "XXXXX__XXX",
+          "XXXXX__XXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "X_XXXXXXXX",
+          "X______XXX",
+          "X_X____XXX",
+          "X_X____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "X_XXXXXXXX",
+          "X______XXX",
+          "X_X____XXX",
+          "X_X____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "i-mini-0",
+    "name": "Mini I-spin Zero",
+    "piece": "i",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXX______X",
+          "XXX____X_X",
+          "XXX____X_X",
+          "XXX____X_X",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "X______XXX",
+          "X_X____XXX",
+          "X_X____XXX",
+          "X_X____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "j-mini-1",
+    "name": "Mini J-spin Single",
+    "piece": "j",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "X__XXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXX_____XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXX__XXXXX",
+          "XX___XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXX__XXXXX",
+          "XX___XXXXX",
+          "XX____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "j-mini-0",
+    "name": "Mini J-spin Zero",
+    "piece": "j",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXXXX_X",
+          "XXXXXX___X",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "XX____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX__X_XX",
+          "XXXX____XX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XX____XXXX",
+          "XX_X__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXX___XX",
+          "XXX_____XX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXX___XXXX",
+          "______XXXX",
+          "_XX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "j-mini-3",
+    "name": "Mini J-spin Triple",
+    "piece": "j",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "j",
+    "name": "Mini J-spin Double",
+    "piece": "j",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX___XXX",
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 0
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXX__XXXXX",
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXX___XXX",
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXX___XXXX",
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXXX_XXXX",
+          "XXXXX__XXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "l-mini-1",
+    "name": "Mini L-spin Single",
+    "piece": "l",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "X__XXXXXXX",
+          "X_____XXXX",
+          "X_X___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "_XXXXXXXXX",
+          "______XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "l-mini-0",
+    "name": "Mini L-spin Zero",
+    "piece": "l",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "_XXXXXXXXX",
+          "_X_XXXXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXX__XX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX____XX",
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXX____XX",
+          "XXXX__X_XX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "X___XXXXXX",
+          "X_____XXXX",
+          "X_X___XXXX",
+          "XXX___XXXX",
+          "_XX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXX___XXXX",
+          "XXX_____XX",
+          "XXX___X_XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "_X___XXXXX",
+          "_X___XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "l-mini-3",
+    "name": "Mini L-spin Triple",
+    "piece": "l",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "l",
+    "name": "Mini L-spin Double",
+    "piece": "l",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X___XXXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XX___XXXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 0
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "s-mini-1",
+    "name": "Mini S-spin Single",
+    "piece": "s",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X____XXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X____XXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX_XXXX",
+          "X__X__XXXX",
+          "XX____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX__XXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "X__XX_XXXX",
+          "XX____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX__XXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "s-mini-0",
+    "name": "Mini S-spin Zero",
+    "piece": "s",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXXXXX_X",
+          "XXXXXXX__X",
+          "XXX_____XX",
+          "XXX_____XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXXXXX_X",
+          "XXXXXXX__X",
+          "XXX_____XX",
+          "XXX_____XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX___XX",
+          "XXX_____XX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX__XXX",
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "s",
+    "name": "Mini S-spin Triple",
+    "piece": "s",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX_XXXXXX",
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "s-mini-2",
+    "name": "Mini S-spin Double",
+    "piece": "s",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXXX__XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXX__XXXXX",
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "X____XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "X____XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "z-mini-1",
+    "name": "Mini Z-spin Single",
+    "piece": "z",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "X_____XXXX",
+          "X_XX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XX____XXXX",
+          "X__X__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "z",
+    "name": "Mini Z-spin Triple",
+    "piece": "z",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXXX__XXX",
+          "XXXXXX_XXX",
+          "XXXX____XX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXXX_XXXX",
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXXX_XXXX",
+          "XXXX___XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "z-mini-0",
+    "name": "Mini Z-spin Zero",
+    "piece": "z",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XX___XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XX___XXXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "X_XX__XXXX",
+          "__XX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX____XX",
+          "XXX_____XX",
+          "XXX___X_XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX____XX",
+          "XXX_____XX",
+          "XXX___X_XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "z-mini-2",
+    "name": "Mini Z-spin Double",
+    "piece": "z",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXX__XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX__XXXX",
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX__XX",
+          "XXXX____XX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX__XX",
+          "XXXX____XX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "mini",
+    "name": "Mini T-spin Single",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXX___XXX",
+          "XXX___XXXX",
+          "XX____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXX___XXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX___XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "tss",
+    "name": "T-spin Single",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotate180"
+        ],
+        "spin": "normal",
+        "lines": 1,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "normal",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "normal",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "t-mini-0",
+    "name": "Mini T-spin Zero",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXX__XX",
+          "XXX_____XX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "XX_X__XXXX",
+          "X_____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX__X_XX",
+          "XXXX_____X",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "X_____XXXX",
+          "XX_X__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXX_____X",
+          "XXXX__X_XX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXX___XXX",
+          "XXX___XXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "tst",
+    "name": "T-spin Triple",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X_____XXXX",
+          "XX____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "XXXXXX_XXX",
+          "XXX____XXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "zero",
+    "name": "T-spin Zero",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_X_XXXXX",
+          "X_____XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "tsd",
+    "name": "T-spin Double",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXX__XX",
+          "XXXX____XX",
+          "XXX_____XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X____XXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "t-mini-2",
+    "name": "Mini T-spin Double",
+    "piece": "t",
+    "group": "Spin classes",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "XXXX___XXX",
+          "XXX_____XX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX__XXXXXX",
+          "XX___XXXXX",
+          "X_____XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotate180",
+          "softDrop",
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-1-t",
+    "name": "T Rotation direction",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX__XX",
+          "XXXXX_XXXX",
+          "XXXXX__XXX",
+          "XXXX_XXXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX__XX",
+          "XXXXX_XXXX",
+          "XXXXX__XXX",
+          "XXXX_XXXXX",
+          "XXXX__XXXX",
+          "__X_______",
+          "__XX______",
+          "__X_______"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-2-t",
+    "name": "T Rotation direction",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "__X_______",
+          "_XX_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "__X___X___",
+          "_XX__XX___",
+          "__X___X___"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-3-t",
+    "name": "T Rotation direction",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-3",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "X_XXX__XXX",
+          "X__XXXX_XX",
+          "XXXX_XX__X",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "X_XXX__XXX",
+          "X__XXXX_XX",
+          "XXXX_XX__X",
+          "XXX__XXXXX",
+          "__X_______",
+          "_XX_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "X_XXX__XXX",
+          "X__XXXX_XX",
+          "XXXX_XX__X",
+          "XXX__XXXXX",
+          "__X___X___",
+          "_XX__XX___",
+          "__X___X___"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "X_XXX__XXX",
+          "X__XXXX_XX",
+          "XXXX_XX__X",
+          "XXX__XXXXX",
+          "__X___XX__",
+          "_XX__XXXX_",
+          "__X___XX__"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-4-t",
+    "name": "T Rotation direction",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX__XXXXX",
+          "_XX____XX_",
+          "_XX_____X_",
+          "_XXXXX__X_",
+          "_XXXXX__X_",
+          "_XX_____X_",
+          "_X______X_",
+          "_X__XX_XX_",
+          "_X__XXXXX_"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW",
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW",
+          "dasLeft",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-5-t",
+    "name": "T Two-turn entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX__XXXXX",
+          "XXX___XXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-6-t",
+    "name": "T Slide in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-6",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX___XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "moveRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-7-t",
+    "name": "T Slide in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-7",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX___XXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "moveLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-8-t",
+    "name": "T Mini slide in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "X___XXXXXX",
+          "XXXXXX___X",
+          "X__XXXX__X"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X___XXXXXX",
+          "X__XXXXX_X"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-2-9-t",
+    "name": "T Mini slide in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 2-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX___XX",
+          "___XX__XXX",
+          "_______X__"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-1-t",
+    "name": "T T slot",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "____XX____"
+        ],
+        "moves": [
+          "rotateCW",
+          "moveRight",
+          "moveRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-2-t",
+    "name": "T Single overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-4-j",
+    "name": "J Single overhang",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-4",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-4-t",
+    "name": "T Single overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "_XX_______",
+          "__X_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-5-l",
+    "name": "L Single overhang",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-5",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XX_____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-5-t",
+    "name": "T Single overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXXX_XXXX",
+          "XX_X___XXX",
+          "___X______"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-8-j",
+    "name": "J Double overhang",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-8",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-8-t",
+    "name": "T Double overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX",
+          "_XX_______",
+          "__X_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-9-j",
+    "name": "J Slot entry",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-9",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-9-t",
+    "name": "T Slot entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XX___XXXXX",
+          "_XX_______",
+          "__X_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-3-10-t",
+    "name": "T Slot entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 3-10",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-1-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "____XX____",
+          "____X_____"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-2-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "____XX____"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-3-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-3",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXX_____XX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "_XX_______",
+          "__X_______"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "_XX_XX____",
+          "__X_______"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-4-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XX___XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-5-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "____XXX___",
+          "____XXX___",
+          "_____X____"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-6-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-6",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "___XXXXXXX",
+          "__XXX_____",
+          "__XXX_____"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-7-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-7",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "XXX____XX_"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-8-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXX___XXX",
+          "XXXXX____X",
+          "X_X_______",
+          "X_________"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-9-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "XX_____XXX",
+          "_X________"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-4-10-t",
+    "name": "T Column entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 4-10",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "X__XXX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-1-t",
+    "name": "T Mini recognition",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "___XXXXXXX",
+          "__XXXXXXXX",
+          "XXXXXXX___",
+          "__XXXXXX__",
+          "XXX___XXXX",
+          "__X__XX___"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "___XXXXXXX",
+          "__XXXXXXXX",
+          "XXXXXXX___",
+          "__XXXXXX__",
+          "__X_XXX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "___XXXXXXX",
+          "__XXXXXXXX",
+          "__XXXXXXX_",
+          "__X_XXX___"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-2-t",
+    "name": "T Mini recognition",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "_XXXXXXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-3-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-3",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXXXX_"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-4-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXX___XX",
+          "XXXXXXXXX_",
+          "XXXX______",
+          "XX_XXXXXXX",
+          "XX________",
+          "_XXXXXXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXX___XX",
+          "XXXXXXXXX_",
+          "XXXX______",
+          "XX_XXXXXXX",
+          "XX________",
+          "XX________",
+          "X_________"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXX___XX",
+          "XXXXXXXXX_",
+          "XXXX______",
+          "XXXX______",
+          "XXX_______",
+          "X_________"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXX___XX",
+          "XXXX____XX",
+          "XXXX_____X",
+          "XXX_______",
+          "X_________"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-5-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX___XXXXX",
+          "XXX__XXXXX",
+          "__X____XXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XX___XX___",
+          "_____X____"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-6-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-6",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXX_XXXX",
+          "XXXXX_____",
+          "XXXXX_____",
+          "___XX_____"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-7-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-7",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXXXXXX___",
+          "XXXXXXXX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXXXXXXXX_"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-8-8-t",
+    "name": "T Mini entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 8-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXXXXXX_X",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "_XXXXXXXXX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXXXXXX_X",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "XXX_______",
+          "XX________"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-1-t",
+    "name": "T Triple overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX__XXXXXX",
+          "XX_XXXXXXX",
+          "_X________",
+          "_XX_______"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-2-t",
+    "name": "T Triple overhang",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "XXXXXX_XXX",
+          "_______X__",
+          "______XX__"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-3-t",
+    "name": "T Triple spin in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-3",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX__XXXXXX",
+          "XX_XXXXXXX",
+          "XX___XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-4-t",
+    "name": "T Triple spin in",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "XXXXXX_XXX",
+          "XXXX___XXX",
+          "__XX__XX__",
+          "__XX______"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-5-t",
+    "name": "T Triple entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXX___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "___XXXX___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXX___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "___XXXX___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-9-t",
+    "name": "T Triple roof",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "______X___",
+          "______XX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-9-10-t",
+    "name": "T Triple entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 9-10",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXX__XX",
+          "XXX__XX_X_",
+          "_X______X_",
+          "_X_____XX_",
+          "________X_"
+        ],
+        "moves": [
+          "softDrop",
+          "dasRight",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-1-j",
+    "name": "J Slide in",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-1",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "___XXXX___",
+          "__XXXXXX__"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-1-l",
+    "name": "L Slide in",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-1",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "___XXXX___",
+          "__XXXXXX__",
+          "__X_______",
+          "XXX_______"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-2-j",
+    "name": "J Slide in",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-2",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "X_X_XXX__X",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-2-l",
+    "name": "L Slide in",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-2",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "X_X_XX___X",
+          "__XX_XXX__",
+          "__X_______",
+          "XXX_______"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-3-j",
+    "name": "J Turn in",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-3",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "X_X_XX_X_X",
+          "X___XXX__X",
+          "___XX_X___"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-3-l",
+    "name": "L Turn in",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-3",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "X_XXXX_X_X",
+          "XXXXXX___X",
+          "___X_XX___"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-4-j",
+    "name": "J Turn in",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-4",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XX_XXXX_XX",
+          "___XXXX___",
+          "_XXX__XXX_"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-4-l",
+    "name": "L Turn in",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-4",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX___",
+          "_XXX__XXX_"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-5-j",
+    "name": "J In-place turn",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-5",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XX_XXX",
+          "X___XX___X",
+          "XX______XX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "moveLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-5-l",
+    "name": "L In-place turn",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-5",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX___X",
+          "XX______XX"
+        ],
+        "moves": [
+          "softDrop",
+          "dasRight",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-6-j",
+    "name": "J In-place turn",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-6",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XX_XXX",
+          "X______X_X",
+          "XXX____XX_"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-6-l",
+    "name": "L In-place turn",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-6",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXX_____X",
+          "_XX____XXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "dasRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-7-j",
+    "name": "J Reverse slide",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-7",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXXX___",
+          "XXXXX_X___",
+          "X___XXXXXX",
+          "X___X_X__X",
+          "XX________"
+        ],
+        "moves": [
+          "rotateCCW",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-8-j",
+    "name": "J Dive under",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-8",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "X_______XX",
+          "X_X___X_XX",
+          "XXX___XXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-8-t",
+    "name": "T Dive under",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XX_XX",
+          "XXXXXXX_XX"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-9-j",
+    "name": "J Triple-style entry",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-9",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "X__XXXX__X",
+          "XX_XXXX_XX",
+          "XX_XXXX_XX",
+          "___X__X___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-9-l",
+    "name": "L Triple-style entry",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-9",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "___X__X___",
+          "__XX__XX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-10-j",
+    "name": "J Raised-roof entry",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-10",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "XXXXXX__XX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "____XX____",
+          "___XXX____",
+          "_____XX___"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "____XX____",
+          "___XXX____",
+          "_____XX___"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-10-l",
+    "name": "L Raised-roof entry",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-10",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "XXXXXX__XX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "____XX____",
+          "___XXX____",
+          "_____XX___"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "____XX____",
+          "___XXX____",
+          "_____XX___"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-1-s",
+    "name": "S S clockwise tuck",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-1",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXX__XXXX",
+          "XXXXX__XXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-2-z",
+    "name": "Z Z counterclockwise tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-2",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-3-s",
+    "name": "S Open tuck",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-3",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX",
+          "XXXXX__XXX",
+          "XXXXXX__XX",
+          "XX__XXXXXX",
+          "X__XXXXXXX",
+          "XXXXXXX__X",
+          "XXXXXX__XX",
+          "XXX__XXXXX",
+          "XXXX__XXXX",
+          "X__XXXXXXX",
+          "XX__XXXXXX"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX",
+          "XXXXX__XXX",
+          "XXXXXX__XX",
+          "XX__XXXXXX",
+          "X__XXXXXXX",
+          "XXXXXXX__X",
+          "XXXXXX__XX",
+          "XXX__XXXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX",
+          "XXXXX__XXX",
+          "XXXXXX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-3-z",
+    "name": "Z Open tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-3",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX",
+          "XXXXX__XXX",
+          "XXXXXX__XX",
+          "XX__XXXXXX",
+          "X__XXXXXXX",
+          "XXXXXXX__X",
+          "XXXXXX__XX"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX",
+          "XXXXX__XXX",
+          "XXXXXX__XX",
+          "XX__XXXXXX",
+          "X__XXXXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XX__XXXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-4-s",
+    "name": "S S counterclockwise tuck",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-4",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX__XXXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-5-z",
+    "name": "Z Z clockwise tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-5",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXX__XXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-6-s",
+    "name": "S Walled tuck",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-6",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "XX__XX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "XX__XX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "X__XXXX__X",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-6-z",
+    "name": "Z Walled tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-6",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "XXXXXXX__X",
+          "XXXXXX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "X__XXXX__X",
+          "X__XXXX__X",
+          "XXXXXXX__X",
+          "XXXXXX__XX",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "X__XXXX__X",
+          "XXXXXXX__X",
+          "XXXXXX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX__X",
+          "XXXXXX__XX"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-7-s",
+    "name": "S Slide in",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-7",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "X___XX___X",
+          "XX__XX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-7-z",
+    "name": "Z Slide in",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-7",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXX_XX___X",
+          "XXXXXX__XX",
+          "XX__XX__XX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-8-s",
+    "name": "S Outer kick",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-8",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXX_XX",
+          "X__XXXX__X",
+          "X_XXXXXX_X",
+          "___X__X___"
+        ],
+        "moves": [
+          "moveLeft",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-8-z",
+    "name": "Z Outer kick",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-8",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XX_XXXX_XX",
+          "X__XXXX__X",
+          "X_XXXXXX_X",
+          "__XX__X___",
+          "_XX_______",
+          "_X________"
+        ],
+        "moves": [
+          "dasRight",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-9-s",
+    "name": "S Pillow kick",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-9",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "XXXXX_XXXX",
+          "XXXX__XXXX",
+          "XXXX_XXXXX",
+          "______XXXX"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-9-z",
+    "name": "Z Pillow kick",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-9",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "XX____XXXX",
+          "X_________",
+          "X_________"
+        ],
+        "moves": [
+          "softDrop",
+          "dasLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-10-s",
+    "name": "S Triple-style entry",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-10",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XX_XXXXXXX",
+          "_X_______X",
+          "_XX______X",
+          "________XX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX_XXXXXX",
+          "_X_______X",
+          "_XX______X",
+          "________XX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-15-10-z",
+    "name": "Z Triple-style entry",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 15-10",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "_X_______X",
+          "_XX______X",
+          "________XX"
+        ],
+        "moves": [
+          "softDrop",
+          "dasRight",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-1-i",
+    "name": "I Left I kick",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-1",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXXX____",
+          "_____XX___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-2-i",
+    "name": "I Right I kick",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-2",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "____XXXXXX",
+          "___XX_____"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-3-i",
+    "name": "I Horizontal I entry",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-3",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-4-i",
+    "name": "I Inverted I entry",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-4",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXX_____XX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "rotateCW",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-5-i",
+    "name": "I Uneven-floor I kick",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-5",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX_XXX_XX",
+          "XXX_X____X",
+          "XXX______X",
+          "XXXX_____X"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-6-t",
+    "name": "T NEO",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-6",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "_______XXX",
+          "________XX",
+          "______XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "rotateCW",
+          "softDrop",
+          "dasRight",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-7-t",
+    "name": "T FIN",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-7",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXX__XX",
+          "________XX",
+          "________XX",
+          "______XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "rotateCW",
+          "softDrop",
+          "dasRight",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-8-t",
+    "name": "T ISO",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-8",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX__XX",
+          "_______XXX",
+          "________XX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW",
+          "dasRight",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-9-t",
+    "name": "T FIN entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "_______XXX",
+          "_______X_X",
+          "_____XXX__"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotate180",
+          "softDrop",
+          "dasRight",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-16-10-t",
+    "name": "T FIN follow-up",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 16-10",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXX__XXX",
+          "X______XXX",
+          "_______XXX",
+          "____XXXX__"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotate180",
+          "softDrop",
+          "dasRight",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XX___XXXXX",
+          "____XXXX__"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-1-s",
+    "name": "S Reverse-order tuck",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-1",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXXX_XXX_",
+          "X__XX_X___",
+          "XX__X_____"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-1-z",
+    "name": "Z Reverse-order tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-1",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXXX_XXXX",
+          "XXXXX_X__X",
+          "XXXXX___XX"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-2-l",
+    "name": "L Reverse-order tuck",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-2",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XX___",
+          "XXXX_XXXX_",
+          "______XX__"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-3-j",
+    "name": "J Reverse-order tuck",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-3",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXXXXXX_",
+          "XXXXXXXXX_",
+          "___XXXXXX_",
+          "_XXXXXXXX_"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-4-z",
+    "name": "Z Reverse-order tuck",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-4",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XX__XXX_XX",
+          "X__XXXX_XX",
+          "____X_____",
+          "____X_____"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-4-i",
+    "name": "I Reverse-order tuck",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-4",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "XXXXXXX_XX",
+          "____X_____",
+          "____X_____"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-5-j",
+    "name": "J Turn insertion",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-5",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXXXX_XXXX",
+          "___XX_XXXX",
+          "__XXX_XXXX",
+          "___XX_XXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-6-z",
+    "name": "Z Turn insertion",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-6",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXX__XXXXX",
+          "XX____XXXX",
+          "XXX___XX__",
+          "XXX_______"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-7-l",
+    "name": "L Turn insertion",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-7",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXXX_XXX",
+          "XXXXX_XXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "XXX_XXXXXX",
+          "XXXXXXXXX_",
+          "XXXXXXXXX_",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-8-s",
+    "name": "S Wall opening",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-8",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XX__XXXXXX",
+          "XXX__XXXXX",
+          "XXX__XX___",
+          "XX___XX___",
+          "X_________"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-9-l",
+    "name": "L Wall opening",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-9",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XX_XXXXXXX",
+          "XX___XXXXX",
+          "XXX__X____"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-17-10-z",
+    "name": "Z Deep well",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 17-10",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXX__XXXX",
+          "XXX___XXXX",
+          "XXXXX_XXXX",
+          "XXXX__XXXX",
+          "_X____XXXX",
+          "________XX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-1-t",
+    "name": "T Imperial Cross",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "XX_XXXXXXX",
+          "___XXXXXXX",
+          "__XX______"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW",
+          "rotate180"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "___XXXXXXX",
+          "__XX______"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-2-t",
+    "name": "T Double Dagger",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "___XX_____"
+        ],
+        "moves": [
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "___XX_____"
+        ],
+        "moves": [
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-3-t",
+    "name": "T Super T-spin Double",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-3",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXXXXX",
+          "__XX______",
+          "__XX______"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X_XXXXXXXX",
+          "___XXXXXXX",
+          "__XX______",
+          "__XX______"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-4-t",
+    "name": "T Super T-spin Double",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX__XXXXX",
+          "XXX__XXXXX",
+          "XXX_XXXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXX_____XX",
+          "X_________"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXX___XXXX",
+          "XXXX__XXXX",
+          "XXXX__XXXX",
+          "XXX_____XX",
+          "X_________"
+        ],
+        "moves": [
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-5-j",
+    "name": "J STSD entry",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-5",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXXXXX",
+          "__XX______"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 2,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-5-t",
+    "name": "T STSD entry",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_XXXXXXXX",
+          "___XXXXXXX",
+          "__XX______"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-6-t",
+    "name": "T STMB Cave",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-6",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXX___XX",
+          "XXXXX___XX",
+          "XXXXX___XX",
+          "XXXXXXX_XX",
+          "XXXXXX___X",
+          "________XX",
+          "________XX"
+        ],
+        "moves": [
+          "dasRight",
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-7-t",
+    "name": "T STMB Cave",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-7",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXX___XXX",
+          "XXXXXX_XXX",
+          "XXXXX___XX",
+          "_______XX_"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-9-j",
+    "name": "J Open S/Z spin",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-9",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "_X_X______",
+          "XX_XX_____",
+          "X___X_____"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCW",
+          "softDrop",
+          "rotate180"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-9-t",
+    "name": "T Open S/Z spin",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-9",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "_X_XXXXX_X",
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "___XX____X",
+          "___XX_____"
+        ],
+        "moves": [
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-10-l",
+    "name": "L Center-well spin",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-10",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 1,
+        "orientation": 3
+      },
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "none",
+        "lines": 1,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-10-z",
+    "name": "Z Center-well spin",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-10",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXX___XXXX",
+          "XXX__XXXXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-10-j",
+    "name": "J Center-well spin",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-10",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XXXXXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 1,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-10-t",
+    "name": "T Center-well spin",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-10",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXXX___XXX",
+          "XXXXX__XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "moveRight",
+          "moveRight",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXX_XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX",
+          "XXX____XXX"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-22-10-s",
+    "name": "S Center-well spin",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 22-10",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXX__XXXXX",
+          "__XX______"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-1-j",
+    "name": "J Super spiral",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-1",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "XXX_XXXXXX",
+          "X___XXXXXX",
+          "X___XXXXXX",
+          "XXX_XXXXXX",
+          "____XXXXXX",
+          "___XX_____",
+          "___XX_____"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "moveRight",
+          "rotateCCW",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-1-t",
+    "name": "T Super spiral",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-1",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "____XXXXXX",
+          "___XX_____",
+          "___XX_____"
+        ],
+        "moves": [
+          "dasLeft",
+          "softDrop",
+          "moveRight",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-2-t",
+    "name": "T Albatross spin",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-2",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "_X_XXX___X",
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "___XX____X"
+        ],
+        "moves": [
+          "moveLeft",
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXX____",
+          "__XX_X____"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XXXXXXXXX_",
+          "X_XXXXXXXX",
+          "___XXXXXXX",
+          "__XX_XX___",
+          "__X_______"
+        ],
+        "moves": [
+          "dasLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-2-j",
+    "name": "J Albatross spin",
+    "piece": "j",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-2",
+    "variants": [
+      {
+        "piece": "j",
+        "rows": [
+          "___XXX____",
+          "__XX_X____"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 0,
+        "orientation": 0
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-2-l",
+    "name": "L Albatross spin",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-2",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXXXXX____",
+          "X_XXXX____",
+          "___XXX____",
+          "__XX_X____",
+          "__X_______"
+        ],
+        "moves": [
+          "dasRight",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "none",
+        "lines": 0,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-3-z",
+    "name": "Z Sagrada Familia",
+    "piece": "z",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-3",
+    "variants": [
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX___",
+          "XXXXXX____",
+          "XXXXXX____"
+        ],
+        "moves": [
+          "dasRight",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX___",
+          "XXXXXX____",
+          "XXXXXX____"
+        ],
+        "moves": [
+          "dasRight",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "z",
+        "rows": [
+          "XXXXXXX_XX",
+          "XXXXXXX__X",
+          "XXXXXXXX_X",
+          "XXXXXXX___",
+          "XXXXXX____",
+          "XXXXXX____"
+        ],
+        "moves": [
+          "dasRight",
+          "moveLeft",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-4-t",
+    "name": "T Repeating Triple",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-4",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X___XXXXXX",
+          "XX__XXXXXX",
+          "_X__XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X_XXXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X___XXXXXX",
+          "XX__XXXXXX",
+          "_X__XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 1
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXXXXX",
+          "__XXXXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X__XXXXXXX",
+          "XX_XXXXXXX",
+          "___XXXXXXX",
+          "__XXXXXXXX",
+          "____XXXXXX",
+          "____XXXXXX",
+          "____XXXXXX"
+        ],
+        "moves": [
+          "rotateCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-5-t",
+    "name": "T Trinity",
+    "piece": "t",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-5",
+    "variants": [
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "XX__XXXXXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "X___XXXXXX",
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX___XXXXX",
+          "_X___XXXXX",
+          "_____XXXXX",
+          "_____XXXXX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "mini",
+        "lines": 1,
+        "orientation": 0
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "XXX_XXXXXX",
+          "XX__XXXXXX",
+          "XXX_XXXXXX",
+          "X___XXXXXX",
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX___XXXXX",
+          "_X___XXXXX",
+          "_____XXXXX",
+          "_____XXXXX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "normal",
+        "lines": 3,
+        "orientation": 3
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "XX_XXXXXXX",
+          "X___XXXXXX",
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX___XXXXX",
+          "_X___XXXXX",
+          "_____XXXXX",
+          "_____XXXXX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "moveLeft",
+          "rotateCW",
+          "softDrop",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 2
+      },
+      {
+        "piece": "t",
+        "rows": [
+          "X__XXXXXXX",
+          "X__XXXXXXX",
+          "X_XXXXXXXX",
+          "X____XXXXX",
+          "XX___XXXXX",
+          "_X___XXXXX",
+          "_____XXXXX",
+          "_____XXXXX",
+          "_____XXXXX"
+        ],
+        "moves": [
+          "moveLeft",
+          "softDrop",
+          "moveLeft",
+          "rotateCW"
+        ],
+        "spin": "normal",
+        "lines": 2,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-7-s",
+    "name": "S S descent",
+    "piece": "s",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-7",
+    "variants": [
+      {
+        "piece": "s",
+        "rows": [
+          "XXXXX_XXXX",
+          "XXXX__XXXX",
+          "XXXX_XXXXX",
+          "__XX__XX__",
+          "__XX___X__",
+          "__X__XXX__",
+          "__XX__XX__",
+          "__XX__XX__",
+          "__XX_XXX__",
+          "__XX__XX__",
+          "__XX___X__",
+          "__X__XXX__",
+          "__XX__XX__",
+          "__XX__XX__",
+          "__XX_XXX__",
+          "______X___"
+        ],
+        "moves": [
+          "moveRight",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 3
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-8-l",
+    "name": "L L descent",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-8",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "XXX__XXXXX",
+          "XXX_XXXXXX",
+          "XXX_XXXXXX",
+          "__X___X___",
+          "__XXX_X___",
+          "__XX__X___",
+          "__X___X___",
+          "__X_X_X___",
+          "__X_XXX___",
+          "__X___X___",
+          "__XXX_X___",
+          "__XX__X___",
+          "__X___X___",
+          "__X_X_X___",
+          "__X_XXX___",
+          "__X___X___",
+          "__XXX_X___"
+        ],
+        "moves": [
+          "rotateCCW",
+          "moveRight",
+          "softDrop",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW",
+          "rotateCCW"
+        ],
+        "spin": "mini",
+        "lines": 3,
+        "orientation": 1
+      }
+    ]
+  },
+  {
+    "id": "ttt-14-7-l",
+    "name": "L Reverse slide",
+    "piece": "l",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 14-7",
+    "variants": [
+      {
+        "piece": "l",
+        "rows": [
+          "___XXXXXXX",
+          "___X_XXXXX",
+          "XXXXXX___X",
+          "X__X_X___X",
+          "________XX"
+        ],
+        "moves": [
+          "moveRight",
+          "rotateCW",
+          "moveRight",
+          "softDrop",
+          "rotateCCW"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ttt-30-9-i",
+    "name": "I Descent turns",
+    "piece": "i",
+    "group": "TTT rotation course",
+    "source": "https://teatube.cn/ttt/ - lesson 30-9, supported descent segments",
+    "variants": [
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X"
+        ],
+        "moves": [
+          "softDrop",
+          "moveRight",
+          "moveRight",
+          "rotateCCW",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X",
+          "XXX______X"
+        ],
+        "moves": [
+          "dasRight",
+          "rotateCW",
+          "softDrop",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X",
+          "XXX______X",
+          "XXX_XXXXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW",
+          "softDrop",
+          "rotateCW",
+          "dasRight",
+          "rotateCCW",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X",
+          "XXX______X",
+          "XXX_XXXXXX",
+          "____XXXXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "rotateCW",
+          "softDrop",
+          "rotateCW",
+          "dasRight",
+          "rotateCCW",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X",
+          "XXX______X",
+          "XXX_XXXXXX",
+          "____XXXXXX",
+          "_XXXX_XXXX"
+        ],
+        "moves": [
+          "softDrop",
+          "dasLeft",
+          "rotateCW",
+          "rotateCW",
+          "rotate180",
+          "rotateCCW",
+          "rotateCCW",
+          "dasRight",
+          "rotateCCW",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      },
+      {
+        "piece": "i",
+        "rows": [
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_XXXXX",
+          "XXXX_____X",
+          "XXXXXXXX_X",
+          "XXX_XXXX_X",
+          "XXX______X",
+          "XXX_XXXXXX",
+          "____XXXXXX",
+          "_XXXX_XXXX",
+          "_XXXX_____"
+        ],
+        "moves": [
+          "rotateCCW",
+          "dasLeft",
+          "softDrop",
+          "rotateCW",
+          "rotateCCW",
+          "rotateCCW",
+          "dasRight",
+          "rotateCCW",
+          "rotateCCW",
+          "moveLeft",
+          "rotateCW"
+        ]
+      }
+    ]
+  }
+]

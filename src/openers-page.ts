@@ -4,7 +4,7 @@ import { decoder, Mino } from 'tetris-fumen';
 import { compileOpener, openerCatalog, allOpeners, verifiedOpeners, type Opener, type OpenerRoute, type OpenerSuggestion } from './openers';
 import { createEngine } from './engine';
 import { drawBoard } from './renderer';
-import { drawMino, nativeColors } from './mino-assets';
+import { drawMino, nativeColors, minoAssetsEvent } from './mino-assets';
 import { placementSteps } from './guide';
 import type { Settings } from './settings';
 import type { ModeRules } from './modes';
@@ -56,6 +56,7 @@ export class OpenersPage {
         el<HTMLInputElement>('opener-search').value = ''; this.refresh(); el('opener-import-status').textContent = 'Validated and saved locally.';
       } catch (error) { el('opener-import-status').textContent = (error as Error).message; }
     });
+    window.addEventListener(minoAssetsEvent, () => { this.catalog(); this.preview(); });
     this.catalog();
   }
   private options() { return { ...openingOptions(), loop: false }; }

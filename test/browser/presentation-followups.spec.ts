@@ -61,7 +61,7 @@ test('Stickspin is searchable, pinnable and has second-bag TSD instructions', as
   await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE');
   expect((await completeRoute(page, true)).lines).toBe(1);
   await expect(page.locator('#continuation-route-name')).toContainText('Second Bag', { timeout: 15000 });
-  await expect(page.locator('#continuation-plan')).toContainText('normal T-spin');
+  await expect(page.locator('#continuation-plan')).toContainText('T-spin Double');
   await expect(page.locator('#continuation-source')).toHaveAttribute('href', 'https://harddrop.com/wiki/Stickspin');
   expect((await completeRoute(page, false)).lines).toBe(3);
   await expect(page.locator('#play-page .action-text-layer')).toHaveAttribute('aria-label', /T-spin.*DOUBLE.*BACK-TO-BACK/);

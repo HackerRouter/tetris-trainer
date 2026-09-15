@@ -1,9 +1,10 @@
+export const minoAssetsEvent = 'trainer-mino-assets-ready';
 const images = new Map<string, HTMLImageElement>();
 const ghosts = new Map<string, HTMLCanvasElement>();
 export const nativeColors: Record<string, string> = Object.fromEntries(Object.entries({ z: 13521497, l: 13533522, o: 13550930, s: 8441426, i: 5426860, j: 6705870, t: 12800718, d: 4605510, gb: 6181727, gbd: 2359335 }).map(([name, color]) => [name, `#${color.toString(16).padStart(6, '0')}`]));
 function asset(name: string) {
   if (typeof Image === 'undefined') return null;
-  if (!images.has(name)) { const image = new Image(); image.src = `/tetrio/ui/${name}.png`; images.set(name, image); }
+  if (!images.has(name)) { const image = new Image(); image.addEventListener('load', () => window.dispatchEvent(new Event(minoAssetsEvent))); image.src = `/tetrio/ui/${name}.png`; images.set(name, image); }
   const image = images.get(name)!;
   return image.complete && image.naturalWidth ? image : null;
 }

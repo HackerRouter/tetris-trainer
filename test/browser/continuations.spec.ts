@@ -18,7 +18,7 @@ async function followupFixture(page: Page) {
   await page.locator('#opener-import-name').fill('PC Followup Test'); await page.locator('#opener-fumen').fill(fumen); await page.getByRole('button', { name: 'Validate and save Fumen' }).click();
   await expect(page.locator('#opener-import-status')).toHaveText('Validated and saved locally.');
   await page.locator('#opener-followups').check(); await page.locator('#opener-start').click();
-  await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE'); await openSection(page, '#continuation-settings'); await page.locator('#continuation-depth').focus(); await page.locator('#continuation-depth').selectOption('4');
+  await expect(page.locator('#mode-label')).toHaveText('OPENER PRACTICE');
   await page.keyboard.press('Space'); await expect(page.locator('#practice-progress')).toContainText('Continue');
   await expect(page.locator('#continuation-status')).toContainText('playable continuation', { timeout: 15000 });
   await expect(page.locator('#continuation-routes button').first()).toBeVisible();
@@ -38,7 +38,7 @@ test('shortlisted openers are pinned in the catalog and in random candidates and
 test('continuation worker provides a live PC hint, full instructions and a route that can be completed', async ({ page }) => {
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   await followupFixture(page);
-  await expect(page.locator('#continuation-enabled')).toBeChecked(); await expect(page.locator('#continuation-seeded')).toBeChecked();
+  await expect(page.locator('#continuation-enabled')).toBeChecked(); await expect(page.locator('#continuation-seeded')).toHaveCount(0);
   await expect(page.locator('#continuation-inputs')).toContainText('Hard drop'); await expect(page.locator('#continuation-plan')).toContainText('perfect clear');
   expect(await page.evaluate(() => (window as any).__testCurrent().hintTarget.length)).toBe(4);
   await page.screenshot({ path: 'test-results/opener-pc-continuation.png', fullPage: true });
@@ -50,12 +50,25 @@ test('continuation worker provides a live PC hint, full instructions and a route
 test('different placements are accepted, stale routes are discarded and continuation preferences survive a new seed', async ({ page }) => {
   await followupFixture(page); await page.locator('#continuation-enforce').uncheck();
   await page.keyboard.press('Space'); await expect(page.locator('#pieces')).toHaveText('2'); await expect(page.locator('#faults')).toHaveText('0');
-  await expect(page.locator('#continuation-status')).toContainText('No published stage', { timeout: 15000 });
-  expect(await page.evaluate(() => (window as any).__testCurrent().hintTarget)).toBeNull(); await expect(page.locator('#continuation-routes button')).toHaveCount(0);
-  await page.locator('#continuation-seeded').uncheck(); await expect(page.locator('#continuation-scope')).toContainText('Visible queue', { timeout: 15000 });
+  await expect(page.locator('#continuation-status')).toContainText('playable continuations', { timeout: 20000 });
+  const choices = page.locator('#continuation-routes button'); expect(await choices.count()).toBeGreaterThan(1);
+  for (const choice of await choices.all()) await expect(choice).toBeEnabled();
+  await choices.nth(1).click(); await expect(choices.nth(1)).toHaveAttribute('aria-pressed', 'true');
+  await choices.first().click(); await expect(choices.first()).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => { const game = (window as any).__testCurrent(); return JSON.stringify(game.continuation.scene.snapshot.board) === JSON.stringify(game.engine.board.state); })).toBe(true);
+  await expect(page.locator('#continuation-depth')).toHaveCount(0);
   await page.keyboard.press('r'); await expect(page.locator('#pieces')).toHaveText('0');
-  await expect(page.locator('#continuation-enabled')).toBeChecked(); await expect(page.locator('#continuation-seeded')).not.toBeChecked();
+  await expect(page.locator('#continuation-enabled')).toBeChecked(); await expect(page.locator('#continuation-seeded')).toHaveCount(0);
   await expect(page.locator('#continuation-status')).toContainText('Complete the opening'); await page.locator('#continuation-enabled').uncheck(); await expect(page.locator('#continuation-options')).toBeHidden();
   await page.getByRole('link', { name: 'Openers', exact: true }).click(); await expect(page.locator('#opener-followups')).not.toBeChecked();
   await page.setViewportSize({ width: 390, height: 844 }); expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('opener canvases refresh native minos when textures finish loading without a user click',async({page})=>{
+  let release!:()=>void;const waiting=new Promise<void>(resolve=>{release=resolve;});
+  await page.route('**/tetrio/ui/minos.png',async route=>{await waiting;await route.continue();});
+  await page.goto('/#openers',{waitUntil:'domcontentloaded'});await expect(page.locator('#opener-board')).toBeVisible();
+  const before=await page.locator('#opener-board').evaluate((canvas:HTMLCanvasElement)=>canvas.toDataURL());
+  release();await expect.poll(()=>page.locator('#opener-board').evaluate((canvas:HTMLCanvasElement)=>canvas.toDataURL())).not.toBe(before);
+  const loaded=await page.locator('#opener-board').evaluate((canvas:HTMLCanvasElement)=>canvas.toDataURL());await openSection(page,'#opener-training-options');await page.locator('#opener-mirror').check();await page.locator('#opener-mirror').uncheck();expect(await page.locator('#opener-board').evaluate((canvas:HTMLCanvasElement)=>canvas.toDataURL())).toBe(loaded);
 });

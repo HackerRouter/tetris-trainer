@@ -2,9 +2,11 @@ import { legal, type EngineSnapshot, type Engine } from '@haelp/teto/engine';
 import { createEngine } from './engine';
 import { copyPiece, findFinesse, type Cell, type FinesseResult } from './finesse';
 import type { AnalysisContext } from './analysis-context';
+import { enumerateSpinPlacements } from './spin-movement';
 import type { PracticeScene } from './practice';
 
 export type ContinuationGoal = 'pc' | 'tspin' | 'tsd' | 'two-tspins' | 'two-tsd';
+export const maxContinuationDepth = 60;
 export type ContinuationStep = { scene: PracticeScene; after: EngineSnapshot; lines: number; spin: string; piece: string; pc: boolean; unknownCurrent?: boolean };
 export type ContinuationRoute = { id: string; name?: string; source?: string; stageId?: string; steps: ContinuationStep[]; spins: number; lines: number; pc: boolean; combo?: { clears: number; setup: number; attack: number; endCombo: number; choices: number[]; boundary: string } };
 export type ContinuationRequest = { context: AnalysisContext; goal: ContinuationGoal; depth: number; seeded: boolean; budgetMs?: number; limit?: number };
@@ -16,6 +18,39 @@ const top = (rows: number[]) => { for (let y = rows.length - 1; y >= 0; y--) if 
 
 export function continuationStateKey(snapshot: EngineSnapshot, depth = 14) {
   return `${boardMask(snapshot.board).join(',')}|${snapshot.falling.symbol}|${snapshot.hold ?? '-'}|${snapshot.holdLocked}|${snapshot.queue.value.slice(0, depth).join('')}`;
+}
+
+export function continuationMatches(snapshot: EngineSnapshot, expected: EngineSnapshot) {
+  const count = Math.min(14, snapshot.queue.value.length, expected.queue.value.length);
+  return continuationStateKey(snapshot, count) === continuationStateKey(expected, count);
+}
+
+export function spinContinuationPaths(engine: Engine, snapshot: EngineSnapshot, deadline: number) {
+  const paths = new Map<string, FinesseResult>();
+  const reached = enumerateSpinPlacements(engine, snapshot, () => performance.now() >= deadline, false);
+  for (const placement of reached.placements) {
+    if (placement.evidence.spin === 'none') continue;
+    const key = cellKey(placement.target), previous = paths.get(key);
+    if (!previous || placement.path.cost < previous.cost) paths.set(key, placement.path);
+  }
+  return paths;
+}
+
+export function continuationQueue(context: AnalysisContext, depth: number, seeded: boolean) {
+  const count = seeded ? depth : context.rules.nextCount;
+  let next = context.snapshot.queue.value;
+  if (seeded && context.generated && next.length < count) {
+    const engine = createEngine(context.settings, 1, context.rules); engine.fromSnapshot(structuredClone(context.snapshot));
+    while (engine.queue.length < count) engine.queue.repopulateOnce();
+    next = engine.queue.slice(0, count);
+  }
+  return [context.snapshot.falling.symbol, ...next.slice(0, count)];
+}
+
+export function continuationGoalReached(goal: ContinuationGoal, steps: ContinuationStep[], pc: boolean) {
+  if (goal === 'pc') return pc;
+  const count = steps.filter(step => step.piece === 't' && (goal === 'tsd' || goal === 'two-tsd' ? step.spin === 'normal' && step.lines === 2 : step.spin !== 'none' && step.lines > 0)).length;
+  return count >= (goal.startsWith('two-') ? 2 : 1);
 }
 
 export function applyContinuationPath(engine: Engine, path: FinesseResult) {
@@ -63,11 +98,10 @@ function fillable(rows: number[], width: number, height: number) {
 }
 
 export function searchContinuations(request: ContinuationRequest): ContinuationResult {
-  const started = performance.now(), budget = Math.max(20, Math.min(15000, request.budgetMs ?? 5000)), deadline = started + budget;
+  const started = performance.now(), budget = Math.max(20, Math.min(15000, request.budgetMs ?? 15000)), deadline = started + budget;
   const { context, goal } = request, { rules, settings } = context;
-  const depth = Math.max(1, Math.min(14, Math.floor(request.depth))), limit = Math.max(1, Math.min(6, request.limit ?? 4));
-  const known = Math.min(context.snapshot.queue.value.length, request.seeded ? depth : rules.nextCount);
-  const queue = [context.snapshot.falling.symbol, ...context.snapshot.queue.value.slice(0, known)];
+  const depth = Math.max(1, Math.min(maxContinuationDepth, Math.floor(request.depth))), limit = Math.max(1, Math.min(6, request.limit ?? 4));
+  const queue = continuationQueue(context, depth, request.seeded);
   const output: ContinuationResult = { routes: [], checked: 0, elapsedMs: 0, depth, queue, seeded: request.seeded, limited: false, message: '' };
   const reject = (message: string) => ({ ...output, message, elapsedMs: performance.now() - started });
   if (!rules.advanced.hardDrop) return reject('Continuation plans currently require hard drop.');
@@ -78,9 +112,10 @@ export function searchContinuations(request: ContinuationRequest): ContinuationR
   let lockedTarget: Cell[] = [];
   engine.events.on('falling.lock.pre', () => { lockedTarget = engine.falling.absoluteBlocks; });
   const initial = structuredClone(context.snapshot); initial.__meta.isUndoRedo = true;
+  initial.queue.value = queue.slice(1); initial._queue.value = queue.slice(1);
   const root: Node = { snapshot: initial, steps: [], drawn: 0, spins: 0, lines: 0, score: 0 };
   const routeKeys = new Set<string>();
-  const timedOut = () => performance.now() >= deadline || output.checked >= 35000;
+  const timedOut = () => performance.now() >= deadline || output.checked >= 120000;
   const goalSpins = goal === 'tspin' || goal === 'tsd' ? 1 : 2;
   const keep = (node: Node, pc: boolean) => {
     const key = node.steps.map(step => `${step.piece}:${cellKey(step.scene.target)}`).join('|');
@@ -113,16 +148,17 @@ export function searchContinuations(request: ContinuationRequest): ContinuationR
         candidates.push({ target, rank: boardScore(remaining, width) + lines * (piece.symbol === 't' ? 100 : 12) });
       }
       candidates.sort((a, b) => b.rank - a.rank);
+      const spinPaths = goal !== 'pc' && piece.symbol === 't' ? spinContinuationPaths(engine, snapshot, deadline) : null;
       for (const { target } of candidates) {
         if (timedOut()) { output.limited = true; break; }
         output.checked++; engine.fromSnapshot(snapshot);
-        const path = findFinesse(engine, snapshot, target); if (!path) continue;
+        const path = spinPaths?.get(cellKey(target)) ?? findFinesse(engine, snapshot, target); if (!path) continue;
         const result = applyContinuationPath(engine, path);
         if (engine.toppedOut || cellKey(lockedTarget) !== cellKey(target)) continue;
         const after = engine.snapshot({ isUndoRedo: true });
         const pc = result.lines > 0 && !after.board.some(row => row.some(Boolean));
         const scoredSpin = result.mino === 't' && result.spin !== 'none' && (goal === 'two-tsd' || goal === 'tsd' ? result.spin === 'normal' && result.lines === 2 : result.lines >= 1);
-        const scene: PracticeScene = { id: `continuation-${output.checked}`, snapshot: holdFirst ? node.snapshot : snapshot, guideSnapshot: holdFirst ? snapshot : undefined, holdFirst, target, path };
+        const scene: PracticeScene = { id: `continuation-${output.checked}`, snapshot: holdFirst ? node.snapshot : snapshot, guideSnapshot: holdFirst ? snapshot : undefined, holdFirst, target, path, spinGoal: result.spin !== 'none' ? { spin: result.spin, lines: result.lines } : undefined };
         const step: ContinuationStep = { scene, after, lines: result.lines, spin: result.spin, piece: result.mino, pc };
         const child: Node = { snapshot: after, steps: [...node.steps, step], drawn: node.drawn + 1 + Number(holdFirst && emptyHold), spins: node.spins + Number(scoredSpin), lines: node.lines + result.lines, score: 0 };
         child.score = child.spins * 3000 + child.steps.reduce((sum, item) => sum + (item.piece === 't' && item.spin !== 'none' ? item.lines * 200 + (item.spin === 'normal' ? 60 : 0) : 0), 0) + boardScore(boardMask(after.board), width) + child.lines * 10 - child.steps.reduce((sum, item) => sum + item.scene.path.cost, 0) * .2;

@@ -12,6 +12,9 @@ import { downloadJson, type Settings } from './settings';
 import { formatTime } from './time';
 import type { PracticeSet } from './practice';
 import { PcLab } from './pc-lab';
+import { SpinLab } from './spin-lab';
+import { SpinDrillsPage } from './spin-drills-page';
+import { SpinReplayPanel } from './spin-replay';
 import { analysisContext, type AnalysisContext } from './analysis-context';
 import { createEngine } from './engine';
 import type { Mino } from '@haelp/teto/engine';
@@ -23,12 +26,14 @@ const cell = (text: string | number) => { const td = document.createElement('td'
 export class Pages {
   readonly opening: OpeningTraining;
   readonly lab: PcLab;
+  readonly spin: SpinLab;
   private openersPage: OpenersPage;
   private sessions: SessionRecord[] = [];
   private groups: FaultGroup[] = [];
   private selected = new Set<string>();
   private tracks: ReplayTrack[] = [];
   private playback: Playback | null = null;
+  private spinReplay: SpinReplayPanel;
   private playing = false;
   private position = 0;
   private last = 0;
@@ -37,7 +42,11 @@ export class Pages {
     this.drills(); this.statistics(); this.replays();
     this.opening = new OpeningTraining(callbacks);
     this.lab = new PcLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
+    this.spin = new SpinLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
+    new SpinDrillsPage((ids,rounds)=>this.spin.startDrills(ids,rounds));
+    this.spinReplay = new SpinReplayPanel({ state: () => ({ playback: this.playback, track: this.tracks[Number(el<HTMLSelectElement>('player-track').value)], position: this.position }), open: scene => { this.playing = false; this.spin.importScene(scene); }, save: scene => this.spin.saveScene(scene) });
     const pcStatistics = document.createElement('section'); pcStatistics.id = 'pc-statistics'; el('statistics-page').append(pcStatistics);
+    const spinStatistics = document.createElement('section'); spinStatistics.id = 'spin-statistics'; el('statistics-page').append(spinStatistics);
     this.openersPage = new OpenersPage({ settings: callbacks.settings, rules: callbacks.rules, random: () => this.opening.startRandom(), single: opener => this.opening.startSingle(opener) });
     window.addEventListener('hashchange', () => this.route());
     document.addEventListener('drop', event => {
@@ -49,19 +58,20 @@ export class Pages {
     });
     this.route();
   }
-  get page() { const page = location.hash.slice(1); return ['drills', 'openers', 'statistics', 'replays'].includes(page) ? page : 'play'; }
+  get page() { const page = location.hash.slice(1); return ['drills', 'spin-drills', 'openers', 'statistics', 'replays'].includes(page) ? page : 'play'; }
   private route() {
     const hint = document.querySelector('.config-hint');
     if (hint) hint.textContent = this.page === 'replays' ? 'Drop a trainer JSON or TETR.IO replay here. TTC files still open the config importer.' : 'Drop a TETR.IO .ttc config anywhere on this page to import your settings.';
-    for (const name of ['play', 'drills', 'openers', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
+    for (const name of ['play', 'drills', 'spin-drills', 'openers', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
     if (['#analysis', '#pc', '#combo'].includes(location.hash)) this.lab.setPage(location.hash === '#combo' ? 'combo' : 'pc');
     this.lab.setVisible(['#analysis', '#pc', '#combo'].includes(location.hash));
+    this.spin.setVisible(location.hash === '#spin');
     document.querySelectorAll<HTMLAnchorElement>('.page-nav a').forEach(link => {
-      if (link.hash === (this.lab.active ? location.hash === '#combo' ? '#combo' : '#pc' : `#${this.page}`)) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+      if (link.hash === (this.spin.active || this.page === 'spin-drills' ? '#spin' : this.lab.active ? location.hash === '#combo' ? '#combo' : '#pc' : `#${this.page}`)) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
     if (this.page !== 'play') { this.opening.suspend(); this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
     if (this.page === 'openers') this.openersPage.refresh();
-    if (this.page === 'statistics') { void this.refreshHistory(); this.lab.renderStatistics(el('pc-statistics')); }
+    if (this.page === 'statistics') { void this.refreshHistory(); this.lab.renderStatistics(el('pc-statistics')); this.spin.renderStatistics(el('spin-statistics')); }
     if (this.page !== 'replays') this.playing = false;
   }
   private notice(message: string) { el('statistics-status').textContent = message; }
@@ -201,7 +211,8 @@ export class Pages {
     } catch (error) { if (token === this.loading) this.replayStatus((error as Error).message); }
   }
   update(now: number) {
-    if (this.page === 'play') { if (this.lab.active) this.lab.update(); else this.opening.update(this.callbacks.game()); }
+    this.spinReplay.update(this.playback, this.page === 'replays');
+    if (this.page === 'play') { if (this.spin.active) this.spin.update(); else if (this.lab.active) this.lab.update(); else this.opening.update(this.callbacks.game()); }
     if (this.page !== 'replays' || !this.playback) return;
     const before = this.position;
     if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) { this.playing = false; this.effectTail = now; } }

@@ -96,7 +96,7 @@ function selectMode(mode: ModeId) {
 }
 element<HTMLSelectElement>('mode-select').value = selectedMode;
 element('mode-select').addEventListener('change', () => {
-  pages.lab.clear();
+  pages.lab.clear(); pages.spin.clear();
   pages.opening.clear();
   selectMode(element<HTMLSelectElement>('mode-select').value as ModeId);
   message.textContent = selectedMode === 'custom' ? 'Adjust Custom rules, then start a session.' : 'Start a new 40-line sprint.';
@@ -136,7 +136,7 @@ element('think-toggle').addEventListener('change', changeThinking);
 document.addEventListener('pointerdown', () => sound.unlock(), { capture: true });
 document.addEventListener('keydown', () => sound.unlock(), { capture: true });
 document.addEventListener('click', event => {
-  if ((event.target as HTMLElement)?.closest('button:not(:disabled)') && !(event.target as HTMLElement).closest('#audio-preview')) sound.play('menuclick', true);
+  if ((event.target as HTMLElement)?.closest('button:not(:disabled)') && !(event.target as HTMLElement).closest('#audio-preview, #pause')) sound.play('menuclick', true);
 });
 element('audio-preview').addEventListener('click', () => {
   sound.configure({ enabled: element<HTMLInputElement>('audio-enabled').checked, volume: Number(element<HTMLInputElement>('audio-volume').value) / 100, ui: true });
@@ -223,7 +223,7 @@ function beginCurrentGame() {
   message.textContent = 'Game started with the current seed and queue.';
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
-function restartGame() { if (game.status === 'ready') { beginCurrentGame(); return; } if (!modePending && pages.lab.restart()) return; if (!modePending && pages.opening.restart()) return; pages.lab.clear(); pages.opening.clear(); start(modePending ? undefined : game.practice?.set); }
+function restartGame() { if (game.status === 'ready') { beginCurrentGame(); return; } if (pages.spin.active) { pages.spin.clear(); pages.lab.clear(); pages.opening.clear(); freeSession=undefined; start(); return; } if (!modePending && pages.lab.restart()) return; if (!modePending && pages.opening.restart()) return; pages.lab.clear(); pages.spin.clear(); pages.opening.clear(); start(modePending ? undefined : game.practice?.set); }
 element('start').addEventListener('click', restartGame);
 element('pause').addEventListener('click', pause);
 canvas.addEventListener('click', event => {
@@ -366,7 +366,7 @@ function refresh() {
   let activeMode = modeSelect.querySelector<HTMLOptionElement>('option[value="active-session"]');
   if (!activeMode) { activeMode = new Option('', 'active-session'); activeMode.disabled = true; modeSelect.add(activeMode); }
   activeMode.hidden = modePending || (!game.practice && !freeSession);
-  if (!activeMode.hidden) { activeMode.textContent = game.analysisScene ? game.rules.name === 'COMBO LAB' ? 'Combo Lab' : 'Perfect Clear Lab' : game.practice ? game.practice.set.kind === 'opener' ? 'Opener practice' : 'Finesse drills' : 'Random opening'; modeSelect.value = 'active-session'; }
+  if (!activeMode.hidden) { activeMode.textContent = game.analysisScene ? game.rules.name === 'SPIN LAB' ? 'Spin Lab' : game.rules.name === 'COMBO LAB' ? 'Combo Lab' : 'Perfect Clear Lab' : game.practice ? game.practice.set.kind === 'opener' ? 'Opener practice' : 'Finesse drills' : 'Random opening'; modeSelect.value = 'active-session'; }
   element('opener-hold-hint').hidden = !(game.practice?.set.scenes[game.practice.index]?.holdFirst && game.engine.falling.symbol !== game.practice.set.scenes[game.practice.index].guideSnapshot?.falling.symbol);
   element('mode-rules').hidden = !custom;
   element('mode-rules').textContent = `${engine.board.width} × ${engine.board.height} · ${engine.kickTableName} · ${game.rules.bag} · ${Number(engine.dynamic.gravity.get().toFixed(4))} G · ${game.rules.infiniteLock ? 'Manual lock' : `${game.rules.lockDelay}f lock delay`} · ${game.rules.finesse ? 'Perfect finesse' : 'Finesse off'}. ${[goals.lines ? `${goals.lines} lines` : '', goals.pieces ? `${goals.pieces} pieces` : '', goals.seconds ? formatTime(goals.seconds * 1000) : ''].filter(Boolean).join(' / ') || 'Endless session'}. Seed: ${game.seed}. Boards cleared: ${game.boardResets}. Attack: ${engine.stats.garbage.attack}. Sent: ${engine.stats.garbage.sent}. Pending garbage: ${engine.garbageQueue.size}. Garbage cleared: ${engine.stats.garbage.cleared}.${game.rules.advanced.garbageRefill ? ` Refill: ${game.rules.advanced.garbageRefill} rows.` : ""}${game.rules.advanced.handlingOverride ? ` Room handling: ARR ${engine.handling.arr}, DAS ${engine.handling.das}, SDF ${engine.handling.sdf}.` : ''}${game.rules.advanced.sequence ? ` Authored queue${game.rules.advanced.repeatSequence ? ' (repeating)' : ''}.` : ''}`;
@@ -419,7 +419,7 @@ function animate(now: number) {
   if (game.placements.length !== historyPlacements && now - lastHistorySave > 5000) {
     historyPlacements = game.placements.length; lastHistorySave = now; void saveHistory();
   }
-  refresh(); demo.update(now, game); if (pages.lab.active) element('practice-guide').hidden = true; else practiceGuide.update(game); pages.update(now); requestAnimationFrame(animate);
+  refresh(); demo.update(now, game); if (pages.lab.active || pages.spin.active) element('practice-guide').hidden = true; else practiceGuide.update(game); pages.update(now); requestAnimationFrame(animate);
 }
 
 const pages = new Pages(history, { game: () => game, analysis: context => { start(undefined, { seed: 1, rules: customRulesFromMode(context.rules) }, context.settings); game.rules.name = 'PERFECT CLEAR LAB'; game.loadAnalysis(context.snapshot); game.setJustThink(true, 'piece'); return game; }, freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });

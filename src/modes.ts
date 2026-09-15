@@ -126,7 +126,7 @@ export const modeDefinitions: Record<ModeId, ModeDefinition> = {
     gravity: .02, lockDelay: 30, lockResets: 15, infiniteLock: false,
     goals: { lines: 40, pieces: 0, seconds: 0 }, hold: true, infiniteHold: settings.training.infiniteHold, allow180: true, nextCount: 5,
     setup: { kind: 'empty', rows: 0, messiness: 1 }, topout: 'stop', finesse: settings.training.finesseEnabled, undo: settings.training.undoEnabled,
-    advanced: structuredClone(advancedDefaults), sourcePreset: ''
+    advanced: { ...structuredClone(advancedDefaults), kickSet: roomCatalog.presets.default['options.kickset'] as AdvancedRules['kickSet'], spinBonuses: roomCatalog.presets.default['options.spinbonuses'] as AdvancedRules['spinBonuses'] }, sourcePreset: ''
   }) },
   custom: { name: 'Custom', rules: settings => {
     const config = validateCustomRules(settings.custom);

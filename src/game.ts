@@ -1,3 +1,5 @@
+import { SpinTracker, type SpinTrace } from './spin-tracker';
+import type { SpinEvidence } from './spin-movement';
 import { actionText, type ActionText } from './action-text';
 import { clearedRows } from './board-effects';
 import { type Engine, type EngineSnapshot, type LockRes } from '@haelp/teto/engine';
@@ -14,12 +16,13 @@ import { RoomRuntime, type RoomState } from './room-runtime';
 import { replayTimeline } from './timeline';
 
 type PracticeProgress = { index: number; completed: number; restarts: number; finished: boolean };
-type Checkpoint = { snapshot: EngineSnapshot; room: RoomState; timerFrames: number; perfects: number; holds: number; clears: Record<string, number>; maxCombo: number; maxB2B: number; eventCount: number; placementCount: number; practice: PracticeProgress | null };
+type Checkpoint = { spinTrace?: SpinTrace; snapshot: EngineSnapshot; room: RoomState; timerFrames: number; perfects: number; holds: number; clears: Record<string, number>; maxCombo: number; maxB2B: number; eventCount: number; placementCount: number; practice: PracticeProgress | null };
 type RedoState = { state: Checkpoint; checkpoint: Checkpoint; undo: Checkpoint; eventCount: number; status: TrainerGame['status']; resumeStatus: 'playing' | 'countdown' };
-type Placement = { clearedRows: number[]; frame: number; endFrame: number; timeMs: number; piece: string; cells: Cell[]; rotation: number; result: LockRes; snapshot: EngineSnapshot; room: RoomState; board: unknown; hold: unknown; next: string[]; accepted: boolean; reason: 'finesse' | 'target' | null; finesse: FinesseResult | null; finesseInputs: number; inputs: Game.Key[] };
+type Placement = { spinEvidence: SpinEvidence & { hold: boolean }; clearedRows: number[]; frame: number; endFrame: number; timeMs: number; piece: string; cells: Cell[]; rotation: number; result: LockRes; snapshot: EngineSnapshot; room: RoomState; board: unknown; hold: unknown; next: string[]; accepted: boolean; reason: 'finesse' | 'target' | null; finesse: FinesseResult | null; finesseInputs: number; inputs: Game.Key[] };
 
 export class TrainerGame {
   engine: Engine;
+  private spinTracker: SpinTracker;
   settings: Settings;
   rules: ModeRules;
   room: RoomRuntime;
@@ -53,6 +56,7 @@ export class TrainerGame {
   analysisMistakes = 0;
   hideAnalysisTarget = false;
   analysisScene = false;
+  spinFinessePaths: { piece: string; target: Cell[]; spin: string; lines: number; hold: boolean; path: FinesseResult }[] | null = null;
   private continuationCheckpoint: Checkpoint | null = null;
   private timerFrames = 0;
   private checkpoint: Checkpoint;
@@ -61,7 +65,7 @@ export class TrainerGame {
   private resumeStatus: 'playing' | 'countdown' = 'playing';
   private pieceInputs: Game.Key[] = [];
   private frameKeyOffset = 0;
-  private locking: { clearedRows: number[]; target: Cell[]; rotation: number; inputs: Game.Key[]; keyOffset: number; checkpoint: Checkpoint } | null = null;
+  private locking: { spinEvidence: SpinEvidence & { hold: boolean }; clearedRows: number[]; target: Cell[]; rotation: number; inputs: Game.Key[]; keyOffset: number; checkpoint: Checkpoint } | null = null;
   private rollback: Checkpoint | null = null;
   private nextScene: number | null = null;
   private precharge = new DasPrecharge();
@@ -76,13 +80,14 @@ export class TrainerGame {
     if (practice?.kind === 'opener') this.rules.undo ||= settings.training.undoEnabled;
     this.seed = seed ?? practice?.seed ?? (mode === 'custom' && !practice && settings.custom.seed ? settings.custom.seed : crypto.getRandomValues(new Uint32Array(1))[0] % 2147483646 + 1);
     this.engine = createEngine(this.settings, this.seed, this.rules);
+    this.spinTracker = new SpinTracker(this.engine);
     this.settings.handling = { ...this.engine.handling };
     this.room = new RoomRuntime(this.engine, this.rules, !!practice, this.seed);
     applyModeSetup(this.engine, this.rules, this.seed);
     this.room.refill();
     this.checkpoint = this.capture();
     this.engine.events.on('falling.lock.pre', () => {
-      this.locking = { clearedRows: clearedRows(this.engine.board.state, this.engine.falling.absoluteBlocks), target: this.engine.falling.absoluteBlocks, rotation: this.engine.falling.rotation, inputs: this.pieceInputs, keyOffset: this.frameKeyOffset, checkpoint: this.checkpoint };
+      this.locking = { spinEvidence: this.spinTracker.evidence(), clearedRows: clearedRows(this.engine.board.state, this.engine.falling.absoluteBlocks), target: this.engine.falling.absoluteBlocks, rotation: this.engine.falling.rotation, inputs: this.pieceInputs, keyOffset: this.frameKeyOffset, checkpoint: this.checkpoint };
     });
     this.engine.events.on('falling.new', ({ isHold }) => {
       if (!this.room.waking || isHold) this.pieceInputs = [];
@@ -127,12 +132,13 @@ export class TrainerGame {
         if (event.type === 'keydown') keys--;
       }
     }
-    return { snapshot: this.engine.snapshot({ isUndoRedo: true }), room: structuredClone(this.room.state), timerFrames: this.timerFrames, perfects: this.perfects, holds: this.holds, clears: { ...this.clears }, maxCombo: this.maxCombo, maxB2B: this.maxB2B, eventCount, placementCount: this.placements.length, practice: this.practice ? { index: this.practice.index, completed: this.practice.completed, restarts: this.practice.restarts, finished: this.practice.finished } : null };
+    return { spinTrace: this.spinTracker.snapshot(), snapshot: this.engine.snapshot({ isUndoRedo: true }), room: structuredClone(this.room.state), timerFrames: this.timerFrames, perfects: this.perfects, holds: this.holds, clears: { ...this.clears }, maxCombo: this.maxCombo, maxB2B: this.maxB2B, eventCount, placementCount: this.placements.length, practice: this.practice ? { index: this.practice.index, completed: this.practice.completed, restarts: this.practice.restarts, finished: this.practice.finished } : null };
   }
 
   private restore(checkpoint: Checkpoint) {
     this.actionEffects = [];
     this.engine.fromSnapshot(checkpoint.snapshot);
+    this.spinTracker.restore(checkpoint.spinTrace ?? null);
     this.timerFrames = checkpoint.timerFrames;
     this.room.restore(checkpoint.room, this.timerFrames, checkpoint.snapshot.frame);
     this.perfects = checkpoint.perfects;
@@ -232,19 +238,27 @@ export class TrainerGame {
     const inputs = [...locking.inputs, ...result.keysPresses.slice(locking.keyOffset)];
     const actual = countFinesseInputs(inputs);
     const enabled = this.rules.finesse;
-    const finesse = enabled ? findFinesse(this.engine, snapshot, locking.target) : null;
-    const inefficient = !!finesse && actual > finesse.cost;
+    let finesse = enabled ? findFinesse(this.engine, snapshot, locking.target) : null;
     const requiredScene = this.practice?.set.scenes[this.practice.index] ?? (this.continuation?.enforced ? this.continuation.scene : null);
     const requiredTarget = requiredScene?.target ?? (!this.settings.training.allowDifferentTarget ? this.fault?.target : null);
     const guideSnapshot = requiredScene?.guideSnapshot ?? requiredScene?.snapshot;
     const wrongPiece = !!guideSnapshot && guideSnapshot.falling.symbol !== result.mino;
-    const wrongTarget = !!requiredTarget && (wrongPiece || !sameCells(requiredTarget, locking.target));
+    const spinGoal = requiredScene?.spinGoal;
+    const proof = { ...locking.spinEvidence, spin: result.spin };
+    const wrongSpin = !!spinGoal && (result.spin !== spinGoal.spin || result.lines !== spinGoal.lines || !!spinGoal.geometric && !proof.geometric || spinGoal.hold !== undefined && spinGoal.hold !== proof.hold || spinGoal.kick !== undefined && spinGoal.kick !== !!proof.rotation?.kick.some(Boolean) || spinGoal.used180 !== undefined && spinGoal.used180 !== proof.used180 || spinGoal.softDrop !== undefined && spinGoal.softDrop !== proof.softDrop);
+    const wrongTarget = !!requiredTarget && (wrongPiece || !sameCells(requiredTarget, locking.target) || wrongSpin);
+    if (finesse && spinGoal && !wrongTarget && requiredScene) finesse = { ...requiredScene.path, cost: Math.max(finesse.cost, requiredScene.path.cost) };
+    const spinPractice = this.continuation?.scene.spinGoal;
+    const validSpinAttempt = !!spinPractice && result.spin === spinPractice.spin && result.lines === spinPractice.lines;
+    const spinPath = this.spinFinessePaths?.filter(path=>path.piece===result.mino&&path.spin===result.spin&&path.lines===result.lines&&path.hold===proof.hold&&sameCells(path.target,locking.target)).sort((a,b)=>a.path.cost-b.path.cost)[0];
+    if(enabled&&spinPath)finesse=spinPath.path;
+    const inefficient = !!finesse && actual > finesse.cost && !(this.analysisPolicy && validSpinAttempt && !this.spinFinessePaths);
     const reason = inefficient ? 'finesse' : wrongTarget ? 'target' : null;
-    this.placements.push({ clearedRows: locking.clearedRows, frame: this.engine.frame, endFrame: this.stepping ? this.stepping.frame + 1 : this.engine.frame, timeMs: this.elapsedMs, piece: result.mino, cells: locking.target, rotation: locking.rotation, result: structuredClone(result), snapshot: structuredClone(snapshot), room: structuredClone(locking.checkpoint.room), board: structuredClone(snapshot.board), hold: snapshot.hold, next: snapshot.queue.value.slice(0, this.rules.nextCount), accepted: reason === null, reason, finesse, finesseInputs: actual, inputs });
+    this.placements.push({ spinEvidence: proof, clearedRows: locking.clearedRows, frame: this.engine.frame, endFrame: this.stepping ? this.stepping.frame + 1 : this.engine.frame, timeMs: this.elapsedMs, piece: result.mino, cells: locking.target, rotation: locking.rotation, result: structuredClone(result), snapshot: structuredClone(snapshot), room: structuredClone(locking.checkpoint.room), board: structuredClone(snapshot.board), hold: snapshot.hold, next: snapshot.queue.value.slice(0, this.rules.nextCount), accepted: reason === null, reason, finesse, finesseInputs: actual, inputs });
     if (reason) {
       const target = requiredTarget ?? locking.target;
-      const demoSnapshot = wrongPiece && guideSnapshot ? guideSnapshot : snapshot;
-      const path = wrongPiece ? requiredScene!.path : sameCells(target, locking.target) ? finesse : findFinesse(this.engine, snapshot, target);
+      const demoSnapshot = (wrongPiece || spinGoal) && guideSnapshot ? guideSnapshot : snapshot;
+      const path = spinGoal ? requiredScene!.path : wrongPiece ? requiredScene!.path : sameCells(target, locking.target) ? finesse : findFinesse(this.engine, snapshot, target);
       if (reason === 'finesse') this.faults++; else this.targetMisses++;
       if (path) this.fault = { target, path, actual, reason };
       this.rollback = wrongPiece && this.continuationCheckpoint ? this.continuationCheckpoint : locking.checkpoint;
@@ -326,7 +340,7 @@ export class TrainerGame {
   loadAnalysis(snapshot: EngineSnapshot) {
     this.analysisScene = true;
     this.practice = null; this.undoStack = []; this.redoStack = [];
-    this.restore({ ...this.capture(), snapshot: structuredClone(snapshot), timerFrames: 0, perfects: 0, holds: 0, clears: {}, maxCombo: 0, maxB2B: 0, practice: null });
+    this.restore({ ...this.capture(), snapshot: structuredClone(snapshot), spinTrace: undefined, timerFrames: 0, perfects: 0, holds: 0, clears: {}, maxCombo: 0, maxB2B: 0, practice: null });
     this.continuation = null; this.continuationCheckpoint = null; this.fault = null; this.demonstration = null; this.hintTarget = null;
     this.status = 'playing'; this.countdownFrames = 0;
     this.analysisPending = false; this.waitingForInput = true; this.revision++;

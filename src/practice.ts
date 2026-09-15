@@ -2,7 +2,7 @@ import type { EngineSnapshot } from '@haelp/teto/engine';
 import type { Cell, FinesseResult } from './finesse';
 import type { CustomRules } from './modes';
 
-export type PracticeScene = { id: string; snapshot: EngineSnapshot; target: Cell[]; path: FinesseResult; holdFirst?: boolean; guideSnapshot?: EngineSnapshot };
+export type PracticeScene = { id: string; snapshot: EngineSnapshot; target: Cell[]; path: FinesseResult; holdFirst?: boolean; guideSnapshot?: EngineSnapshot; spinGoal?: { spin: string; lines: number; geometric?: boolean; rotation?: number; hold?: boolean; kick?: boolean; used180?: boolean; softDrop?: boolean } };
 export type PracticeSet = { name: string; scenes: PracticeScene[]; allow180?: boolean; customRules?: CustomRules; loop?: boolean; kind?: 'pure' | 'focused' | 'opener'; finesseEnabled?: boolean; allowHold?: boolean; continueAfter?: boolean; seed?: number };
 export type Demonstration = PracticeScene & { serial: number; sceneNumber: number; kind?: 'retry' | 'guide' };
 

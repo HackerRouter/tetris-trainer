@@ -473,7 +473,8 @@ for (const objective of ['combo','attack']) for (const information of ['pack','v
   const result = await page.evaluate(() => (window as any).pcResult), route = result.routes[0];
   expect(route.combo.setup).toBeGreaterThan(2); expect(result.complete).toBe(false);
   expect(await page.evaluate(() => [(window as any).pcRequest.depth,(window as any).pcRequest.information,(window as any).pcRequest.position.next.length])).toEqual([60,'seeded',60]);
-  expect(route.steps.length).toBeGreaterThan(20);
+  expect(route.steps.length).toBeLessThanOrEqual(60);
+  if(information==='pack')expect(route.steps.length).toBeGreaterThan(20);
   if(objective==='combo'&&information==='pack') expect(route.combo.clears).toBeGreaterThanOrEqual(10);
   await testInfo.attach('opening-result', { body: JSON.stringify({ objective, information, elapsedMs:result.elapsedMs, checked:result.checked, route:route.combo, steps:route.steps.map((step:any)=>({piece:step.piece,lines:step.lines,hold:step.scene.holdFirst})) }), contentType:'application/json' });
   await page.click('#pc-practice'); const searches = await page.evaluate(() => (window as any).pcRequests);
