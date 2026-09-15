@@ -2,10 +2,10 @@ import type { Engine, LockRes } from '@haelp/teto/engine';
 
 export function placementSounds(engine: Engine, result: LockRes, hardDrop: boolean) {
   const sounds = hardDrop ? ['harddrop', 'floor'] : ['floor'];
+  if (result.spin !== 'none') sounds.push('spinend');
   if (result.lines) {
-    sounds.push(result.spin !== 'none' ? 'clearspin' : result.lines >= 4 ? 'clearquad' : 'clearline');
-    if (engine.stats.combo > 0) sounds.push(`combo_${Math.min(16, engine.stats.combo)}`);
-    if (engine.stats.b2b > 0 && (result.spin !== 'none' || result.lines >= 4)) sounds.push('clearbtb');
+    sounds.push(result.lines >= 4 ? result.stats.b2b > 0 ? 'clearbtb' : 'clearquad' : result.spin !== 'none' ? 'clearspin' : 'clearline');
+    if (result.stats.combo > 0) sounds.push(`combo_${Math.min(16, result.stats.combo)}`);
     if (engine.board.perfectClear) sounds.push('allclear');
   }
   return sounds;

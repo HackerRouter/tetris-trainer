@@ -1,0 +1,5172 @@
+{
+  "revision": "tetrio-v19-20260714",
+  "replayVersion": 19,
+  "source": {
+    "url": "https://tetr.io/js/tetrio.js?hv=771338492.507fe115b47d.20260714T182728",
+    "capturedAt": "2026-07-18T09:34:25.484Z",
+    "sha256": "87dcd1e0c0fd3da6f25528eea43ddaaccba6a7eb485eccb76262a6f3d1d663c1",
+    "locations": {
+      "garbage": 770879,
+      "zenithRevivePrompts": 772096,
+      "zenithReviveDecks": 776882,
+      "zenithFatigue": 777390,
+      "zenithFatigueRevEx": 779496,
+      "zenithFatigueRevDuo": 783048,
+      "zenithMods": 793706,
+      "zenithModsShort": 794243,
+      "allowedReverseCards": 794640
+    }
+  },
+  "tasks": [
+    {
+      "id": "f-combo-3",
+      "index": 0,
+      "tier": "F",
+      "predicate": "combo",
+      "target": 3,
+      "label": "Perform a 3-Combo",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        919174,
+        921102
+      ]
+    },
+    {
+      "id": "f-double-2",
+      "index": 1,
+      "tier": "F",
+      "predicate": "double",
+      "target": 2,
+      "label": "Clear 2 Doubles",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        927863
+      ]
+    },
+    {
+      "id": "f-quad-1",
+      "index": 2,
+      "tier": "F",
+      "predicate": "quad",
+      "target": 1,
+      "label": "Clear a Quad",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        929485
+      ]
+    },
+    {
+      "id": "f-lines-6",
+      "index": 3,
+      "tier": "F",
+      "predicate": "lines",
+      "target": 6,
+      "label": "Clear 6 Lines",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        920049
+      ]
+    },
+    {
+      "id": "f-osingle-1",
+      "index": 4,
+      "tier": "F",
+      "predicate": "osingle",
+      "target": 1,
+      "label": "Clear a Single\nusing an O-Piece",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        927180
+      ]
+    },
+    {
+      "id": "f-odouble-1",
+      "index": 5,
+      "tier": "F",
+      "predicate": "odouble",
+      "target": 1,
+      "label": "Clear a Double\nusing an O-Piece",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        927918
+      ]
+    },
+    {
+      "id": "f-szdouble-1",
+      "index": 6,
+      "tier": "F",
+      "predicate": "szdouble",
+      "target": 1,
+      "label": "Clear a Double\nusing an S or Z-Piece",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        928009,
+        928102
+      ]
+    },
+    {
+      "id": "f-ljtriple-1",
+      "index": 7,
+      "tier": "F",
+      "predicate": "ljtriple",
+      "target": 1,
+      "label": "Clear a Triple\nusing an L or J-Piece",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        928861,
+        928954
+      ]
+    },
+    {
+      "id": "f-iholdlines-3",
+      "index": 8,
+      "tier": "F",
+      "predicate": "iholdlines",
+      "target": 3,
+      "label": "Clear 3 lines\nwhile holding an I-Piece",
+      "labelType": 3,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        920154
+      ]
+    },
+    {
+      "id": "f-hold-8",
+      "index": 9,
+      "tier": "F",
+      "predicate": "hold",
+      "target": 8,
+      "label": "Use Hold 8 times",
+      "labelType": 2,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        867860
+      ]
+    },
+    {
+      "id": "f-rotate-20",
+      "index": 10,
+      "tier": "F",
+      "predicate": "rotate",
+      "target": 20,
+      "label": "Rotate 20 times",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        863663
+      ]
+    },
+    {
+      "id": "f-singleconsecutive-2",
+      "index": 11,
+      "tier": "F",
+      "predicate": "singleconsecutive",
+      "target": 2,
+      "label": "Clear 2 Singles in a row",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        924100
+      ]
+    },
+    {
+      "id": "e-spin-1",
+      "index": 12,
+      "tier": "E",
+      "predicate": "spin",
+      "target": 1,
+      "label": "Perform any Spin",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        925560
+      ]
+    },
+    {
+      "id": "e-tspinsingle-1",
+      "index": 13,
+      "tier": "E",
+      "predicate": "tspinsingle",
+      "target": 1,
+      "label": "Clear a T-Spin Single",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        926723
+      ]
+    },
+    {
+      "id": "e-tspindouble-1",
+      "index": 14,
+      "tier": "E",
+      "predicate": "tspindouble",
+      "target": 1,
+      "label": "Clear a T-Spin Double",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        927547
+      ]
+    },
+    {
+      "id": "e-szspin-1",
+      "index": 15,
+      "tier": "E",
+      "predicate": "szspin",
+      "target": 1,
+      "label": "Clear an S/Z-Spin",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        920712
+      ]
+    },
+    {
+      "id": "e-ljspin-1",
+      "index": 16,
+      "tier": "E",
+      "predicate": "ljspin",
+      "target": 1,
+      "label": "Clear an L/J-Spin",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        920767
+      ]
+    },
+    {
+      "id": "e-combo-5",
+      "index": 17,
+      "tier": "E",
+      "predicate": "combo",
+      "target": 5,
+      "label": "Perform a 5-Combo",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        919174,
+        921102
+      ]
+    },
+    {
+      "id": "e-iflat-2",
+      "index": 18,
+      "tier": "E",
+      "predicate": "iflat",
+      "target": 2,
+      "label": "Clear 2 Lines using\nhorizontal I-Pieces",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        927050
+      ]
+    },
+    {
+      "id": "e-pieces-20",
+      "index": 19,
+      "tier": "E",
+      "predicate": "pieces",
+      "target": 20,
+      "label": "Place 20 pieces",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        868492
+      ]
+    },
+    {
+      "id": "e-attack-6",
+      "index": 20,
+      "tier": "E",
+      "predicate": "attack",
+      "target": 6,
+      "label": "Send 6 Attack",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        820917
+      ]
+    },
+    {
+      "id": "e-placeoconsecutive-2",
+      "index": 21,
+      "tier": "E",
+      "predicate": "placeoconsecutive",
+      "target": 2,
+      "label": "Place 2 O-Pieces\nin a row",
+      "labelType": 3,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        868906
+      ]
+    },
+    {
+      "id": "e-norotateclockwise-12",
+      "index": 22,
+      "tier": "E",
+      "predicate": "norotateclockwise",
+      "target": 12,
+      "label": "Place 12 pieces while only\nrotating counterclockwise",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        868808,
+        868854
+      ]
+    },
+    {
+      "id": "e-singlenocombo-6",
+      "index": 23,
+      "tier": "E",
+      "predicate": "singlenocombo",
+      "target": 6,
+      "label": "Clear 6 Singles without\nstarting a combo",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        920228
+      ]
+    },
+    {
+      "id": "d-double-4",
+      "index": 24,
+      "tier": "D",
+      "predicate": "double",
+      "target": 4,
+      "label": "Clear 4 Doubles",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        927863
+      ]
+    },
+    {
+      "id": "d-spam-3",
+      "index": 25,
+      "tier": "D",
+      "predicate": "spam",
+      "target": 3,
+      "label": "Place 3 pieces in a row\nwithout moving or rotating",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        868621,
+        868660
+      ]
+    },
+    {
+      "id": "d-noclear-14",
+      "index": 26,
+      "tier": "D",
+      "predicate": "noclear",
+      "target": 14,
+      "label": "Place 14 pieces in a row\nwithout clearing any lines",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        920193,
+        921128
+      ]
+    },
+    {
+      "id": "d-szdouble-2",
+      "index": 27,
+      "tier": "D",
+      "predicate": "szdouble",
+      "target": 2,
+      "label": "Clear 2 Doubles\nusing S or Z-Pieces",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        928009,
+        928102
+      ]
+    },
+    {
+      "id": "d-ljtriple-2",
+      "index": 28,
+      "tier": "D",
+      "predicate": "ljtriple",
+      "target": 2,
+      "label": "Clear 2 Triples\nusing L or J-Pieces",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        928861,
+        928954
+      ]
+    },
+    {
+      "id": "d-ispinclear-1",
+      "index": 29,
+      "tier": "D",
+      "predicate": "ispinclear",
+      "target": 1,
+      "label": "Clear an I-Spin",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        925081
+      ]
+    },
+    {
+      "id": "d-upperhalfquad-1",
+      "index": 30,
+      "tier": "D",
+      "predicate": "upperhalfquad",
+      "target": 1,
+      "label": "Clear a Quad in the\nupper half of the board",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        929879
+      ]
+    },
+    {
+      "id": "d-rotate-80",
+      "index": 31,
+      "tier": "D",
+      "predicate": "rotate",
+      "target": 80,
+      "label": "Rotate 80 times",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        863663
+      ]
+    },
+    {
+      "id": "d-quadcombo-1",
+      "index": 32,
+      "tier": "D",
+      "predicate": "quadcombo",
+      "target": 1,
+      "label": "Clear a Quad\nwhile on a 2+-Combo",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        924165
+      ]
+    },
+    {
+      "id": "d-szsingle-2",
+      "index": 33,
+      "tier": "D",
+      "predicate": "szsingle",
+      "target": 2,
+      "label": "Clear 2 Singles in a row\nusing S or Z-Pieces",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        924239
+      ]
+    },
+    {
+      "id": "d-combonohold-3",
+      "index": 34,
+      "tier": "D",
+      "predicate": "combonohold",
+      "target": 3,
+      "label": "Perform a 3-Combo\nwithout using Hold",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        868024,
+        919234,
+        921162
+      ]
+    },
+    {
+      "id": "d-noclearspin-3",
+      "index": 35,
+      "tier": "D",
+      "predicate": "noclearspin",
+      "target": 3,
+      "label": "Perform 3 Spins\nthat don't clear any lines",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        926417
+      ]
+    },
+    {
+      "id": "d-szljspin-2",
+      "index": 36,
+      "tier": "D",
+      "predicate": "szljspin",
+      "target": 2,
+      "label": "Perform 2\nS/Z/L/J-Spins",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        924430
+      ]
+    },
+    {
+      "id": "c-tspintriple-1",
+      "index": 37,
+      "tier": "C",
+      "predicate": "tspintriple",
+      "target": 1,
+      "label": "Clear a T-Spin Triple",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        928545
+      ]
+    },
+    {
+      "id": "c-nohold-25",
+      "index": 38,
+      "tier": "C",
+      "predicate": "nohold",
+      "target": 25,
+      "label": "Place 25 pieces in a row\nwithout using Hold",
+      "labelType": 4,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        867989,
+        868533
+      ]
+    },
+    {
+      "id": "c-triple-3",
+      "index": 39,
+      "tier": "C",
+      "predicate": "triple",
+      "target": 3,
+      "label": "Clear 3 Triples",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        928771
+      ]
+    },
+    {
+      "id": "c-b2b-4",
+      "index": 40,
+      "tier": "C",
+      "predicate": "b2b",
+      "target": 4,
+      "label": "Reach B2B x4",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        921357,
+        922978
+      ]
+    },
+    {
+      "id": "c-quadbuckets-2",
+      "index": 41,
+      "tier": "C",
+      "predicate": "quadbuckets",
+      "target": 2,
+      "label": "Clear a Quad in\n2 different columns",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        929828
+      ]
+    },
+    {
+      "id": "c-holdconsecutive-12",
+      "index": 42,
+      "tier": "C",
+      "predicate": "holdconsecutive",
+      "target": 12,
+      "label": "Use Hold on\n12 pieces in a row",
+      "labelType": 3,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        867899,
+        924479
+      ]
+    },
+    {
+      "id": "c-softdrop-10",
+      "index": 43,
+      "tier": "C",
+      "predicate": "softdrop",
+      "target": 10,
+      "label": "Place 10 pieces without\nreleasing Soft Drop",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        868715,
+        908815
+      ]
+    },
+    {
+      "id": "c-top3rows-3",
+      "index": 44,
+      "tier": "C",
+      "predicate": "top3rows",
+      "target": 3,
+      "label": "Have part of your stack in\nthe top 3 rows for 3 seconds",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        995452,
+        995493
+      ]
+    },
+    {
+      "id": "c-linesnoti-10",
+      "index": 45,
+      "tier": "C",
+      "predicate": "linesnoti",
+      "target": 10,
+      "label": "Clear 10 Lines without\nclearing with T or I-pieces",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        920344,
+        920374
+      ]
+    },
+    {
+      "id": "c-szspintriple-1",
+      "index": 46,
+      "tier": "C",
+      "predicate": "szspintriple",
+      "target": 1,
+      "label": "Clear an S/Z-Spin Triple",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        929125
+      ]
+    },
+    {
+      "id": "c-odoubleconsecutive-2",
+      "index": 47,
+      "tier": "C",
+      "predicate": "odoubleconsecutive",
+      "target": 2,
+      "label": "Clear 2 Doubles consecutively\nusing two O-Pieces",
+      "labelType": 4,
+      "excludes": [
+        "nohold"
+      ],
+      "calls": [
+        0,
+        923391
+      ]
+    },
+    {
+      "id": "c-tspinminiclear-4",
+      "index": 48,
+      "tier": "C",
+      "predicate": "tspinminiclear",
+      "target": 4,
+      "label": "Clear 4 T-Spin Minis",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        925010
+      ]
+    },
+    {
+      "id": "c-attack-14",
+      "index": 49,
+      "tier": "C",
+      "predicate": "attack",
+      "target": 14,
+      "label": "Send 14 Attack",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        820917
+      ]
+    },
+    {
+      "id": "c-doublespiece-3",
+      "index": 50,
+      "tier": "C",
+      "predicate": "doublespiece",
+      "target": 3,
+      "label": "Clear 3 Doubles\nwith the same type of piece",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        919283
+      ]
+    },
+    {
+      "id": "c-ljgarbage-1",
+      "index": 51,
+      "tier": "C",
+      "predicate": "ljgarbage",
+      "target": 1,
+      "label": "Clear Garbage\nusing a L/J-Spin",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        916724
+      ]
+    },
+    {
+      "id": "c-szgarbage-1",
+      "index": 52,
+      "tier": "C",
+      "predicate": "szgarbage",
+      "target": 1,
+      "label": "Clear Garbage\nusing a S/Z-Spin",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        916846
+      ]
+    },
+    {
+      "id": "c-columnopiece-3",
+      "index": 53,
+      "tier": "C",
+      "predicate": "columnopiece",
+      "target": 3,
+      "label": "Place 3 O-Pieces\nin column 1",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        869747
+      ]
+    },
+    {
+      "id": "c-spinclear-2",
+      "index": 54,
+      "tier": "C",
+      "predicate": "spinclear",
+      "target": 2,
+      "label": "Clear 2 Spins\nin one combo",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        925133,
+        925524
+      ]
+    },
+    {
+      "id": "c-iclearspam-1",
+      "index": 55,
+      "tier": "C",
+      "predicate": "iclearspam",
+      "target": 1,
+      "label": "Clear a Single with an I-Piece\nwithout moving or rotating",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        927121
+      ]
+    },
+    {
+      "id": "c-holddas-6",
+      "index": 56,
+      "tier": "C",
+      "predicate": "holddas",
+      "target": 6,
+      "label": "Place 6 Pieces\nwithout releasing DAS",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        869058,
+        908499,
+        908704,
+        909610
+      ]
+    },
+    {
+      "id": "b-oclear-6",
+      "index": 57,
+      "tier": "B",
+      "predicate": "oclear",
+      "target": 6,
+      "label": "Clear 6 Lines\nusing O-Pieces",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        920105
+      ]
+    },
+    {
+      "id": "b-spinbuckets-3",
+      "index": 58,
+      "tier": "B",
+      "predicate": "spinbuckets",
+      "target": 3,
+      "label": "Clear Spin-Clears\nwith 3 different pieces",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        920919
+      ]
+    },
+    {
+      "id": "b-quad-4",
+      "index": 59,
+      "tier": "B",
+      "predicate": "quad",
+      "target": 4,
+      "label": "Clear 4 Quads",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        929485
+      ]
+    },
+    {
+      "id": "b-spam-5",
+      "index": 60,
+      "tier": "B",
+      "predicate": "spam",
+      "target": 5,
+      "label": "Place 5 pieces in a row\nwithout moving or rotating",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        868621,
+        868660
+      ]
+    },
+    {
+      "id": "b-ljspintriple-1",
+      "index": 61,
+      "tier": "B",
+      "predicate": "ljspintriple",
+      "target": 1,
+      "label": "Clear an L/J-Spin Triple",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        929038
+      ]
+    },
+    {
+      "id": "b-quadconsecutive-2",
+      "index": 62,
+      "tier": "B",
+      "predicate": "quadconsecutive",
+      "target": 2,
+      "label": "Clear 2 Quads in a row",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        924037
+      ]
+    },
+    {
+      "id": "b-singlesonly-8",
+      "index": 63,
+      "tier": "B",
+      "predicate": "singlesonly",
+      "target": 8,
+      "label": "Clear 8 Singles without doing\nother clears or using Hold",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        867949,
+        920959
+      ]
+    },
+    {
+      "id": "b-nogarbage-4",
+      "index": 64,
+      "tier": "B",
+      "predicate": "nogarbage",
+      "target": 4,
+      "label": "Have no Garbage Lines on\nyour board for 4 seconds",
+      "labelType": 4,
+      "excludes": [
+        "duo_reversed"
+      ],
+      "calls": [
+        0,
+        995746,
+        995788
+      ]
+    },
+    {
+      "id": "b-rotate-300",
+      "index": 65,
+      "tier": "B",
+      "predicate": "rotate",
+      "target": 300,
+      "label": "Rotate 300 times",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        863663
+      ]
+    },
+    {
+      "id": "b-nocancel-8",
+      "index": 66,
+      "tier": "B",
+      "predicate": "nocancel",
+      "target": 8,
+      "label": "Don't cancel any\ngarbage for 8 seconds",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        822553,
+        996029
+      ]
+    },
+    {
+      "id": "b-tspindoubleup-1",
+      "index": 67,
+      "tier": "B",
+      "predicate": "tspindoubleup",
+      "target": 1,
+      "label": "Clear a T-Spin Double\nwith the Piece pointing up",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        927676
+      ]
+    },
+    {
+      "id": "b-oclearspam-1",
+      "index": 68,
+      "tier": "B",
+      "predicate": "oclearspam",
+      "target": 1,
+      "label": "Clear a Double with an O-Piece\nwithout moving or rotating",
+      "labelType": 4,
+      "excludes": [],
+      "calls": [
+        0,
+        928240
+      ]
+    },
+    {
+      "id": "b-tnorotate-3",
+      "index": 69,
+      "tier": "B",
+      "predicate": "tnorotate",
+      "target": 3,
+      "label": "Place 3 T-Pieces\nwithout rotating any",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        863718,
+        869127
+      ]
+    },
+    {
+      "id": "b-tspincombo-1",
+      "index": 70,
+      "tier": "B",
+      "predicate": "tspincombo",
+      "target": 1,
+      "label": "Clear a T-Spin Double\nwhile on a 2+-Combo",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        927733
+      ]
+    },
+    {
+      "id": "a-combo-7",
+      "index": 71,
+      "tier": "A",
+      "predicate": "combo",
+      "target": 7,
+      "label": "Perform a 7-Combo",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        919174,
+        921102
+      ]
+    },
+    {
+      "id": "a-ispindouble-1",
+      "index": 72,
+      "tier": "A",
+      "predicate": "ispindouble",
+      "target": 1,
+      "label": "Clear an I-Spin Double",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        928163
+      ]
+    },
+    {
+      "id": "a-szspinconsecutive-2",
+      "index": 73,
+      "tier": "A",
+      "predicate": "szspinconsecutive",
+      "target": 2,
+      "label": "Clear two S/Z-Spin\nDoubles consecutively",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        923076
+      ]
+    },
+    {
+      "id": "a-ljspinconsecutive-2",
+      "index": 74,
+      "tier": "A",
+      "predicate": "ljspinconsecutive",
+      "target": 2,
+      "label": "Clear two L/J-Spin\nDoubles consecutively",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        923189
+      ]
+    },
+    {
+      "id": "a-colorclear-1",
+      "index": 75,
+      "tier": "A",
+      "predicate": "colorclear",
+      "target": 1,
+      "label": "Perform a Color Clear",
+      "labelType": 2,
+      "excludes": [],
+      "calls": [
+        0,
+        936447
+      ]
+    },
+    {
+      "id": "a-lines-40",
+      "index": 76,
+      "tier": "A",
+      "predicate": "lines",
+      "target": 40,
+      "label": "Clear 40 Lines",
+      "labelType": 1,
+      "excludes": [],
+      "calls": [
+        0,
+        920049
+      ]
+    },
+    {
+      "id": "a-combospin-4",
+      "index": 77,
+      "tier": "A",
+      "predicate": "combospin",
+      "target": 4,
+      "label": "Clear 4 Spins\nin one Combo",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        921194,
+        924347
+      ]
+    },
+    {
+      "id": "a-tspindtcolumn-1",
+      "index": 78,
+      "tier": "A",
+      "predicate": "tspindtcolumn",
+      "target": 1,
+      "label": "Clear a T-Spin Double/Triple\ncentered in column 1 or 10",
+      "labelType": 3,
+      "excludes": [],
+      "calls": [
+        0,
+        927619,
+        928639
+      ]
+    }
+  ],
+  "garbage": {
+    "SINGLE": 0,
+    "DOUBLE": 1,
+    "TRIPLE": 2,
+    "QUAD": 4,
+    "PENTA": 5,
+    "TSPIN_MINI": 0,
+    "TSPIN": 0,
+    "TSPIN_MINI_SINGLE": 0,
+    "TSPIN_SINGLE": 2,
+    "TSPIN_MINI_DOUBLE": 1,
+    "TSPIN_DOUBLE": 4,
+    "TSPIN_MINI_TRIPLE": 2,
+    "TSPIN_TRIPLE": 6,
+    "TSPIN_MINI_QUAD": 4,
+    "TSPIN_QUAD": 10,
+    "TSPIN_PENTA": 12,
+    "BACKTOBACK_BONUS": 1,
+    "BACKTOBACK_BONUS_LOG": 0.8,
+    "COMBO_MINIFIER": 1,
+    "COMBO_MINIFIER_LOG": 1.25,
+    "COMBO_BONUS": 0.25,
+    "ALL_CLEAR": 10,
+    "combotable": {
+      "none": [
+        0
+      ],
+      "classic guideline": [
+        0,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+        4,
+        4,
+        4,
+        5
+      ],
+      "modern guideline": [
+        0,
+        1,
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        4
+      ]
+    }
+  },
+  "decks": [
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 1,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 2,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 3,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 2,
+      "E": 1,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 1,
+      "E": 2,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 3,
+      "D": 0,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 2,
+      "D": 1,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 1,
+      "D": 2,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 3,
+      "C": 0,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 2,
+      "C": 1,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 1,
+      "C": 2,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 3,
+      "B": 0,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 2,
+      "B": 1,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 1,
+      "B": 2,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 3,
+      "A": 0
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 2,
+      "A": 1
+    },
+    {
+      "F": 0,
+      "E": 0,
+      "D": 0,
+      "C": 0,
+      "B": 1,
+      "A": 2,
+      "order": [
+        "A",
+        "B",
+        "A"
+      ]
+    }
+  ],
+  "fatigue": {
+    "normal": [
+      [
+        28080,
+        [
+          [
+            "dim",
+            0.7
+          ]
+        ]
+      ],
+      [
+        28200,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        28320,
+        [
+          [
+            "dim",
+            0.5
+          ]
+        ]
+      ],
+      [
+        28440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        28560,
+        [
+          [
+            "dim",
+            0.3
+          ]
+        ]
+      ],
+      [
+        28680,
+        [
+          [
+            "dim",
+            0.1
+          ]
+        ]
+      ],
+      [
+        28800,
+        [
+          [
+            "color",
+            16518572
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "FATIGUE SETS IN…<br><span style=\"font-size: 0.8em;\">+2 PERMANENT LINES</span>",
+              "fgcolor": "#FFFFFF",
+              "bgcolor": "#801346",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        28830,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        28860,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        31680,
+        [
+          [
+            "dim",
+            0.7
+          ]
+        ]
+      ],
+      [
+        31800,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        31920,
+        [
+          [
+            "dim",
+            0.5
+          ]
+        ]
+      ],
+      [
+        32040,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        32160,
+        [
+          [
+            "dim",
+            0.3
+          ]
+        ]
+      ],
+      [
+        32280,
+        [
+          [
+            "dim",
+            0.1
+          ]
+        ]
+      ],
+      [
+        32400,
+        [
+          [
+            "color",
+            16518572
+          ],
+          [
+            "receivemultiplier",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "YOUR BODY GROWS WEAK…<br><span style=\"font-size: 0.8em;\">receive 25% more garbage</span>",
+              "fgcolor": "#FFFFFF",
+              "bgcolor": "#801346",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        32460,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        35280,
+        [
+          [
+            "dim",
+            0.7
+          ]
+        ]
+      ],
+      [
+        35400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        35520,
+        [
+          [
+            "dim",
+            0.5
+          ]
+        ]
+      ],
+      [
+        35640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        35760,
+        [
+          [
+            "dim",
+            0.3
+          ]
+        ]
+      ],
+      [
+        35880,
+        [
+          [
+            "dim",
+            0.1
+          ]
+        ]
+      ],
+      [
+        36000,
+        [
+          [
+            "color",
+            16518572
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "ALL SENSES BLUR TOGETHER…<br><span style=\"font-size: 0.8em;\">+3 PERMANENT LINES</span>",
+              "fgcolor": "#FFFFFF",
+              "bgcolor": "#801346",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        36030,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36060,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36120,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        38880,
+        [
+          [
+            "dim",
+            0.7
+          ]
+        ]
+      ],
+      [
+        39000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        39120,
+        [
+          [
+            "dim",
+            0.5
+          ]
+        ]
+      ],
+      [
+        39240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        39360,
+        [
+          [
+            "dim",
+            0.3
+          ]
+        ]
+      ],
+      [
+        39480,
+        [
+          [
+            "dim",
+            0.1
+          ]
+        ]
+      ],
+      [
+        39600,
+        [
+          [
+            "color",
+            16518572
+          ],
+          [
+            "receivemultiplier",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "YOUR CONSCIOUSNESS FADES…<br><span style=\"font-size: 0.8em;\">receive 25% more garbage</span>",
+              "fgcolor": "#FFFFFF",
+              "bgcolor": "#801346",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        39660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        42480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.65,
+              0.65
+            ]
+          ]
+        ]
+      ],
+      [
+        42600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        42720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.45,
+              0.45
+            ]
+          ]
+        ]
+      ],
+      [
+        42840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        42960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.25,
+              0.25
+            ]
+          ]
+        ]
+      ],
+      [
+        43080,
+        [
+          [
+            "dim",
+            [
+              0.1,
+              0.05,
+              0.05
+            ]
+          ]
+        ]
+      ],
+      [
+        43200,
+        [
+          [
+            "color",
+            16711705
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THIS IS THE END.<br><span style=\"font-size: 0.8em;\">+5 PERMANENT LINES</span>",
+              "fgcolor": "#FFFFFF",
+              "bgcolor": "#870815",
+              "timeout": 10000
+            }
+          ]
+        ]
+      ],
+      [
+        43230,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        43260,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        43310,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        43360,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        43500,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ]
+    ],
+    "expert_reversed": [
+      [
+        20880,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        21000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        21120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        21240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        21360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        21480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        21600,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "gracestillmessy"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "YOUR POWER SLIPS…<br><span style=\"font-size: 0.8em;\">garbage received becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        21660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        24480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        24600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        24720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        24840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        24960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        25080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        25200,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "receivemultiplier",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "WHISPERS OF DISCONTENT SPREAD…<br><span style=\"font-size: 0.8em;\">receive 25% more garbage</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        25260,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        28080,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        28200,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        28320,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        28440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        28560,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        28680,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        28800,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "PROTESTERS LINE THE STREETS…<br><span style=\"font-size: 0.8em;\">+3 PERMANENT LINES</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        28830,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        28860,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        28920,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        31680,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        31800,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        31920,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        32040,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        32160,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        32280,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        32400,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "receivemultiplier",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "YOUR CLOSEST ALLIES DEFECT…<br><span style=\"font-size: 0.8em;\">receive 25% more garbage</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        32460,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        35280,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        35400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        35520,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        35640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        35760,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        35880,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        36000,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "PARANOIA CLOUDS YOUR JUDGEMENT…<br><span style=\"font-size: 0.8em;\">+5 PERMANENT LINES</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        36030,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36060,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36110,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36160,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        36300,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        38880,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        39000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        39120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        39240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        39360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        39480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        39600,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "maxmessy"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THE REVOLUTION HAS BEGUN…<br><span style=\"font-size: 0.8em;\">garbage received becomes much messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        39660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        42000,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        42120,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        42240,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        42360,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        42480,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        42600,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        42720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        42840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        42960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.1,
+              0.1
+            ]
+          ]
+        ]
+      ],
+      [
+        43080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        43140,
+        [
+          [
+            "dim",
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        43200,
+        [
+          [
+            "color",
+            16711680
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THE END OF AN ERA.<br><span style=\"font-size: 0.8em;\">+12 PERMANENT LINES</span>",
+              "fgcolor": "#ff2600",
+              "bgcolor": "#000000",
+              "timeout": 15000
+            }
+          ]
+        ]
+      ],
+      [
+        43230,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43260,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43310,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43360,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43420,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43480,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43550,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43620,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43700,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43780,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43850,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        43920,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ]
+    ],
+    "duo_reversed": [
+      [
+        2880,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        3000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        3120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        3240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        3360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        3480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        3600,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.05
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THE RELATIONSHIP STAGNATES…<br><span style=\"font-size: 0.8em;\">garbage becomes a bit messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        3660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        4680,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        4800,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        4920,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        5040,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        5160,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        5280,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        5400,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.15
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "INSECURITIES GROW STRONGER…<br><span style=\"font-size: 0.8em;\">garbage becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        5460,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        6480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        6600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        6720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        6840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        6960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        7080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        7200,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.3
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "%p2 FEELS NEGLECTED…<br><span style=\"font-size: 0.8em;\">garbage becomes much messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        7260,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        8280,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        8400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        8520,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        8640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        8760,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        8880,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        9000,
+        [
+          [
+            "color",
+            16566784
+          ],
+          [
+            "messiness",
+            0.2
+          ],
+          [
+            "rerollcolumn"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "%p1 SUCCESSFULLY APOLOGIZES…?<br><span style=\"font-size: 0.8em;\">garbage becomes a bit cleaner</span>",
+              "fgcolor": "#ffb700",
+              "bgcolor": "#421d04",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        9060,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        10080,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        10200,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        10320,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        10440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        10560,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        10680,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        10800,
+        [
+          [
+            "color",
+            16566784
+          ],
+          [
+            "messiness",
+            0
+          ],
+          [
+            "rerollcolumn"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THINGS ARE BACK TO HOW THEY SHOULD BE…!<br><span style=\"font-size: 0.8em;\">garbage becomes much cleaner</span>",
+              "fgcolor": "#ffb700",
+              "bgcolor": "#421d04",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        10860,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        11880,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        12000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        12120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        12240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        12360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        12480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        12600,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.1
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "THE WEIGHT OF WORDS UNSPOKEN…<br><span style=\"font-size: 0.8em;\">garbage becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        12660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        13680,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        13800,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        13920,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        14040,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        14160,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        14280,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        14400,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "\"WHY CAN'T YOU JUST LISTEN TO ME?\"<br><span style=\"font-size: 0.8em;\">garbage becomes much messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        14460,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        15480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        15600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        15720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        15840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        15960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        16080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        16200,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "revivelevel",
+            3
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "\"THIS IS ALL YOUR FAULT\".<br><span style=\"font-size: 0.8em;\">revive difficulty increased</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        16260,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        17280,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        17400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        17520,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        17640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        17760,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        17880,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        18000,
+        [
+          [
+            "color",
+            16566784
+          ],
+          [
+            "messiness",
+            0.1
+          ],
+          [
+            "rerollcolumn"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "%p2 MAKES THE SAME PROMISE AGAIN…<br><span style=\"font-size: 0.8em;\">garbage becomes cleaner</span>",
+              "fgcolor": "#ffb700",
+              "bgcolor": "#421d04",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        18060,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        19080,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        19200,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        19320,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        19440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        19560,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        19680,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        19800,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "\"THIS TIME WILL BE DIFFERENT.\"<br><span style=\"font-size: 0.8em;\">+4 PERMANENT GARBAGE</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        19830,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        19860,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        19910,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            5
+          ]
+        ]
+      ],
+      [
+        20040,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        20880,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        21000,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        21120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        21240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        21360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        21480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        21600,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.3
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "SOME HABITS CAN'T BE BROKEN…<br><span style=\"font-size: 0.8em;\">garbage becomes much messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        21660,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        22680,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        22800,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        22920,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        23040,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        23160,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        23280,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        23400,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.4
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "ALL TRUST HAS WITHERED AWAY…<br><span style=\"font-size: 0.8em;\">garbage becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        23460,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        24480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        24600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        24720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        24840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        24960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        25080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        25200,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.5
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "%p1 SETS AN ULTIMATUM…<br><span style=\"font-size: 0.8em;\">garbage becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        25260,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        26280,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        26400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        26520,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        26640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        26760,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        26880,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        27000,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "messiness",
+            0.6
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "%p2 CONTEMPLATES THEIR WASTED EFFORT…<br><span style=\"font-size: 0.8em;\">garbage becomes messier</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        27060,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        28080,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        28200,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        28320,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        28440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        28560,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        28680,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        28800,
+        [
+          [
+            "color",
+            16518753
+          ],
+          [
+            "receivemultiplier",
+            0.25
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "ONE LAST PAINFUL ARGUMENT…<br><span style=\"font-size: 0.8em;\">receive 25% more garbage</span>",
+              "fgcolor": "#ff006f",
+              "bgcolor": "#420a25",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        28860,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        29400,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        29520,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        29640,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        29760,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        29880,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        30000,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        30120,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        30240,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        30360,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.1,
+              0.1
+            ]
+          ]
+        ]
+      ],
+      [
+        30480,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        30540,
+        [
+          [
+            "dim",
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        30600,
+        [
+          [
+            "color",
+            16711680
+          ],
+          [
+            "norevive"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "GOODBYE.<br><span style=\"font-size: 0.8em;\">you can no longer revive</span>",
+              "fgcolor": "#ff2600",
+              "bgcolor": "#000000",
+              "timeout": 15000
+            }
+          ]
+        ]
+      ],
+      [
+        30900,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        33480,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        33600,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        33720,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        33840,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        33960,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        34080,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        34200,
+        [
+          [
+            "color",
+            16566784
+          ],
+          [
+            "messiness",
+            0.2
+          ],
+          [
+            "rerollcolumn"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "\"I MISS YOU\"<br><span style=\"font-size: 0.8em;\">garbage becomes much cleaner</span>",
+              "fgcolor": "#ffb700",
+              "bgcolor": "#421d04",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        34260,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        35280,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        35400,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        35520,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        35640,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        35760,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        35880,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        36000,
+        [
+          [
+            "color",
+            16566784
+          ],
+          [
+            "messiness",
+            0.1
+          ],
+          [
+            "rerollcolumn"
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "WHAT IF…?<br><span style=\"font-size: 0.8em;\">garbage becomes a bit cleaner</span>",
+              "fgcolor": "#ffb700",
+              "bgcolor": "#421d04",
+              "timeout": 5000
+            }
+          ]
+        ]
+      ],
+      [
+        36060,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ],
+      [
+        36600,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.6,
+              0.6
+            ]
+          ]
+        ]
+      ],
+      [
+        36720,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        36840,
+        [
+          [
+            "dim",
+            [
+              0.7,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        36960,
+        [
+          [
+            "dim",
+            0.9
+          ]
+        ]
+      ],
+      [
+        37080,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.4,
+              0.4
+            ]
+          ]
+        ]
+      ],
+      [
+        37200,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        37320,
+        [
+          [
+            "dim",
+            [
+              0.5,
+              0.2,
+              0.2
+            ]
+          ]
+        ]
+      ],
+      [
+        37440,
+        [
+          [
+            "dim",
+            0.8
+          ]
+        ]
+      ],
+      [
+        37560,
+        [
+          [
+            "dim",
+            [
+              0.3,
+              0.1,
+              0.1
+            ]
+          ]
+        ]
+      ],
+      [
+        37680,
+        [
+          [
+            "dim",
+            [
+              0.2,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        37740,
+        [
+          [
+            "dim",
+            [
+              0,
+              0,
+              0
+            ]
+          ]
+        ]
+      ],
+      [
+        37800,
+        [
+          [
+            "color",
+            16711680
+          ],
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ],
+          [
+            "waterfall",
+            {
+              "msg": "…<br><span style=\"font-size: 0.8em;\">+12 PERMANENT LINES</span>",
+              "fgcolor": "#ff2600",
+              "bgcolor": "#000000",
+              "timeout": 15000
+            }
+          ]
+        ]
+      ],
+      [
+        37830,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        37860,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        37910,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        37960,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38020,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38080,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38150,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38220,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38300,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38380,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38450,
+        [
+          [
+            "unclearable"
+          ],
+          [
+            "shake",
+            10
+          ]
+        ]
+      ],
+      [
+        38520,
+        [
+          [
+            "dim",
+            1
+          ]
+        ]
+      ]
+    ]
+  },
+  "mods": {
+    "invisible": "Invisible",
+    "messy": "Messier Garbage",
+    "volatile": "Volatile Garbage",
+    "nohold": "No Hold",
+    "doublehole": "Double Hole Garbage",
+    "allspin": "All-Spin",
+    "gravity": "Gravity",
+    "expert": "Expert Mode",
+    "duo": "Duo",
+    "snowman": "Snowball Board",
+    "snowman_reversed": "Permafrost Board",
+    "invisible_reversed": "The Exile",
+    "messy_reversed": "Loaded Dice",
+    "volatile_reversed": "Last Stand",
+    "nohold_reversed": "Asceticism",
+    "doublehole_reversed": "Damnation",
+    "allspin_reversed": "The Warlock",
+    "gravity_reversed": "Freefall",
+    "expert_reversed": "The Tyrant",
+    "duo_reversed": "Bleeding Hearts"
+  },
+  "modShortNames": {
+    "invisible": "IN",
+    "messy": "MS",
+    "volatile": "VL",
+    "nohold": "NH",
+    "doublehole": "DH",
+    "allspin": "AS",
+    "gravity": "GV",
+    "expert": "EX",
+    "duo": "2P",
+    "snowman": "SNOWBALL",
+    "snowman_reversed": "SNOWBALL-R",
+    "invisible_reversed": "IN-R",
+    "messy_reversed": "MS-R",
+    "volatile_reversed": "VL-R",
+    "nohold_reversed": "NH-R",
+    "doublehole_reversed": "DH-R",
+    "allspin_reversed": "AS-R",
+    "gravity_reversed": "GV-R",
+    "expert_reversed": "EX-R",
+    "duo_reversed": "2P-R"
+  },
+  "reverseCards": [
+    "expert",
+    "nohold",
+    "messy",
+    "gravity",
+    "volatile",
+    "doublehole",
+    "invisible",
+    "allspin",
+    "duo"
+  ]
+}

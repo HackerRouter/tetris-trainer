@@ -13,6 +13,7 @@ export type FaultGroup = { key: string; label: string; count: number; extra: num
 
 export async function analyzeSession(replay: TrainerReplay): Promise<SessionRecord> {
   if (!replay.startedAt || !Array.isArray(replay.placements) || replay.placements.length > 20000) throw new Error('Invalid session recording.');
+  if (replay.modeRules.id === 'zenith') return { id: `${replay.startedAt}:${replay.seed}:${replay.mode}`, date: replay.startedAt, mode: replay.mode, status: replay.status, attempts: replay.placements.length, accepted: replay.placements.length, verified: 0, perfect: 0, extra: 0, faults: [], replay };
   const custom = replay.modeRules.id === 'custom' ? validateCustomRules(replay.settings.custom) : undefined;
   const rules = modeDefinitions[custom ? 'custom' : 'sprint'].rules({ ...replay.settings, custom: custom ?? customDefaults });
   const engine = createEngine(replay.settings, replay.seed, rules), faults: FaultEntry[] = [];

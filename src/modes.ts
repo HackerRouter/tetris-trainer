@@ -64,7 +64,7 @@ export function validateAdvancedRules(value: unknown): AdvancedRules {
 }
 
 export const randomizers = ['7-bag', '14-bag', 'classic', 'pairs', 'total mayhem', '7+1-bag', '7+2-bag', '7+x-bag'] as const;
-export type ModeId = 'sprint' | 'custom';
+export type ModeId = 'sprint' | 'custom' | 'zenith';
 export type CustomRules = {
   gravity: number; lockDelay: number; lockResets: number; infiniteLock: boolean;
   bag: BagType; seed: number; lineGoal: number; pieceGoal: number; timeLimit: number;
@@ -121,6 +121,16 @@ export function validateCustomRules(value: unknown): CustomRules {
 }
 
 export const modeDefinitions: Record<ModeId, ModeDefinition> = {
+  zenith: { name: 'Quick Play / Zenith', rules: settings => {
+    const mods = settings.quickplay.profile.mods;
+    return {
+      id: 'zenith', name: mods.includes('duo') ? 'ZENITH DUO · LOCAL TRAINING' : 'ZENITH · LOCAL TRAINING', board: { width: 10, height: 20, buffer: 20 }, bag: '7-bag',
+      gravity: .02, lockDelay: 30, lockResets: 15, infiniteLock: false, goals: { lines: 0, pieces: 0, seconds: 0 },
+      hold: !mods.includes('nohold'), infiniteHold: false, allow180: true, nextCount: 5, setup: { kind: 'empty', rows: 0, messiness: .1 },
+      topout: 'stop', finesse: false, undo: false,
+      advanced: { ...structuredClone(advancedDefaults), spinBonuses: mods.includes('allspin') ? 'all+' : 'all-mini+', allClear: true, allClearGarbage: 3, allClearB2B: 2, b2bChaining: false, b2bCharging: true, gravityIncrease: mods.includes('gravity') ? .001 : .0005 }, sourcePreset: ''
+    };
+  } },
   sprint: { name: '40L Sprint', rules: settings => ({
     id: 'sprint', name: '40 LINE SPRINT', board: { width: 10, height: 20, buffer: 20 }, bag: '7-bag',
     gravity: .02, lockDelay: 30, lockResets: 15, infiniteLock: false,

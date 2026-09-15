@@ -7,10 +7,11 @@ import type { Settings } from './settings';
 import { drawNativeBorder } from './ui-assets';
 import { drawMino, drawGhost, nativeColors } from './mino-assets';
 import type { ModeRules } from './modes';
+import { qpTileOpacity, qpVisual, type QpVisual } from './qp-mod-state';
 
 const colors = nativeColors;
 
-export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: EngineSnapshot['board'], piece: TetrominoSnapshot | null, target: Cell[] | null, options: Pick<Settings['display'], 'grid' | 'ghost' | 'ghostOpacity'> & Partial<Settings['display']>, buffer = 3) {
+export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: EngineSnapshot['board'], piece: TetrominoSnapshot | null, target: Cell[] | null, options: Pick<Settings['display'], 'grid' | 'ghost' | 'ghostOpacity'> & Partial<Settings['display']>, buffer = 3, visual?: QpVisual) {
   const ctx = canvas.getContext('2d')!;
   const width = engine.board.width, height = engine.board.height;
   const size = canvas.width / width, top = size * buffer, bottom = top + size * height;
@@ -34,6 +35,7 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
     const tile = board[y][x];
     if (tile) {
       const symbol = (typeof tile === 'string' ? tile : tile.mino).toLowerCase();
+      ctx.globalAlpha = visual ? qpTileOpacity(visual, symbol, x, y) : 1;
       drawCell(x, y, colors[symbol] || '#8a92a3', false, symbol);
       if (symbol === 'bomb') {
         const px = (x + .5) * size, py = top + (height - y - .5) * size;
@@ -43,13 +45,19 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
       }
     }
   }
+  ctx.globalAlpha = 1;
+  if (visual) for (const wound of visual.state.wounds) {
+    const x = (wound.hole + .5) * size, y = top + (height - wound.y - .5) * size;
+    ctx.fillStyle = '#ff5480'; ctx.beginPath(); ctx.arc(x, y, size * .36, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffffff'; ctx.font = `bold ${size * .55}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(wound.remaining), x, y);
+  }
   const targetCells = new Set(target?.map(([x, y]) => `${x},${y}`));
   const ghostCells = new Set<string>();
   let ghostColor = '#b3b3b3';
   if (piece) {
     if (options.ghost && options.ghostOpacity > 0) {
       const ghost = copyPiece(engine, piece); ghost.softDrop(board);
-      ghostColor = options.coloredGhost === false ? '#b3b3b3' : colors[ghost.symbol.toLowerCase()];
+      ghostColor = options.coloredGhost === false ? '#b3b3b3' : colors[ghost.symbol.toLowerCase()] ?? '#b3b3b3';
       ctx.globalAlpha = options.ghostOpacity;
       for (const [x, y] of ghost.absoluteBlocks) {
         const key = `${x},${y}`; ghostCells.add(key);
@@ -57,7 +65,7 @@ export function drawBoard(canvas: HTMLCanvasElement, engine: Engine, board: Engi
       }
       ctx.globalAlpha = 1;
     }
-    for (const [x, y] of copyPiece(engine, piece).absoluteBlocks) drawCell(x, y, colors[piece.symbol.toLowerCase()], false, piece.symbol.toLowerCase());
+    for (const [x, y] of copyPiece(engine, piece).absoluteBlocks) drawCell(x, y, colors[piece.symbol.toLowerCase()] ?? '#b3b3b3', false, piece.symbol.toLowerCase());
   }
   const overlapColor = `#${ghostColor.slice(1).match(/../g)!.map(channel => Math.round(parseInt(channel, 16) * .65).toString(16).padStart(2, '0')).join('')}`;
   if (target) for (const [x, y] of target) {
@@ -99,17 +107,18 @@ function drawPreviews(canvas: HTMLCanvasElement, engine: Engine, pieces: (string
 const effects = new WeakMap<TrainerGame, { placements: number; since: number }>();
 
 export type PlacementEffect = { rows: number[]; cells: Cell[]; piece: string; hardDrop: boolean; lines: number };
-type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null; actions?: TimedActionText[] };
+type Scene = { board: EngineSnapshot['board']; piece: TetrominoSnapshot | null; target: Cell[] | null; hold: string | null; holdLocked: boolean; next: string[]; effect: PlacementEffect | null; actions?: TimedActionText[]; visual?: QpVisual };
 
 export function drawScene(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, next: HTMLCanvasElement, engine: Engine, rules: ModeRules, display: Settings['display'], scene: Scene, age: number) {
   const resolution = Math.max(30, Math.ceil(canvas.getBoundingClientRect().width / engine.board.width * Math.min(2, window.devicePixelRatio || 1)));
   if (canvas.width !== engine.board.width * resolution || canvas.height !== (engine.board.height + 3) * resolution) {
     canvas.width = engine.board.width * resolution; canvas.height = (engine.board.height + 3) * resolution;
   }
-  drawBoard(canvas, engine, scene.board, scene.piece, scene.target, { ...display, ghost: display.ghost && rules.advanced.shadow });
+  drawBoard(canvas, engine, scene.board, scene.piece, scene.target, { ...display, ghost: display.ghost && rules.advanced.shadow }, 3, scene.visual);
   const cellSize = canvas.getBoundingClientRect().width / engine.board.width;
-  drawPreviews(hold, engine, [scene.hold], cellSize, display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
-  drawPreviews(next, engine, scene.next, cellSize);
+  const previewSize = rules.id === 'zenith' ? Math.min(cellSize, Math.min(...[hold, next].map(preview => preview.getBoundingClientRect().width).filter(width => width > 0)) / 5) : cellSize;
+  drawPreviews(hold, engine, [scene.hold], previewSize, display.dimLockedHold && scene.holdLocked && !rules.infiniteHold);
+  drawPreviews(next, engine, scene.next, previewSize);
   drawPlacementEffect(canvas, engine, scene.effect, age);
   drawActionText(canvas, engine, scene.actions ?? []);
 }
@@ -136,7 +145,8 @@ export function drawGame(canvas: HTMLCanvasElement, hold: HTMLCanvasElement, nex
   if (!previous || previous.placements !== game.placements.length) effects.set(game, { placements: game.placements.length, since: now });
   const placement = game.placements.at(-1);
   drawScene(canvas, hold, next, engine, game.rules, game.settings.display, {
-    board: engine.board.state, piece: game.status === 'topout' || game.room.waiting ? null : engine.falling.snapshot(), target: game.target,
+    visual: game.qp ? qpVisual(game.qp.sides[0], game.qp.frame) : undefined,
+    board: engine.board.state, piece: game.status === 'topout' || game.room.waiting || game.qp && game.qp.sides[0].life !== 'alive' ? null : engine.falling.snapshot(), target: game.target,
     actions: game.actionEffects.map(action => { if (!actionTimes.has(action)) actionTimes.set(action, now); return { action, age: now - actionTimes.get(action)! }; }),
     hold: engine.held, holdLocked: engine.holdLocked, next: engine.queue.slice(0, game.rules.nextCount),
     effect: placement?.accepted ? { rows: placement.clearedRows ?? clearedRows(placement.snapshot.board, placement.cells), cells: placement.cells, piece: placement.piece, hardDrop: placement.inputs.includes('hardDrop'), lines: placement.result.lines } : null

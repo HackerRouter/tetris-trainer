@@ -1,4 +1,5 @@
 import { customDefaults, validateCustomRules, type CustomRules } from './modes';
+import { qpDefaults, validateQpSettings, type QpSettings } from './qp-config';
 
 export const actions = {
   moveLeft: 'Move left', moveRight: 'Move right', softDrop: 'Soft drop',
@@ -18,6 +19,7 @@ export type Settings = {
   tetrioConfig?: Record<string, unknown>;
   audio: { enabled: boolean; volume: number; ui: boolean };
   custom: CustomRules;
+  quickplay: QpSettings;
 };
 
 export const storageKey = 'tetrio-trainer-settings-v1';
@@ -28,7 +30,8 @@ export const defaults: Settings = {
   display: { grid: true, ghost: true, ghostOpacity: 0.24, gridOpacity: 0.09, boardOpacity: 1, coloredGhost: true, dimLockedHold: true },
   training: { countdownSeconds: 3, finesseEnabled: true, practiceFinesseEnabled: true, allowDifferentTarget: true, undoEnabled: false, infiniteHold: false, strictPractice: false, justThink: false, thinkStyle: 'piece' },
   audio: { enabled: true, volume: .3, ui: true },
-  custom: structuredClone(customDefaults)
+  custom: structuredClone(customDefaults),
+  quickplay: structuredClone(qpDefaults)
 };
 
 const record = (v: unknown): Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
@@ -48,6 +51,7 @@ export function validateSettings(value: unknown): Settings {
   const root = record(value), handling = record(root.handling), bindings = record(root.bindings), display = record(root.display);
   if (root.version !== 1) throw new Error('Unsupported settings version.');
   const result = structuredClone(defaults);
+  if (root.quickplay !== undefined) result.quickplay = validateQpSettings(root.quickplay as QpSettings);
   for (const [key, min, max, step] of [['arr', 0, 20, 0.1], ['das', 0, 20, 0.1], ['dcd', 0, 20, 0.1], ['sdf', 1, 41, 1]] as const) {
     const n = handling[key];
     if (typeof n !== 'number' || !Number.isFinite(n) || n < min || n > max || Math.abs(n / step - Math.round(n / step)) > 1e-7) throw new Error(`${key.toUpperCase()} must be ${min}–${max}, in steps of ${step}.`);

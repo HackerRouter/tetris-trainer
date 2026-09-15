@@ -4,7 +4,8 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 
-const archive = resolve(process.argv[2] ?? '../TETRIO_OFFLINE/offline-data/archive');
+const soundsOnly = process.argv.includes('--sounds-only');
+const archive = resolve(process.argv.slice(2).find(arg => !arg.startsWith('--')) ?? '../TETRIO_OFFLINE/offline-data/archive');
 const destination = resolve('public/tetrio');
 const files = await readdir(join(archive, 'metadata'));
 const metadata = await Promise.all(files.filter(file => file.endsWith('.json')).map(async file => ({ ...JSON.parse(await readFile(join(archive, 'metadata', file), 'utf8')), id: file.slice(0, -5) })));
@@ -30,7 +31,7 @@ async function save(path, body) {
   await mkdir(resolve(output, '..'), { recursive: true });
   await writeFile(output, body);
 }
-for (const [path, target] of selected) await save(target, await asset(path));
+if (!soundsOnly) for (const [path, target] of selected) await save(target, await asset(path));
 const rsd = await asset('/sfx/tetrio.opus.rsd');
 if (rsd.subarray(0, 4).toString() !== 'tRSD' || rsd.readUInt32LE(4) !== 1 || rsd.readUInt32LE(8) !== 0) throw new Error('Unsupported RSD header.');
 let cursor = 12, previous = null;
@@ -49,6 +50,7 @@ while (true) {
 const length = rsd.readUInt32LE(cursor); cursor += 4;
 if (cursor + length !== rsd.length || rsd.subarray(cursor, cursor + 4).toString() !== 'OggS') throw new Error('Invalid RSD audio payload.');
 const names = ['boardappear', 'boardlock', 'move', 'rotate', 'floor', 'harddrop', 'softdrop', 'hold', 'clearline', 'clearquad', 'clearspin', 'clearbtb', 'allclear', 'combobreak', ...Array.from({ length: 16 }, (_, i) => `combo_${i + 1}`), 'countdown1', 'countdown2', 'countdown3', 'countdown4', 'countdown5', 'go', 'failure', 'finish', 'menuback', 'menuclick', 'menuconfirm', 'menuhover', 'menutap', 'pause_continue', 'pause_exit', 'pause_retry', 'pause_start', 'undo', 'finessefault'];
+for (const name of Object.keys(atlas)) if (/^(spin$|spinend$|irs$|ihs$|garbage|damage|impact$|offset$|counter$|warning$|hyperalert$|boardlock_|losestock$|zenith_(up|down)speed_|zenith_levelup_|speed_tick_|b2bcharge_|btb_|combo_\d+_power$|wound|voidhole$|inject$|thunder[1-6]$)/.test(name) && !names.includes(name)) names.push(name);
 const working = await mkdtemp(join(tmpdir(), 'trainer-audio-'));
 const input = join(working, 'source.ogg');
 const output = join(working, 'sounds.ogg');
@@ -77,5 +79,6 @@ try {
   await unlink(output).catch(() => {});
   await rmdir(working);
 }
-await save('sources.json', JSON.stringify({ extractedAt: new Date().toISOString(), sources }, null, 2));
+const retained = soundsOnly ? JSON.parse(await readFile(join(destination, 'sources.json'), 'utf8')).sources.filter(source => !sources.some(current => current.path === source.path)) : [];
+await save('sources.json', JSON.stringify({ extractedAt: new Date().toISOString(), sources: [...retained, ...sources] }, null, 2));
 console.log(JSON.stringify({ assets: sources.length, sounds: names.length, duration: samples / 48000 }, null, 2));

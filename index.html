@@ -4,7 +4,7 @@
 <body>
   <div class="app">
     <header class="app-header"><a class="brand" href="#play" aria-label="Tetris Trainer home">TETRIS <span>TRAINER</span></a>
-    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#pc">PC</a><a href="#combo">Combo</a><a href="#spin">Spin</a><a href="#drills">Finesse</a><a href="#openers">Openers</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
+    <nav class="page-nav" aria-label="Main navigation"><a href="#play">Play</a><a href="#quickplay">Quick Play</a><a href="#revive">Revive</a><a href="#pc">PC</a><a href="#combo">Combo</a><a href="#spin">Spin</a><a href="#drills">Finesse</a><a href="#openers">Openers</a><a href="#statistics">Statistics</a><a href="#replays">Replays</a></nav>
       <div class="header-tools"><button id="tools-open" class="secondary" aria-haspopup="dialog">Tools</button><button id="settings-open" class="secondary" aria-haspopup="dialog">Settings</button></div>
     </header>
     <main id="play-page" class="training-workspace">
@@ -40,8 +40,8 @@
           <div class="board-column"><canvas id="board" width="300" height="690" aria-label="Game board"></canvas><div id="board-overlay" role="status" aria-live="polite"><span id="overlay-label">READY</span><strong id="overlay-value">Start a game</strong></div></div>
           <div class="right-column"><section id="next-panel" class="preview-panel next-panel" aria-label="Next queue"><canvas id="next-frame" class="preview-frame" aria-hidden="true"></canvas><h2>NEXT</h2><canvas id="next-preview" width="150" height="450" aria-label="Next pieces"></canvas></section></div>
         </div>
-        <p id="message" role="status" class="muted">Set your handling, then start a game.</p>
-        <p id="controls-summary" class="muted"></p>
+        <p id="message" role="status" hidden></p>
+        <p id="controls-summary" hidden></p>
         <p id="retry-status" class="muted" role="status" hidden>Timer paused. Press a game key to continue.</p>
       </section>
       <aside id="current-guidance" class="workspace-right workspace-panel" aria-label="Current placement guidance">

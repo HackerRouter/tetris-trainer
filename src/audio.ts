@@ -1,4 +1,5 @@
 import { placementSounds } from './sound-events';
+import { qpSounds } from './qp-sound';
 import type { TrainerGame } from './game';
 import type { Settings } from './settings';
 
@@ -12,7 +13,7 @@ export class SoundPlayer {
   private voices = new Set<AudioBufferSourceNode>();
   private recent = new Map<string, number>();
   private options: Settings['audio'];
-  private observed: { game: TrainerGame; status: TrainerGame['status']; countdown: number; placements: number; events: number; holds: number; x: number; y: number; rotation: number } | null = null;
+  private observed: { qpEvents: number; game: TrainerGame; status: TrainerGame['status']; countdown: number; placements: number; events: number; holds: number; x: number; y: number; rotation: number } | null = null;
   status = 'Loading local sound effects…';
 
   constructor(options: Settings['audio']) {
@@ -76,8 +77,10 @@ export class SoundPlayer {
       if (game.status === 'topout') this.play('failure');
     }
     if (!fresh) {
+      for (const event of game.qp?.events.slice(previous.qpEvents) ?? []) for (const name of qpSounds(event)) this.play(name);
       const events = game.events.slice(previous.events);
       for (const event of events) {
+        if (event.type === 'rotation-sound') { this.play('rotate'); if ((event.data as { spin: string }).spin !== 'none') this.play('spin'); }
         if (event.type === 'undo') this.play('undo');
         if (event.type === 'clear-field') this.play('boardappear');
       }
@@ -85,15 +88,14 @@ export class SoundPlayer {
       const placements = game.placements.slice(previous.placements);
       for (const placement of placements) {
         if (!placement.accepted) { this.play('finessefault'); continue; }
-        for (const name of placementSounds(game.engine, placement.result, placement.inputs.includes('hardDrop'))) this.play(name);
+        for (const name of placement.sounds ?? placementSounds(game.engine, placement.result, placement.inputs.includes('hardDrop'))) this.play(name);
       }
       if (!placements.length && game.holds === previous.holds && game.status === 'playing') {
         if (piece.x !== previous.x) this.play('move');
-        if (piece.rotation !== previous.rotation) this.play('rotate');
         const softDrop = game.engine.input.keys.softDrop || events.some(event => event.type === 'keydown' && (event.data as { key?: string }).key === 'softDrop');
         if (piece.y < previous.y && softDrop) this.play('softdrop');
       }
     }
-    this.observed = { game, status: game.status, countdown, placements: game.placements.length, events: game.events.length, holds: game.holds, x: piece.x, y: piece.y, rotation: piece.rotation };
+    this.observed = { qpEvents: game.qp?.events.length ?? 0, game, status: game.status, countdown, placements: game.placements.length, events: game.events.length, holds: game.holds, x: piece.x, y: piece.y, rotation: piece.rotation };
   }
 }

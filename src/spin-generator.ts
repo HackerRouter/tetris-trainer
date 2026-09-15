@@ -13,7 +13,14 @@ export function randomSpinDrill(source: AnalysisContext, id: string, seed: numbe
   const definition=spinDrills.find(drill=>drill.id===id);
   const base = spinDrill(source,id,false,random(definition?.variants?.length??1));
   const translator=spinEngine(spinRequest(base.scene.context)),translated:Move[]=[];
-  for(const move of base.witness.steps[0].scene.path.moves){const before=translator.falling.x;translator.press(move as 'moveLeft');if(move==='dasLeft'||move==='dasRight')translated.push(...Array(Math.abs(translator.falling.x-before)).fill(move==='dasLeft'?'moveLeft':'moveRight'));else translated.push(move);}
+  let lowest=Infinity;
+  for(const move of base.witness.steps[0].scene.path.moves){const before=translator.falling.x;translator.press(move as 'moveLeft');lowest=Math.min(lowest,...translator.falling.absoluteBlocks.map(([,y])=>y));if(move==='dasLeft'||move==='dasRight')translated.push(...Array(Math.abs(translator.falling.x-before)).fill(move==='dasLeft'?'moveLeft':'moveRight'));else translated.push(move);}
+  const trim=Math.max(0,lowest-2);
+  if(trim>4){
+    const board=base.scene.context.snapshot.board;
+    base.scene.context.snapshot.board=[...board.slice(trim),...Array.from({length:trim},()=>board[0].map(()=>null))];
+    base.witness.steps[0].scene.target=base.witness.steps[0].scene.target.map(([x,y])=>[x,y-trim]);
+  }
   for (let attempt=0;attempt<96;attempt++) {
     const scene=structuredClone(base.scene),snapshot=scene.context.snapshot,width=source.rules.board.width;
     const height=base.scene.context.snapshot.board.reduce((top,row,y)=>row.some(Boolean)?y+1:top,0),dx=random(7)-3,dy=random(Math.max(1,Math.min(5,source.rules.board.height-height)));
@@ -23,7 +30,7 @@ export function randomSpinDrill(source: AnalysisContext, id: string, seed: numbe
     if(target.some(([x])=>x<0||x>=width))continue;
     const left=Math.min(...target.map(([x])=>x)),right=Math.max(...target.map(([x])=>x));
     for(let y=0;y<height;y++)for(let x=0;x<width;x++)snapshot.board[y+dy][x]=x-dx<0||x-dx>=width?{mino:'gb' as Mino,connections:0}:structuredClone(original[y][x-dx]);
-    for(let y=height;y<height+3&&y+dy<snapshot.board.length;y++)for(let x=0;x<width;x++)if(x-dx<0||x-dx>=width)snapshot.board[y+dy][x]={mino:'gb' as Mino,connections:0};
+    for(let y=height;y<height+3&&y+dy<source.rules.board.height-2;y++)for(let x=0;x<width;x++)if(x-dx<0||x-dx>=width)snapshot.board[y+dy][x]={mino:'gb' as Mino,connections:0};
     for(let y=0;y<height;y++){
       const clear=original[y].every((tile,x)=>tile||base.witness.steps[0].scene.target.some(([tx,ty])=>tx===x&&ty===y));
       if(!clear&&snapshot.board[y+dy].every((tile,x)=>tile||target.some(([tx,ty])=>tx===x&&ty===y+dy))){const gaps=Array.from({length:width},(_,x)=>x).filter(x=>x<left||x>right);if(gaps.length)snapshot.board[y+dy][gaps[random(gaps.length)]]=null;}

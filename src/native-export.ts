@@ -8,6 +8,7 @@ import { replayTimeline } from './timeline';
 const gameKeys = ['moveLeft', 'moveRight', 'softDrop', 'hardDrop', 'rotateCW', 'rotateCCW', 'rotate180', 'hold'] as const;
 
 export async function exportNative(replay: TrainerReplay) {
+  if (replay.modeRules.id === 'zenith') throw new Error('Native Zenith / Duo export has not been validated. Use the trainer Quick Play recording.');
   if (!replay.startedAt || !replay.placements.length) throw new Error('Place at least one piece before exporting a TETR.IO replay.');
   const rules = replay.modeRules, a = rules.advanced, tape = replayTimeline(replay);
   if (replay.analysisScene) throw new Error('This session uses scene changes. Export trainer JSON to preserve the PC board.');

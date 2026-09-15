@@ -1,3 +1,4 @@
+import { placementSounds } from './sound-events';
 import { SpinTracker, type SpinTrace } from './spin-tracker';
 import type { SpinEvidence } from './spin-movement';
 import { actionText, type ActionText } from './action-text';
@@ -14,14 +15,16 @@ import { applyDasPrecharge, DasPrecharge, type DasCharge } from './das-precharge
 import { applyModeSetup, exportPreset, modeDefinitions, reachedGoal, type ModeId, type ModeRules } from './modes';
 import { RoomRuntime, type RoomState } from './room-runtime';
 import { replayTimeline } from './timeline';
+import { QuickPlayRuntime, type QpCheckpoint } from './qp-runtime';
 
 type PracticeProgress = { index: number; completed: number; restarts: number; finished: boolean };
 type Checkpoint = { spinTrace?: SpinTrace; snapshot: EngineSnapshot; room: RoomState; timerFrames: number; perfects: number; holds: number; clears: Record<string, number>; maxCombo: number; maxB2B: number; eventCount: number; placementCount: number; practice: PracticeProgress | null };
 type RedoState = { state: Checkpoint; checkpoint: Checkpoint; undo: Checkpoint; eventCount: number; status: TrainerGame['status']; resumeStatus: 'playing' | 'countdown' };
-type Placement = { spinEvidence: SpinEvidence & { hold: boolean }; clearedRows: number[]; frame: number; endFrame: number; timeMs: number; piece: string; cells: Cell[]; rotation: number; result: LockRes; snapshot: EngineSnapshot; room: RoomState; board: unknown; hold: unknown; next: string[]; accepted: boolean; reason: 'finesse' | 'target' | null; finesse: FinesseResult | null; finesseInputs: number; inputs: Game.Key[] };
+type Placement = { sounds: string[]; spinEvidence: SpinEvidence & { hold: boolean }; clearedRows: number[]; frame: number; endFrame: number; timeMs: number; piece: string; cells: Cell[]; rotation: number; result: LockRes; snapshot: EngineSnapshot; room: RoomState; board: unknown; hold: unknown; next: string[]; accepted: boolean; reason: 'finesse' | 'target' | null; finesse: FinesseResult | null; finesseInputs: number; inputs: Game.Key[] };
 
 export class TrainerGame {
   engine: Engine;
+  qp: QuickPlayRuntime | null = null;
   private spinTracker: SpinTracker;
   settings: Settings;
   rules: ModeRules;
@@ -76,15 +79,17 @@ export class TrainerGame {
     this.settings = structuredClone(settings);
     if (practice?.customRules) this.settings.custom = structuredClone(practice.customRules);
     this.rules = modeDefinitions[practice ? practice.customRules ? 'custom' : 'sprint' : mode].rules(this.settings);
+    if (this.rules.id === 'zenith') this.settings.training.justThink = false;
     if (practice) { this.rules.finesse = practice.finesseEnabled ?? this.settings.training.practiceFinesseEnabled; this.settings.training.practiceFinesseEnabled = this.rules.finesse; this.rules.allow180 = practice.allow180 ?? this.rules.allow180; }
     if (practice?.kind === 'opener') this.rules.undo ||= settings.training.undoEnabled;
     this.seed = seed ?? practice?.seed ?? (mode === 'custom' && !practice && settings.custom.seed ? settings.custom.seed : crypto.getRandomValues(new Uint32Array(1))[0] % 2147483646 + 1);
     this.engine = createEngine(this.settings, this.seed, this.rules);
-    this.spinTracker = new SpinTracker(this.engine);
+    this.spinTracker = new SpinTracker(this.engine, spin => this.events.push({ frame: this.engine.frame, type: 'rotation-sound', data: { spin } }));
     this.settings.handling = { ...this.engine.handling };
     this.room = new RoomRuntime(this.engine, this.rules, !!practice, this.seed);
     applyModeSetup(this.engine, this.rules, this.seed);
     this.room.refill();
+    if (this.rules.id === 'zenith') this.qp = new QuickPlayRuntime(this.settings, this.seed, this.engine);
     this.checkpoint = this.capture();
     this.engine.events.on('falling.lock.pre', () => {
       this.locking = { spinEvidence: this.spinTracker.evidence(), clearedRows: clearedRows(this.engine.board.state, this.engine.falling.absoluteBlocks), target: this.engine.falling.absoluteBlocks, rotation: this.engine.falling.rotation, inputs: this.pieceInputs, keyOffset: this.frameKeyOffset, checkpoint: this.checkpoint };
@@ -100,6 +105,12 @@ export class TrainerGame {
       this.practice = { set: structuredClone(practice), index: 0, restarts: 0, completed: 0, finished: false };
       this.loadScene(0);
     }
+  }
+
+  initializeReviveScene(scene: QpCheckpoint) {
+    if (!this.qp || this.status !== 'ready' || this.startedAt) throw new Error('Choose a scene before starting the new run.');
+    this.qp.initializeScene(scene); this.timerFrames = scene.frame;
+    this.events.push({ frame: scene.frame, type: 'qp-scene', data: structuredClone(scene) });
   }
 
   start() {
@@ -175,7 +186,7 @@ export class TrainerGame {
       }
       return;
     }
-    if (this.status !== 'playing' || this.analysisPending) return;
+    if (this.status !== 'playing' || this.analysisPending && !this.qp) return;
     const holdBlocked = !this.rules.hold || (!!this.practice && !this.practice.finished && !this.practice.set.allowHold) || (!!this.fault && !this.settings.training.allowDifferentTarget && !this.continuation?.enforced);
     const frames = this.input.drain(this.engine.frame).filter(frame => !holdBlocked || !('key' in frame.data && frame.data.key === 'hold'));
     if (frames.some(frame => frame.type === 'keydown')) this.redoStack = [];
@@ -187,7 +198,7 @@ export class TrainerGame {
       this.events.push({ frame: this.engine.frame, type: 'input-resume', data: { key: trigger.data.key, timeMs: this.elapsedMs } });
     }
     if (this.settings.training.justThink && this.settings.training.thinkStyle === 'input' && !frames.length && !this.input.activeKeys.some(key => (key !== 'hold' || !holdBlocked) && (key !== 'rotate180' || this.rules.allow180) && (key !== 'hardDrop' || this.rules.advanced.hardDrop))) return;
-    const received = this.room.beforeTick(this.timerFrames);
+    const received = this.qp ? 0 : this.room.beforeTick(this.timerFrames);
     if (received) this.events.push({ frame: this.engine.frame, type: 'solo-garbage', data: { amount: received, timeMs: this.elapsedMs } });
     if (this.bufferedCharge) {
       const charge = this.bufferedCharge; this.bufferedCharge = null;
@@ -199,7 +210,7 @@ export class TrainerGame {
     this.stepping = { frame: this.engine.frame, start: this.events.length, events: frames, consumed: 0 };
     this.events.push(...frames.map(frame => ({ frame: frame.frame, type: frame.type, data: frame.data })));
     this.timerFrames++;
-    const result = this.engine.tick(frames);
+    const result = this.qp ? this.qp.tick(frames) : this.engine.tick(frames);
     this.stepping = null;
     this.pieceInputs.push(...result.keys.slice(this.frameKeyOffset));
     this.frameKeyOffset = 0;
@@ -224,7 +235,7 @@ export class TrainerGame {
       else this.loadScene(index);
     }
     if (!this.practice && reachedGoal(this.rules, this.engine.stats, this.elapsedMs)) { this.status = 'complete'; this.releaseAll(); }
-    else if (this.engine.toppedOut) {
+    else if (this.qp ? this.qp.over : this.engine.toppedOut) {
       if (!this.practice && this.rules.topout === 'clear') this.clearField(false);
       else { this.status = 'topout'; this.releaseAll(); }
     }
@@ -254,7 +265,7 @@ export class TrainerGame {
     if(enabled&&spinPath)finesse=spinPath.path;
     const inefficient = !!finesse && actual > finesse.cost && !(this.analysisPolicy && validSpinAttempt && !this.spinFinessePaths);
     const reason = inefficient ? 'finesse' : wrongTarget ? 'target' : null;
-    this.placements.push({ spinEvidence: proof, clearedRows: locking.clearedRows, frame: this.engine.frame, endFrame: this.stepping ? this.stepping.frame + 1 : this.engine.frame, timeMs: this.elapsedMs, piece: result.mino, cells: locking.target, rotation: locking.rotation, result: structuredClone(result), snapshot: structuredClone(snapshot), room: structuredClone(locking.checkpoint.room), board: structuredClone(snapshot.board), hold: snapshot.hold, next: snapshot.queue.value.slice(0, this.rules.nextCount), accepted: reason === null, reason, finesse, finesseInputs: actual, inputs });
+    this.placements.push({ sounds: placementSounds(this.engine, result, inputs.includes('hardDrop')), spinEvidence: proof, clearedRows: locking.clearedRows, frame: this.engine.frame, endFrame: this.stepping ? this.stepping.frame + 1 : this.engine.frame, timeMs: this.elapsedMs, piece: result.mino, cells: locking.target, rotation: locking.rotation, result: structuredClone(result), snapshot: structuredClone(snapshot), room: structuredClone(locking.checkpoint.room), board: structuredClone(snapshot.board), hold: snapshot.hold, next: snapshot.queue.value.slice(0, this.rules.nextCount), accepted: reason === null, reason, finesse, finesseInputs: actual, inputs });
     if (reason) {
       const target = requiredTarget ?? locking.target;
       const demoSnapshot = (wrongPiece || spinGoal) && guideSnapshot ? guideSnapshot : snapshot;
@@ -272,7 +283,7 @@ export class TrainerGame {
       }
     } else {
       this.actionEffects = [...this.actionEffects.filter(item => item.frame >= this.engine.frame - 300), actionText(this.engine, result)].slice(-64);
-      this.undoStack.push(locking.checkpoint);
+      if (this.rules.undo) this.undoStack.push(locking.checkpoint);
       this.redoStack = [];
       if (enabled) { if (finesse) this.perfects++; else this.unverified++; }
       this.fault = null;
@@ -327,6 +338,7 @@ export class TrainerGame {
   }
 
   setContinuation(scene: PracticeScene | null, enforced = false) {
+    if (this.qp) return;
     if (this.continuation?.scene === scene && this.continuation.enforced === enforced) return;
     if (this.continuation?.enforced || (scene && enforced)) {
       this.fault = null;
@@ -338,6 +350,7 @@ export class TrainerGame {
   }
 
   loadAnalysis(snapshot: EngineSnapshot) {
+    if (this.qp) return;
     this.analysisScene = true;
     this.practice = null; this.undoStack = []; this.redoStack = [];
     this.restore({ ...this.capture(), snapshot: structuredClone(snapshot), spinTrace: undefined, timerFrames: 0, perfects: 0, holds: 0, clears: {}, maxCombo: 0, maxB2B: 0, practice: null });
@@ -348,6 +361,7 @@ export class TrainerGame {
   }
 
   retryAnalysisPlacement() {
+    if (this.qp) return false;
     const checkpoint = this.undoStack.pop(), placement = this.placements.at(-1);
     if (!checkpoint || !placement) return false;
     const fromTimeMs = this.elapsedMs;
@@ -360,6 +374,7 @@ export class TrainerGame {
   }
 
   setFinesseEnabled(enabled: boolean) {
+    if (this.qp) return;
     this.rules.finesse = enabled;
     if (this.practice) { this.settings.training.practiceFinesseEnabled = enabled; this.practice.set.finesseEnabled = enabled; }
     else if (this.rules.id === 'custom') this.settings.custom.finesse = enabled;
@@ -370,6 +385,7 @@ export class TrainerGame {
   }
 
   setJustThink(enabled: boolean, style: 'piece' | 'input') {
+    if (this.qp) return;
     this.settings.training.justThink = enabled; this.settings.training.thinkStyle = style;
     this.thinking = enabled && style === 'piece';
     this.releaseAll();
@@ -405,7 +421,15 @@ export class TrainerGame {
     return true;
   }
 
+  stopQuickPlay() {
+    if (!this.qp || !this.active || !this.qp.stop()) return false;
+    this.status = 'complete'; this.releaseAll(); this.fault = null; this.demonstration = null; this.hintTarget = null;
+    this.events.push({ frame: this.engine.frame, type: 'finish', data: { timeMs: this.elapsedMs, reason: 'stopped' } });
+    return true;
+  }
+
   pause() {
+    if (this.qp) { this.releaseAll(false); return; }
     if (!this.active) return;
     this.resumeStatus = this.status as 'playing' | 'countdown';
     this.status = 'paused'; this.releaseAll();
@@ -413,7 +437,8 @@ export class TrainerGame {
   }
   resume() { if (this.status === 'paused') this.status = this.resumeStatus; }
 
-  releaseAll() {
+  releaseAll(includeTeammate = true) {
+    this.qp?.sides.filter((_, index) => includeTeammate || index === 0).forEach(side => this.qp!.release(side));
     this.input.reset();
     this.precharge.reset(); this.bufferedCharge = null;
     const input = this.engine.input;
@@ -427,6 +452,6 @@ export class TrainerGame {
 
   export() {
     const timeline = replayTimeline({ events: this.events, placements: this.placements, result: { sessionTimeMs: this.engine.frame * 1000 / 60 } });
-    return { version: 1, analysisScene: this.analysisScene, mode: this.practice ? 'fault-practice' : this.rules.id === 'custom' ? 'custom' : '40l-finesse', modeRules: this.rules, presetSource: this.rules.sourcePreset ? exportPreset(this.settings.custom).source : null, runtime: { room: structuredClone(this.room.state), timerFrames: this.timerFrames, waitingForInput: this.waitingForInput, thinking: this.thinking, justThink: this.settings.training.justThink, thinkStyle: this.settings.training.thinkStyle }, finalSnapshot: this.engine.snapshot({ isUndoRedo: true }), seed: this.seed, startedAt: this.startedAt, savedAt: new Date().toISOString(), settings: this.settings, engineVersion: '4.2.7', finesseRules, status: this.status, timeline: { version: 1, frames: timeline.frames }, events: timeline.events, placements: this.placements, practice: this.practice ? { name: this.practice.set.name, completed: this.practice.completed, kind: this.practice.set.kind, loop: this.practice.set.loop, total: this.practice.set.scenes.length, restarts: this.practice.restarts, finished: this.practice.finished, continueAfter: this.practice.set.continueAfter } : null, result: { timeMs: this.elapsedMs, sessionTimeMs: this.engine.frame * 1000 / 60, inputs: this.inputs, holds: this.holds, faults: this.faults, targetMisses: this.targetMisses, perfects: this.perfects, unverified: this.unverified, clears: this.clears, maxCombo: this.maxCombo, maxB2B: this.maxB2B, boardResets: this.boardResets, ...this.engine.stats } };
+    return { version: 1, quickplay: this.qp ? { revision: 'tetrio-v19-20260714', climb: structuredClone(this.qp.climb), events: structuredClone(this.qp.events), completed: structuredClone(this.qp.completed), sides: this.qp.sides.map(side => ({ life: side.life, revives: side.revives, deaths: side.deaths, task: structuredClone(side.task), garbage: structuredClone(side.garbage), snapshot: side.engine.snapshot() })) } : null, analysisScene: this.analysisScene, mode: this.practice ? 'fault-practice' : this.rules.id === 'zenith' ? 'zenith' : this.rules.id === 'custom' ? 'custom' : '40l-finesse', modeRules: this.rules, presetSource: this.rules.sourcePreset ? exportPreset(this.settings.custom).source : null, runtime: { room: structuredClone(this.room.state), timerFrames: this.timerFrames, waitingForInput: this.waitingForInput, thinking: this.thinking, justThink: this.settings.training.justThink, thinkStyle: this.settings.training.thinkStyle }, finalSnapshot: this.engine.snapshot({ isUndoRedo: true }), seed: this.seed, startedAt: this.startedAt, savedAt: new Date().toISOString(), settings: this.settings, engineVersion: '4.2.7', finesseRules, status: this.status, timeline: { version: 1, frames: timeline.frames }, events: timeline.events, placements: this.placements, practice: this.practice ? { name: this.practice.set.name, completed: this.practice.completed, kind: this.practice.set.kind, loop: this.practice.set.loop, total: this.practice.set.scenes.length, restarts: this.practice.restarts, finished: this.practice.finished, continueAfter: this.practice.set.continueAfter } : null, result: { timeMs: this.elapsedMs, sessionTimeMs: this.engine.frame * 1000 / 60, inputs: this.inputs, holds: this.holds, faults: this.faults, targetMisses: this.targetMisses, perfects: this.perfects, unverified: this.unverified, clears: this.clears, maxCombo: this.maxCombo, maxB2B: this.maxB2B, boardResets: this.boardResets, ...this.engine.stats } };
   }
 }

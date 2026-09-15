@@ -14,10 +14,12 @@ function groundedCells(board:Board) {
   return seen;
 }
 export function supportedSpinTerrain(board:Board){const grounded=groundedCells(board);return !board.some(row=>row.every(Boolean))&&board.reduce((count,row)=>count+row.filter(Boolean).length,0)===grounded.size;}
+export function spinTerrainHeight(board:Board){return board.reduce((top,row,y)=>row.some(Boolean)?y+1:top,0);}
 
 export function supportSpinTerrain(context:AnalysisContext,moves:Move[]) {
   const engine=createEngine(context.settings,1,context.rules);engine.fromSnapshot(context.snapshot);engine.misc.movement.infinite=true;
-  const board=context.snapshot.board,width=board[0].length,protectedCells=new Set<number>();
+  const board=context.snapshot.board,width=board[0].length,height=Math.min(context.rules.board.height-2,spinTerrainHeight(board)),protectedCells=new Set<number>();
+  if(spinTerrainHeight(board)>height)return false;
   const protect=()=>engine.falling.absoluteBlocks.forEach(([x,y])=>{if(y>=0&&y<board.length)protectedCells.add(y*width+x);});
   protect();
   for(const move of moves){
@@ -34,7 +36,7 @@ export function supportSpinTerrain(context:AnalysisContext,moves:Move[]) {
       pending.sort((a,b)=>distances.get(b)!-distances.get(a)!);const cell=pending.pop()!,x=cell%width,y=Math.floor(cell/width);
       if(grounded.has(cell)||y===0){endpoint=cell;break;}
       for(const [nx,ny] of [[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){
-        const key=ny*width+nx;if(nx<0||nx>=width||ny<0||ny>=board.length||protectedCells.has(key))continue;
+        const key=ny*width+nx;if(nx<0||nx>=width||ny<0||ny>=height||protectedCells.has(key))continue;
         const cost=distances.get(cell)!+Number(!board[ny][nx]);if(cost>=(distances.get(key)??Infinity))continue;
         distances.set(key,cost);parent.set(key,cell);pending.push(key);
       }

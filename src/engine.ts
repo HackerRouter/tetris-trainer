@@ -1,6 +1,7 @@
 import { Bag, Engine, Tetromino, type Mino, type EngineInitializeParams } from '@haelp/teto/engine';
 import type { Settings } from './settings';
 import { modeDefinitions, type ModeRules } from './modes';
+import { configureZenithEngine } from './qp-engine';
 
 export function createEngine(settings: Settings, seed: number, rules: ModeRules = modeDefinitions.sprint.rules(settings)): Engine {
   const a = rules.advanced;
@@ -22,6 +23,7 @@ export function createEngine(settings: Settings, seed: number, rules: ModeRules 
     misc: { allowed: { hardDrop: a.hardDrop, spin180: rules.allow180, hold: rules.hold, retry: false, undo: false }, infiniteHold: rules.infiniteHold, movement: { infinite: rules.infiniteLock, lockResets: rules.lockResets, lockTime: rules.infiniteLock ? Number.MAX_SAFE_INTEGER : rules.lockDelay, may20G: true }, stride: false }
   };
   const engine = new Engine(config);
+  if (rules.id === 'zenith') configureZenithEngine(engine, seed, settings.quickplay.profile.mods);
   if (a.sequence) {
     const sequence = [...a.sequence] as Mino[];
     if (a.repeatSequence) {

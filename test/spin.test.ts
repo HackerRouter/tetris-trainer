@@ -14,7 +14,7 @@ import { buildDemoFrames } from '../src/demo-frames';
 import { placementSteps } from '../src/guide';
 import roomCatalog from '../src/room-presets.json';
 import { randomSpinDrill } from '../src/spin-generator';
-import { supportedSpinTerrain } from '../src/spin-terrain';
+import { supportedSpinTerrain, spinTerrainHeight } from '../src/spin-terrain';
 import { SpinTracker } from '../src/spin-tracker';
 import { spinReplayScene, spinReplaySamples } from '../src/spin-replay';
 import { buildPlayback } from '../src/playback';
@@ -83,7 +83,7 @@ test('guided spin retries one piece and time, teaches the verified spin path and
 test('scene clustering separates mode, orientation and occupied terrain',()=>{const a=spinDrill(source(),'tsd').scene,b=structuredClone(a);assert.equal(spinCluster(a),spinCluster(b));b.context.rules.advanced.kickSet='SRS';assert.notEqual(spinCluster(a),spinCluster(b));b.context=structuredClone(a.context);b.context.snapshot.falling.rotation=1;assert.notEqual(spinCluster(a),spinCluster(b));});
 
 test('randomized drills vary position, height and terrain and preserve every selected spin class',()=>{
-  for(const {id} of spinDrills){const columns=new Set<number>(),boards=new Set<string>(),heights=new Set<number>();for(let seed=1;seed<=24;seed++){const {scene,witness}=randomSpinDrill(source(),id,seed);assert.ok(verifySpinRoute(spinRequest(scene.context,{filters:scene.filters}),witness));assert.ok(supportedSpinTerrain(scene.context.snapshot.board),id);columns.add(Math.min(...witness.steps[0].scene.target.map(([x])=>x)));heights.add(Math.min(...witness.steps[0].scene.target.map(([,y])=>y)));boards.add(JSON.stringify(scene.context.snapshot.board));}assert.ok(columns.size>=2,`${id}: ${columns.size} columns`);assert.ok(heights.size>=2,`${id}: ${heights.size} heights`);assert.ok(boards.size>=12,`${id}: ${boards.size} boards`);}
+  for(const {id} of spinDrills){const columns=new Set<number>(),boards=new Set<string>(),heights=new Set<number>();for(let seed=1;seed<=24;seed++){const {scene,witness}=randomSpinDrill(source(),id,seed);assert.ok(verifySpinRoute(spinRequest(scene.context,{filters:scene.filters}),witness));assert.ok(supportedSpinTerrain(scene.context.snapshot.board),id);assert.ok(spinTerrainHeight(scene.context.snapshot.board)<=scene.context.rules.board.height-2,`${id}/${seed}: terrain must leave spawn headroom`);columns.add(Math.min(...witness.steps[0].scene.target.map(([x])=>x)));heights.add(Math.min(...witness.steps[0].scene.target.map(([,y])=>y)));boards.add(JSON.stringify(scene.context.snapshot.board));}assert.ok(columns.size>=2,`${id}: ${columns.size} columns`);assert.ok(heights.size>=2,`${id}: ${heights.size} heights`);assert.ok(boards.size>=12,`${id}: ${boards.size} boards`);}
 });
 
 test('live spin evidence follows actual rotations and survives snapshot restoration without scoring geometry as a bonus',()=>{
@@ -100,7 +100,7 @@ test('replay review extracts a verified missed spin with only recorded visible N
 
 test('every catalog variant is grounded and preserves all TTT rotation chapters and scored line classes',()=>{
   for(const drill of spinDrills)for(let variant=0;variant<(drill.variants?.length??1);variant++){
-    const {scene,witness}=spinDrill(source(),drill.id,false,variant);assert.ok(supportedSpinTerrain(scene.context.snapshot.board),`${drill.id}/${variant}`);assert.ok(verifySpinRoute(spinRequest(scene.context,{filters:scene.filters}),witness),`${drill.id}/${variant}`);
+    const {scene,witness}=spinDrill(source(),drill.id,false,variant);assert.ok(supportedSpinTerrain(scene.context.snapshot.board),`${drill.id}/${variant}`);assert.ok(spinTerrainHeight(scene.context.snapshot.board)<=scene.context.rules.board.height-2,`${drill.id}/${variant}: spawn headroom`);assert.ok(verifySpinRoute(spinRequest(scene.context,{filters:scene.filters}),witness),`${drill.id}/${variant}`);
   }
   for(const piece of ['i','j','l','s','z'])for(const lines of [0,1,2,3])assert.ok(spinDrills.some(drill=>drill.piece===piece&&drill.variants?.some(variant=>variant.lines===lines&&variant.spin==='mini')),`${piece}/${lines}`);
   assert.ok(spinDrills.every(drill=>drill.piece!=='o'));

@@ -3,7 +3,7 @@ import type { TrainerGame } from './game';
 import { OpenersPage } from './openers-page';
 import { defaultDrillFilter, makeDrillSet, type DrillFilter } from './drills';
 import { faultGroups, focusedDrills, HistoryStore, type FaultGroup, type SessionRecord, type TrainerReplay } from './history';
-import { buildPlayback, type Playback } from './playback';
+import { buildPlayback, qpPlaybackScene, type Playback } from './playback';
 import { drawScene } from './renderer';
 import { drawNativePreview } from './ui-assets';
 import type { CustomRules, ModeRules } from './modes';
@@ -13,13 +13,18 @@ import { formatTime } from './time';
 import type { PracticeSet } from './practice';
 import { PcLab } from './pc-lab';
 import { SpinLab } from './spin-lab';
+import { QuickPlayPage } from './qp-page';
+import { RevivePage } from './revive-page';
+import { QpReplayView } from './qp-replay-view';
+import type { QpCheckpoint } from './qp-runtime';
+import type { QpSettings } from './qp-config';
 import { SpinDrillsPage } from './spin-drills-page';
 import { SpinReplayPanel } from './spin-replay';
 import { analysisContext, type AnalysisContext } from './analysis-context';
 import { createEngine } from './engine';
 import type { Mino } from '@haelp/teto/engine';
 
-type Callbacks = { game: () => TrainerGame; analysis: (context: AnalysisContext) => TrainerGame; freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
+type Callbacks = { quickplay: (active: boolean) => void; startQuickplay: (settings: QpSettings) => void; startRevive: (settings: QpSettings, scene?: QpCheckpoint) => TrainerGame; game: () => TrainerGame; analysis: (context: AnalysisContext) => TrainerGame; freeBuild: (seed: number, rules: CustomRules) => void; sound: (name: string) => void; rules: () => ModeRules; settings: () => Settings; current: () => TrainerReplay | null; pause: () => void; save: () => Promise<unknown>; practice: (set: PracticeSet) => void };
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id)! as T;
 const cell = (text: string | number) => { const td = document.createElement('td'); td.textContent = String(text); return td; };
 
@@ -27,6 +32,8 @@ export class Pages {
   readonly opening: OpeningTraining;
   readonly lab: PcLab;
   readonly spin: SpinLab;
+  readonly quickplay: QuickPlayPage;
+  readonly revive: RevivePage;
   private openersPage: OpenersPage;
   private sessions: SessionRecord[] = [];
   private groups: FaultGroup[] = [];
@@ -34,12 +41,16 @@ export class Pages {
   private tracks: ReplayTrack[] = [];
   private playback: Playback | null = null;
   private spinReplay: SpinReplayPanel;
+  private qpReplay: QpReplayView;
   private playing = false;
   private position = 0;
   private last = 0;
   private loading = 0;
   constructor(private history: HistoryStore, private callbacks: Callbacks) {
     this.drills(); this.statistics(); this.replays();
+    this.qpReplay = new QpReplayView();
+    this.quickplay = new QuickPlayPage({ game: callbacks.game, settings: callbacks.settings, enter: callbacks.quickplay, start: callbacks.startQuickplay });
+    this.revive = new RevivePage({ game: callbacks.game, start: callbacks.startRevive });
     this.opening = new OpeningTraining(callbacks);
     this.lab = new PcLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
     this.spin = new SpinLab({ game: callbacks.game, start: callbacks.analysis, clearOpening: () => this.opening.clear() });
@@ -60,6 +71,8 @@ export class Pages {
   }
   get page() { const page = location.hash.slice(1); return ['drills', 'spin-drills', 'openers', 'statistics', 'replays'].includes(page) ? page : 'play'; }
   private route() {
+    this.quickplay.setVisible(['#quickplay', '#revive'].includes(location.hash));
+    this.revive.setVisible(location.hash === '#revive');
     const hint = document.querySelector('.config-hint');
     if (hint) hint.textContent = this.page === 'replays' ? 'Drop a trainer JSON or TETR.IO replay here. TTC files still open the config importer.' : 'Drop a TETR.IO .ttc config anywhere on this page to import your settings.';
     for (const name of ['play', 'drills', 'spin-drills', 'openers', 'statistics', 'replays']) el(`${name}-page`).hidden = name !== this.page;
@@ -67,7 +80,7 @@ export class Pages {
     this.lab.setVisible(['#analysis', '#pc', '#combo'].includes(location.hash));
     this.spin.setVisible(location.hash === '#spin');
     document.querySelectorAll<HTMLAnchorElement>('.page-nav a').forEach(link => {
-      if (link.hash === (this.spin.active || this.page === 'spin-drills' ? '#spin' : this.lab.active ? location.hash === '#combo' ? '#combo' : '#pc' : `#${this.page}`)) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
+      if (link.hash === (this.revive.active ? '#revive' : this.quickplay.active ? '#quickplay' : this.spin.active || this.page === 'spin-drills' ? '#spin' : this.lab.active ? location.hash === '#combo' ? '#combo' : '#pc' : `#${this.page}`)) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
     });
     if (this.page !== 'play') { this.opening.suspend(); this.callbacks.pause(); void this.callbacks.save().catch(error => this.notice(error.message)); }
     if (this.page === 'openers') this.openersPage.refresh();
@@ -157,6 +170,12 @@ export class Pages {
     el('player-tetrion').append(tetrion);
     const analyze = document.createElement('button'); analyze.id = 'player-analyze'; analyze.className = 'secondary wide'; analyze.textContent = 'Analyze this frame for PC';
     el('player-info').parentElement!.before(analyze);
+    const revive = document.createElement('button'); revive.id = 'player-revive'; revive.className = 'secondary wide'; revive.textContent = 'Practice Revive from this frame'; revive.hidden = true; analyze.before(revive);
+    revive.onclick = () => {
+      if (!this.playback) return;
+      try { this.playing = false; this.revive.fromRecording(qpPlaybackScene(this.playback, this.position), `${this.playback.name} · ${(this.position).toFixed(2)} s`); }
+      catch (error) { this.replayStatus((error as Error).message); }
+    };
     analyze.addEventListener('click', () => {
       const playback = this.playback; if (!playback) return;
       try {
@@ -195,6 +214,9 @@ export class Pages {
       const playback = await buildPlayback(track, this.callbacks.settings(), text => { if (token !== this.loading) throw new Error('Playback loading canceled.'); this.replayStatus(text); });
       if (token !== this.loading) return;
       this.playback = playback; this.position = 0; this.effectTail = null;
+      el('player-revive').hidden = !playback.qpScenes?.length;
+      el('player-analyze').hidden = playback.rules.id === 'zenith';
+      el('player-spin').hidden = playback.rules.id === 'zenith';
       el('player-mode').textContent = playback.modeName;
       el('player-hold-panel').hidden = !playback.rules.hold; el('player-next-panel').hidden = !playback.rules.nextCount;
       el<HTMLCanvasElement>('player-next-preview').height = Math.max(1, playback.rules.nextCount) * 90;
@@ -211,8 +233,9 @@ export class Pages {
     } catch (error) { if (token === this.loading) this.replayStatus((error as Error).message); }
   }
   update(now: number) {
+    this.revive.update(now);
     this.spinReplay.update(this.playback, this.page === 'replays');
-    if (this.page === 'play') { if (this.spin.active) this.spin.update(); else if (this.lab.active) this.lab.update(); else this.opening.update(this.callbacks.game()); }
+    if (this.page === 'play') { if (this.quickplay.active) this.quickplay.update(); else if (this.spin.active) this.spin.update(); else if (this.lab.active) this.lab.update(); else this.opening.update(this.callbacks.game()); }
     if (this.page !== 'replays' || !this.playback) return;
     const before = this.position;
     if (this.playing) { this.position = Math.min(this.playback.duration, this.position + Math.min(200, now - this.last) / 1000 * Number(el<HTMLSelectElement>('player-speed').value)); if (this.position >= this.playback.duration) { this.playing = false; this.effectTail = now; } }
@@ -232,8 +255,9 @@ export class Pages {
     let lo = 0, hi = replay.frames.length - 1;
     while (lo < hi) { const mid = Math.ceil((lo + hi) / 2); if (replay.frames[mid].time <= this.position) lo = mid; else hi = mid - 1; }
     const frame = replay.frames[lo];
+    this.qpReplay.update(replay, frame);
     const visualTime = this.position + (this.effectTail === null ? 0 : Math.max(0, performance.now() - this.effectTail) / 1000);
-    drawScene(el<HTMLCanvasElement>('player-board'), el<HTMLCanvasElement>('player-hold-preview'), el<HTMLCanvasElement>('player-next-preview'), replay.engine, replay.rules, replay.settings.display, { ...frame, actions: frame.actionEffects.map(action => ({ action, age: (visualTime - action.frame / 60) * 1000 })) }, (visualTime - frame.effectTime) * 1000);
+    drawScene(el<HTMLCanvasElement>('player-board'), el<HTMLCanvasElement>('player-hold-preview'), el<HTMLCanvasElement>('player-next-preview'), replay.engine, replay.rules, replay.settings.display, { ...frame, visual: frame.qp?.visual, actions: frame.actionEffects.map(action => ({ action, age: (visualTime - action.frame / 60) * 1000 })) }, (visualTime - frame.effectTime) * 1000);
     drawNativePreview(el<HTMLCanvasElement>('player-hold-frame'), 'hold'); drawNativePreview(el<HTMLCanvasElement>('player-next-frame'), 'next');
     el('player-clock').textContent = formatTime(this.position * 1000);
     el('player-pieces').textContent = String(frame.pieces); el('player-lines').textContent = String(frame.lines);

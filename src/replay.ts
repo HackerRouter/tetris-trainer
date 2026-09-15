@@ -15,7 +15,7 @@ const keys = new Set(['moveLeft', 'moveRight', 'rotateCW', 'rotateCCW', 'rotate1
 
 export function readReplay(value: unknown, name: string): ReplayTrack[] {
   const root = object(value);
-  if (root.version === 1 && ['40l-finesse', 'fault-practice', 'custom'].includes(root.mode) && Array.isArray(root.placements)) return [{ name, kind: 'trainer', data: root }];
+  if (root.version === 1 && ['40l-finesse', 'fault-practice', 'custom', 'zenith'].includes(root.mode) && Array.isArray(root.placements)) return [{ name, kind: 'trainer', data: root }];
   const tracks: ReplayTrack[] = [];
   function visit(value: unknown, label: string, depth = 0) {
     if (depth > 8 || tracks.length > 500) throw new Error('Replay contains too many nested rounds.');
@@ -90,6 +90,7 @@ function sceneFrom(snapshotValue: unknown, targetValue: unknown, settings: Setti
 
 function trainerScenes(track: ReplayTrack, settings: Settings): PracticeSet {
   const replay = track.data;
+  if (replay.mode === 'zenith') throw new Error('Quick Play has no finesse faults. Open this recording in the replay player or import its pressure into Quick Play.');
   const allow180 = replay.modeRules?.allow180 !== false;
   const customRules = replay.mode === 'custom' || replay.modeRules?.id === 'custom' ? validateCustomRules(replay.settings?.custom) : undefined;
   const rules = modeDefinitions[customRules ? 'custom' : 'sprint'].rules({ ...settings, custom: customRules ?? settings.custom });

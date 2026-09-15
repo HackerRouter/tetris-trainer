@@ -1,6 +1,12 @@
 import './style.css';
 import './workspace.css';
+import './qp.css';
 import { TrainerGame } from './game';
+import { QuickPlayClock } from './qp-clock';
+import { QpBotPool } from './qp-bot-controller';
+import { loadRevivePreferences } from './revive-practice';
+import type { QpCheckpoint } from './qp-runtime';
+import './revive.css';
 import { drawGame } from './renderer';
 import { SettingsPanel } from './settings-panel';
 import { actions, bindingCodes, bindingLabel, downloadJson, loadSettings, storageKey, type Action } from './settings';
@@ -30,6 +36,26 @@ let selectedMode: ModeId = localStorage.getItem('tetrio-trainer-mode') === 'cust
 let modePending = false;
 let game = new TrainerGame(settings, undefined, undefined, selectedMode);
 let analysisRules = game.rules;
+let qpSession: TrainerGame | null = null;
+let reviveSession: TrainerGame | null = null;
+let qpRoute: string | null = null;
+let previousSession: TrainerGame | null = null;
+const qpClock = new QuickPlayClock();
+const qpBots = new QpBotPool();
+function quickplayPage(active: boolean) {
+  const destination = active ? location.hash : null;
+  if (destination === qpRoute) return;
+  game.pause(); saveReplay(); pressed.clear(); accumulator = 0;
+  if (qpRoute === '#quickplay') qpSession = game;
+  if (qpRoute === '#revive') reviveSession = game;
+  if (active) {
+    if (!qpRoute) previousSession = game;
+    game = destination === '#revive' ? reviveSession ?? new TrainerGame({ ...settings, quickplay: loadRevivePreferences(localStorage) }, undefined, undefined, 'zenith') : qpSession ?? new TrainerGame(settings, undefined, undefined, 'zenith');
+  } else if (previousSession) { game = previousSession; previousSession = null; }
+  qpRoute = destination;
+  game.fault = null; game.demonstration = null;
+}
+
 let freeSession: { seed: number; rules: CustomRules } | undefined;
 const sound = new SoundPlayer(settings.audio);
 const history = new HistoryStore();
@@ -67,7 +93,7 @@ const panel = new SettingsPanel(next => {
   if (game.practice?.set.kind === 'opener' || game.rules.id === 'sprint') { game.rules.undo = next.training.undoEnabled; game.settings.training.undoEnabled = next.training.undoEnabled; }
   sound.configure(settings.audio);
   message.textContent = 'Settings saved. Start a new game to apply them.';
-  if (game.status === 'ready') game = new TrainerGame(settings, game.seed, undefined, selectedMode);
+  if (game.status === 'ready') game = new TrainerGame(settings, game.seed, undefined, game.rules.id === 'zenith' ? 'zenith' : selectedMode);
 }, () => {
   sound.configure(settings.audio);
   last = performance.now(); accumulator = 0;
@@ -112,6 +138,7 @@ element('clear-field').addEventListener('click', () => {
 });
 element('finish-session').addEventListener('click', () => { game.finish(); pressed.clear(); element('finish-session').blur(); });
 element('finesse-toggle').addEventListener('change', () => {
+  if (game.qp) return;
   const enabled = element<HTMLInputElement>('finesse-toggle').checked;
   game.setFinesseEnabled(enabled); pages.opening.finesse(enabled); if (freeSession) freeSession.rules.finesse = enabled; pressed.clear();
   if (!pages.opening.active) {
@@ -125,6 +152,7 @@ element('finesse-toggle').addEventListener('change', () => {
 });
 element<HTMLInputElement>('think-toggle').checked = settings.training.justThink;
 function changeThinking() {
+  if (game.qp) return;
   const enabled = element<HTMLInputElement>('think-toggle').checked, style = settings.training.thinkStyle;
   game.setJustThink(enabled, style); pressed.clear(); accumulator = 0;
   settings.training.justThink = enabled; settings.training.thinkStyle = style;
@@ -183,17 +211,20 @@ async function saveHistory() {
   catch (error) { message.textContent = (error as Error).message; }
 }
 
-function start(practice?: PracticeSet, session?: { seed: number; rules: CustomRules }, sourceSettings = settings) {
+function start(practice?: PracticeSet, session?: { seed: number; rules: CustomRules }, sourceSettings = location.hash === '#revive' ? { ...settings, quickplay: loadRevivePreferences(localStorage) } : settings, reviveScene?: QpCheckpoint) {
   if (panel.open || customPanel.open) return;
   const heldCodes = [...pressed.keys()];
   saveReplay();
   if (practice || modePending) freeSession = undefined;
   if (session) freeSession = session;
   if (modePending) element('opener-references').hidden = true;
-  game = new TrainerGame(freeSession ? { ...sourceSettings, custom: freeSession.rules } : sourceSettings, freeSession?.seed, practice, freeSession ? 'custom' : selectedMode);
-  if (freeSession) game.rules.name = 'OPENER FREE BUILD';
+  const qp = ['#quickplay', '#revive'].includes(location.hash) && !practice;
+  game = new TrainerGame(!qp && freeSession ? { ...sourceSettings, custom: freeSession.rules } : sourceSettings, qp ? reviveScene?.seed : freeSession?.seed, practice, qp ? 'zenith' : freeSession ? 'custom' : selectedMode);
+  if (reviveScene) game.initializeReviveScene(reviveScene);
+  if (qp) { if (location.hash === '#revive') reviveSession = game; else qpSession = game; }
+  if (freeSession && !qp) game.rules.name = 'OPENER FREE BUILD';
   if (!practice) analysisRules = game.rules;
-  game.start(); sound.sync(game);
+  game.start(); qpClock.start(game, performance.now()); sound.sync(game);
   modePending = false;
   accumulator = 0; last = performance.now(); pressed.clear(); saved = false;
   historyPlacements = 0;
@@ -201,11 +232,12 @@ function start(practice?: PracticeSet, session?: { seed: number; rules: CustomRu
     const action = (['moveLeft', 'moveRight'] as const).find(action => bindingCodes(game.settings, action).includes(code));
     if (action) { pressed.set(code, action); game.input.press(action); }
   }
-  message.textContent = practice ? `Match every outlined target${game.rules.finesse ? ' with perfect finesse' : ''}.` : game.rules.id === 'custom' ? 'Custom session started. Use Clear board to reset the field, or Finish session to save a result.' : 'Clear 40 lines. Fault retries also restore the timer.';
+  message.textContent = qp ? 'Climb, cancel incoming attacks and complete revive tasks. All accepted inputs advance the run.' : practice ? `Match every outlined target${game.rules.finesse ? ' with perfect finesse' : ''}.` : game.rules.id === 'custom' ? 'Custom session started. Use Clear board to reset the field, or Finish session to save a result.' : 'Clear 40 lines. Fault retries also restore the timer.';
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
 
 function pause() {
+  if (game.qp) return;
   const before = game.status;
   if (game.active) { game.pause(); pressed.clear(); }
   else if (game.status === 'paused') game.resume();
@@ -217,13 +249,13 @@ function pause() {
 function beginCurrentGame() {
   if (game.status !== 'ready' || panel.open || customPanel.open || importing) return;
   modePending = false;
-  game.start(); sound.sync(game); analysisRules = game.rules;
+  game.start(); qpClock.start(game, performance.now()); sound.sync(game); analysisRules = game.rules;
   accumulator = 0; last = performance.now(); saved = false; historyPlacements = 0;
   for (const action of pressed.values()) if (action === 'moveLeft' || action === 'moveRight') game.input.press(action);
   message.textContent = 'Game started with the current seed and queue.';
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
 }
-function restartGame() { if (game.status === 'ready') { beginCurrentGame(); return; } if (pages.spin.active) { pages.spin.clear(); pages.lab.clear(); pages.opening.clear(); freeSession=undefined; start(); return; } if (!modePending && pages.lab.restart()) return; if (!modePending && pages.opening.restart()) return; pages.lab.clear(); pages.spin.clear(); pages.opening.clear(); start(modePending ? undefined : game.practice?.set); }
+function restartGame() { if (game.qp) { if (game.status === 'ready') beginCurrentGame(); else start(); return; } if (game.status === 'ready') { beginCurrentGame(); return; } if (pages.spin.active) { pages.spin.clear(); pages.lab.clear(); pages.opening.clear(); freeSession=undefined; start(); return; } if (!modePending && pages.lab.restart()) return; if (!modePending && pages.opening.restart()) return; pages.lab.clear(); pages.spin.clear(); pages.opening.clear(); start(modePending ? undefined : game.practice?.set); }
 element('start').addEventListener('click', restartGame);
 element('pause').addEventListener('click', pause);
 canvas.addEventListener('click', event => {
@@ -310,7 +342,7 @@ function editable(target: EventTarget | null) {
 document.addEventListener('keydown', event => {
   if (pages.page !== 'play') return;
   if (panel.open || customPanel.open || toolsDialog.open || editable(event.target) || event.isComposing) return;
-  if ((event.ctrlKey || event.metaKey) && ['KeyZ', 'KeyY'].includes(event.code)) { event.preventDefault(); if (!event.repeat) { if (event.code === 'KeyY' || event.shiftKey) redo(); else undo(); } return; }
+  if ((event.ctrlKey || event.metaKey) && ['KeyZ', 'KeyY'].includes(event.code)) { event.preventDefault(); if (game.qp) return; if (!event.repeat) { if (event.code === 'KeyY' || event.shiftKey) redo(); else undo(); } return; }
   const action = (Object.keys(actions) as Action[]).find(key => bindingCodes(game.settings, key).includes(event.code));
   if (!action) return;
   event.preventDefault();
@@ -332,8 +364,9 @@ addEventListener('pagehide', saveReplay);
 function refresh() {
   const engine = game.engine;
   const tetrion = document.querySelector<HTMLElement>('.tetrion')!;
-  tetrion.style.gridTemplateColumns = `minmax(0,5fr) minmax(0,${engine.board.width}fr) minmax(0,5fr)`;
-  tetrion.style.setProperty('--tetrion-columns', String(engine.board.width + 10));
+  const previewColumns = game.qp ? 4 : 5;
+  tetrion.style.gridTemplateColumns = `minmax(0,${game.qp ? 5 : previewColumns}fr) minmax(0,${engine.board.width}fr) minmax(0,${previewColumns}fr)`;
+  tetrion.style.setProperty('--tetrion-columns', String(engine.board.width + 2 * previewColumns + Number(!!game.qp)));
   tetrion.style.setProperty('--board-rows', String(engine.board.height + 3));
   const goals = game.rules.goals, custom = game.rules.id === 'custom' && !game.practice;
   element<HTMLInputElement>('finesse-toggle').checked = game.rules.finesse;
@@ -378,7 +411,8 @@ function refresh() {
   element<HTMLButtonElement>('pause').disabled = !game.active && game.status !== 'paused';
   element('pause').textContent = game.status === 'paused' ? 'Resume' : 'Pause';
   element('start').textContent = modePending ? 'Start selected mode' : game.startedAt ? 'Restart game' : 'Start game';
-  element<HTMLButtonElement>('download').disabled = !game.startedAt;
+  element<HTMLButtonElement>('download').disabled = !game.startedAt || (game.qp?.sides.length ?? 0) > 1;
+  element<HTMLButtonElement>('download-native').disabled = exporting || !!game.qp;
   element<HTMLButtonElement>('undo').disabled = !game.canUndo;
   element<HTMLButtonElement>('redo').disabled = !game.canRedo;
   element<HTMLButtonElement>('practice-last').disabled = importing || !(lastReplay || (!game.practice && game.placements.length));
@@ -390,8 +424,9 @@ function refresh() {
   canvas.style.cursor = game.status === 'paused' || game.status === 'ready' ? 'pointer' : '';
   canvas.title = game.status === 'paused' ? 'Click to resume' : game.status === 'ready' ? 'Click to start with the current seed' : '';
   element('overlay-label').textContent = game.status === 'countdown' ? 'GET READY' : game.status.toUpperCase();
-  element('overlay-value').textContent = game.status === 'countdown' ? String(Math.ceil(game.countdownFrames / 60)) : game.status === 'ready' ? 'Start a game' : game.status === 'paused' ? 'Paused' : game.status === 'complete' ? (game.practice ? 'Practice complete' : custom ? 'Session complete' : '40 lines complete') : game.status === 'topout' ? 'Game over' : '';
-  element('controls-summary').textContent = `Move: ${bindingLabel(game.settings, 'moveLeft')} / ${bindingLabel(game.settings, 'moveRight')} · ${game.rules.advanced.hardDrop ? `Hard drop: ${bindingLabel(game.settings, 'hardDrop')}` : `Soft drop: ${bindingLabel(game.settings, 'softDrop')} (automatic lock)`}${game.rules.hold ? ` · Hold: ${bindingLabel(game.settings, 'hold')}` : ''} · Pause: ${bindingLabel(game.settings, 'pause')}`;
+  element('overlay-value').textContent = game.status === 'countdown' ? String(Math.ceil(game.countdownFrames / 60)) : game.status === 'ready' ? 'Start a game' : game.status === 'paused' ? 'Paused' : game.status === 'complete' ? (game.qp ? 'Run stopped' : game.practice ? 'Practice complete' : custom ? 'Session complete' : '40 lines complete') : game.status === 'topout' ? 'Game over' : '';
+  if (game.qp && game.status === 'playing' && game.qp.sides[0].life !== 'alive') { element('overlay-label').textContent = 'DUO'; element('overlay-value').textContent = game.qp.sides[0].life === 'reviving' ? 'Reviving?' : 'Awaiting rescue'; }
+  element('controls-summary').textContent = `Move: ${bindingLabel(game.settings, 'moveLeft')} / ${bindingLabel(game.settings, 'moveRight')} · ${game.rules.advanced.hardDrop ? `Hard drop: ${bindingLabel(game.settings, 'hardDrop')}` : `Soft drop: ${bindingLabel(game.settings, 'softDrop')} (automatic lock)`}${game.rules.hold ? ` · Hold: ${bindingLabel(game.settings, 'hold')}` : ''}${game.qp ? ' · Live session · No pause or rewind' : ` · Pause: ${bindingLabel(game.settings, 'pause')}`}`;
   element('coach').hidden = !game.fault || game.hideAnalysisTarget;
   if (game.fault) {
     const path = placementSteps(game.fault.path, game.settings).map(step => step.text);
@@ -408,21 +443,30 @@ function refresh() {
 }
 
 function animate(now: number) {
-  if (game.active) {
+  advanceQuickplay(now);
+  if (game.active && !game.qp) {
     accumulator += Math.min(100, now - last);
     while (accumulator >= 1000 / 60 && game.active) { game.step(); sound.sync(game); accumulator -= 1000 / 60; }
   } else accumulator = 0;
   last = now;
   if (['complete', 'topout'].includes(game.status) && !saved) {
-    saved = true; message.textContent = game.status === 'complete' ? (game.practice ? 'All fault scenes complete.' : game.rules.id === 'custom' ? 'Session complete. Your replay has been saved.' : '40 lines complete. Your replay has been saved.') : 'Game over. Your replay has been saved.'; saveReplay();
+    saved = true; message.textContent = game.status === 'complete' ? (game.qp ? 'Run stopped' : game.practice ? 'All fault scenes complete.' : game.rules.id === 'custom' ? 'Session complete. Your replay has been saved.' : '40 lines complete. Your replay has been saved.') : 'Game over. Your replay has been saved.'; saveReplay();
   }
   if (game.placements.length !== historyPlacements && now - lastHistorySave > 5000) {
     historyPlacements = game.placements.length; lastHistorySave = now; void saveHistory();
   }
-  refresh(); demo.update(now, game); if (pages.lab.active || pages.spin.active) element('practice-guide').hidden = true; else practiceGuide.update(game); pages.update(now); requestAnimationFrame(animate);
+  refresh(); demo.update(now, game); if (pages.lab.active || pages.spin.active || pages.quickplay.active) element('practice-guide').hidden = true; else practiceGuide.update(game); pages.update(now); requestAnimationFrame(animate);
 }
 
-const pages = new Pages(history, { game: () => game, analysis: context => { start(undefined, { seed: 1, rules: customRulesFromMode(context.rules) }, context.settings); game.rules.name = 'PERFECT CLEAR LAB'; game.loadAnalysis(context.snapshot); game.setJustThink(true, 'piece'); return game; }, freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });
+function advanceQuickplay(now: number) {
+  qpBots.update([game.qp, qpSession?.qp, reviveSession?.qp]);
+  if (game.qp) qpClock.advance(game, now, document.hidden ? undefined : () => sound.sync(game));
+  if (qpSession && qpSession !== game) qpClock.advance(qpSession, now);
+  if (reviveSession && reviveSession !== game) qpClock.advance(reviveSession, now);
+}
+setInterval(() => { if (document.hidden) advanceQuickplay(performance.now()); }, 100);
+
+const pages = new Pages(history, { quickplay: quickplayPage, startQuickplay: config => { settings.quickplay = structuredClone(config); localStorage.setItem(storageKey, JSON.stringify(settings)); start(); }, startRevive: (config, scene) => { start(undefined, undefined, scene ? scene.settings : { ...settings, quickplay: config }, scene); return game; }, game: () => game, analysis: context => { start(undefined, { seed: 1, rules: customRulesFromMode(context.rules) }, context.settings); game.rules.name = 'PERFECT CLEAR LAB'; game.loadAnalysis(context.snapshot); game.setJustThink(true, 'piece'); return game; }, freeBuild: (seed, rules) => { selectedMode = 'custom'; element<HTMLSelectElement>('mode-select').value = 'custom'; start(undefined, { seed, rules }); }, sound: name => sound.play(name), rules: () => modePending ? modeDefinitions[selectedMode].rules(settings) : analysisRules, settings: () => settings, current: () => game.startedAt ? game.export() : null, pause: () => { game.pause(); pressed.clear(); accumulator = 0; }, save: saveHistory, practice: set => start(set) });
 window.addEventListener('pagehide', () => { saveReplay(); });
 if (loaded.message) message.textContent = loaded.message;
 requestAnimationFrame(animate);

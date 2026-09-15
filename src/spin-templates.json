@@ -595,30 +595,6 @@
         "spin": "mini",
         "lines": 0,
         "orientation": 3
-      },
-      {
-        "piece": "j",
-        "rows": [
-          "XXX___XXXX",
-          "______XXXX",
-          "_XX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX"
-        ],
-        "moves": [
-          "rotate180",
-          "softDrop",
-          "moveLeft",
-          "moveLeft",
-          "rotate180"
-        ],
-        "spin": "mini",
-        "lines": 0,
-        "orientation": 0
       }
     ]
   },
@@ -823,29 +799,6 @@
         "spin": "mini",
         "lines": 1,
         "orientation": 3
-      },
-      {
-        "piece": "l",
-        "rows": [
-          "_XXXXXXXXX",
-          "______XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX",
-          "XXX___XXXX"
-        ],
-        "moves": [
-          "softDrop",
-          "moveLeft",
-          "moveLeft",
-          "rotate180"
-        ],
-        "spin": "mini",
-        "lines": 1,
-        "orientation": 2
       },
       {
         "piece": "l",

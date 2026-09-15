@@ -1,0 +1,61 @@
+import { test, expect } from '@playwright/test';
+import { defaults } from '../../src/settings';
+import { TrainerGame } from '../../src/game';
+
+test('Revive page searches multiple timed routes, demonstrates a copy and records any legal completion without pausing', async ({ page }) => {
+  const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game;' }); });
+  await page.addInitScript(settings => localStorage.setItem('tetrio-trainer-settings-v1', JSON.stringify(settings)), { ...defaults, training: { ...defaults.training, countdownSeconds: 0 } });
+  await page.setViewportSize({ width: 2048, height: 1280 }); await page.goto('/#revive');
+  await expect(page.locator('.page-nav a[href="#revive"]')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('#qp-options')).toBeHidden(); await expect(page.locator('#revive-options')).toBeVisible();
+  await page.click('#revive-form button[type="submit"]'); await expect(page.locator('#qp-task-title')).toHaveText('Your revive tasks', { timeout: 5000 });
+  await expect(page.locator('#revive-depth')).toHaveCount(0); await expect(page.locator('#revive-information')).toHaveCount(0);
+  await expect(page.locator('#revive-search-status')).toContainText('Completion route found');
+  expect(await page.locator('.revive-route').count()).toBeGreaterThan(1); await expect(page.locator('#revive-steps')).toContainText('Release');
+  await page.locator('#revive-options details').first().evaluate(node => (node as HTMLDetailsElement).open = true); await page.click('#revive-save');
+  const originalSource = await page.locator('#revive-scope').textContent(); await page.keyboard.press('ArrowDown'); await page.waitForTimeout(450); await expect(page.locator('#revive-scope')).toHaveText(originalSource!);
+  await expect(page.locator('#revive-coach-steps')).toContainText('20'); await expect(page.locator('#revive-next-step')).not.toContainText('Hard drop');
+  await page.click('#revive-demo'); const before = await page.evaluate(() => { const g = (window as any).__qpGame(); return { frame: g.qp.frame, inputs: g.inputs }; });
+  await page.waitForTimeout(250); expect(await page.evaluate(() => (window as any).__qpGame().qp.frame)).toBeGreaterThan(before.frame + 5);
+  expect(await page.evaluate(() => (window as any).__qpGame().inputs)).toBe(before.inputs);
+  await page.screenshot({ path: 'TEMP/Q1-revive-browser.png', fullPage: true });
+  for (let i = 0; i < 20; i++) { await page.keyboard.press('ArrowUp', { delay: 20 }); await page.waitForTimeout(20); }
+  await expect.poll(() => page.evaluate(() => (window as any).__qpGame().qp.sides[0].revives)).toBe(1);
+  await expect(page.locator('#revive-detail')).toBeHidden(); await expect(page.locator('#revive-stats')).toContainText('1 completed');
+  await page.click('#revive-open'); await expect(page.locator('#revive-status')).toHaveText('New run started from the saved situation.');
+  expect(await page.evaluate(() => (window as any).__qpGame().qp.sides[0].task.prompts[0].count)).toBe(0);
+  const labFrame = await page.evaluate(() => (window as any).__qpGame().qp.frame);
+  await page.locator('a[href="#quickplay"]').click(); await expect(page.locator('#qp-options')).toBeVisible(); await expect(page.locator('#revive-options')).toBeHidden();
+  await expect(page.locator('#qp-party')).toHaveValue('solo'); await page.waitForTimeout(200);
+  await page.locator('a[href="#revive"]').click(); await expect(page.locator('#revive-options')).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (window as any).__qpGame().qp.frame)).toBeGreaterThan(labFrame + 5);
+  await expect(page.locator('#pause')).toBeHidden(); await expect(page.locator('#think-toggle')).toBeHidden(); await expect(page.locator('#undo')).toBeHidden();
+  await page.click('#revive-stop'); await expect(page.locator('#overlay-value')).toHaveText('Run stopped');
+  expect(errors).toEqual([]);
+});
+
+test('Solo QP replay displays its garbage meter, native previews and altitude and opens a fresh Revive situation', async ({ page }) => {
+  const settings = structuredClone(defaults); settings.training.countdownSeconds = 0;
+  settings.quickplay.pressure = { mode: 'replay', strength: 1, burstiness: 0, tape: { version: 1, name: 'Burst', ruleRevision: 'tetrio-v19-20260714', frames: 500, mods: [], unknown: [], packets: [{ frame: 0, amount: 12, stage: 'after-receiver', source: 1, sourceAltitude: 0 }] } };
+  const game = new TrainerGame(settings, 1234, undefined, 'zenith'); game.start();
+  for (let frame = 0; frame < 500; frame++) game.step();
+  const replay = game.export(), errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/src/main.ts', async route => { const response = await route.fetch(); await route.fulfill({ response, body: await response.text() + '\nwindow.__qpGame = () => game;' }); });
+  await page.setViewportSize({ width: 2048, height: 1280 }); await page.goto('/#replays');
+  await page.setInputFiles('#player-file', { name: 'solo-qp.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(replay)) });
+  await expect(page.locator('#player-status')).toHaveText('Ready.');
+  await page.locator('#player-seek').evaluate((input: HTMLInputElement) => { input.value = '4'; input.dispatchEvent(new Event('input')); });
+  await expect(page.locator('#player-qp-height')).toContainText('CLIMB SPEED');
+  await expect(page.locator('#player-tetrion .qp-garbage-meter')).toHaveAttribute('aria-label', /queued/);
+  await expect(page.locator('#player-tetrion .qp-garbage-segment')).not.toHaveCount(0);
+  await expect(page.locator('#player-hold-panel')).toHaveClass(/native-frame/); await expect(page.locator('#player-qp-partner')).toBeHidden();
+  const boxes = await page.evaluate(() => { const stats = document.querySelector('#player-clock')!.getBoundingClientRect(), meter = document.querySelector('#player-tetrion .qp-garbage-meter')!.getBoundingClientRect(); return { stats: stats.right, meter: meter.left }; });
+  expect(boxes.stats).toBeLessThan(boxes.meter);
+  await page.screenshot({ path: 'TEMP/Q1-solo-replay-browser.png', fullPage: true });
+  await page.click('#player-revive'); await expect(page).toHaveURL(/#revive$/); await expect(page.locator('#revive-status')).toContainText('Recording situation loaded');
+  expect(await page.evaluate(() => (window as any).__qpGame().qp.sides.length)).toBe(2);
+  await expect(page.locator('#qp-task-title')).toHaveText('Your revive tasks', { timeout: 5000 });
+  const loaded = await page.evaluate(() => (window as any).__qpGame().qp.sides[0].garbage);
+  expect(loaded.pending.length).toBeGreaterThan(0); expect(errors).toEqual([]);
+});
